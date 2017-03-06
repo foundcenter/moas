@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  db:
+    image: mongo
+    volumes:
+      - mongodb:/data/db
+
+  web:
+    build: ./backend/
+    ports:
+      - "8080:8081"
+    links:
+      - db:db
+    volumes:
+      - ./backend:/go/src/app
+
+volumes:
+  mongodb:
