@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"github.com/foundcenter/moas/backend/services/auth"
 	"github.com/foundcenter/moas/backend/controllers/response"
-	"reflect"
 )
 
 type loginRequest struct {
@@ -36,8 +35,10 @@ func handleAuthMock(w http.ResponseWriter, r *http.Request) {
 
 	err, user := auth.Login(l.Email, l.Password)
 
-	if err.Error() == auth.BadCredentials {
-		//create error struct
+	if err != nil {
+		// later use switch
+		// if there are more reasons
+		// err.Error() == auth.BadCredentials
 		response.Reply(w).Unauthorized()
 		return
 	}
