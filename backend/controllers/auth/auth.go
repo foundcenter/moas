@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"github.com/foundcenter/moas/backend/services/auth"
 	"github.com/foundcenter/moas/backend/controllers/response"
+	"github.com/foundcenter/moas/backend/repo"
 )
 
 type loginRequest struct {
@@ -17,15 +18,12 @@ type loginRequest struct {
 
 func Load(router *httprouter.Router) {
 	router.Handler("GET", "/auth", alice.New(logger.Handler).ThenFunc(handleAuth))
-	router.Handler("POST", "/auth/login", alice.New(logger.Handler).ThenFunc(handleAuthMock))
+	router.Handler("POST", "/auth/login", alice.New(logger.Handler).ThenFunc(handleAuth))
+	router.Handler("POST", "/auth/login/mock", alice.New(logger.Handler).ThenFunc(handleAuthMock))
+	router.Handler("GET", "/user/test", alice.New(logger.Handler).ThenFunc(insertDummyUser))
 }
 
 func handleAuth(w http.ResponseWriter, r *http.Request) {
-	res := map[string]interface{}{"data": map[string]interface{}{"age": 1, "johnson": "peanuts"}}
-	json.NewEncoder(w).Encode(res)
-}
-
-func handleAuthMock(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var l loginRequest
 	err := decoder.Decode(&l)
@@ -40,6 +38,45 @@ func handleAuthMock(w http.ResponseWriter, r *http.Request) {
 		// if there are more reasons
 		// err.Error() == auth.BadCredentials
 		response.Reply(w).Unauthorized()
+		return
+	}
+
+	//issue jwt
+
+	response.Reply(w).Ok(user)
+}
+
+func handleAuthMock(w http.ResponseWriter, r *http.Request) {
+	decoder := json.NewDecoder(r.Body)
+	var l loginRequest
+	err := decoder.Decode(&l)
+	if err != nil {
+		panic(err)
+	}
+
+	err, user := auth.LoginMock(l.Email, l.Password)
+
+	if err != nil {
+		// later use switch
+		// if there are more reasons
+		// err.Error() == auth.BadCredentials
+		response.Reply(w).Unauthorized()
+		return
+	}
+
+	//issue jwt
+
+	response.Reply(w).Ok(user)
+}
+
+func insertDummyUser(w http.ResponseWriter, r *http.Request)  {
+	db := repo.New()
+	defer db.Destroy()
+
+	err, user := db.UserRepo.Insert()
+
+	if err != nil {
+		response.Reply(w).BadRequest()
 		return
 	}
 

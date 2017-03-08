@@ -18,6 +18,11 @@ func Reply(w http.ResponseWriter) *Response {
 	return &Response{writer: w}
 }
 
+func (r *Response) BadRequest() {
+	err := &Error{"Bad request", http.StatusBadRequest}
+	gores.JSON(r.writer, err.Status, map[string]interface{}{"error": err})
+}
+
 func (r *Response) Unauthorized() {
 	err := &Error{"Bad credentials", http.StatusUnauthorized}
 	gores.JSON(r.writer, err.Status, map[string]interface{}{"error": err})
