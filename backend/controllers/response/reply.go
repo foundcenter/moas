@@ -1,0 +1,29 @@
+package response
+
+import (
+	"net/http"
+	"github.com/alioygur/gores"
+	"reflect"
+)
+
+type Response struct {
+	writer http.ResponseWriter
+}
+
+type ResponseMeta struct {
+	Type string `json:"type"`
+}
+
+func Reply(w http.ResponseWriter) *Response {
+	return &Response{writer: w}
+}
+
+func (r *Response) Unauthorized() {
+	err := &Error{"Bad credentials", http.StatusUnauthorized}
+	gores.JSON(r.writer, err.Status, map[string]interface{}{"error": err})
+}
+
+func (r *Response) Ok(data interface{}) {
+	meta := &ResponseMeta{Type: reflect.TypeOf(data).Name()}
+	gores.JSON(r.writer, http.StatusOK, map[string]interface{}{"data": data, "meta": meta})
+}

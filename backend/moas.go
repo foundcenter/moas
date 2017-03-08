@@ -4,17 +4,11 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
-	"io"
+	"github.com/foundcenter/moas/backend/controllers"
 )
 
 func main() {
 	router := httprouter.New()
-	router.GET("/", hello)
-
+	controllers.Load(router)
 	log.Fatal(http.ListenAndServe(":8081", router))
-
-}
-
-func hello (w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	io.WriteString(w, "Hello world!")
 }
