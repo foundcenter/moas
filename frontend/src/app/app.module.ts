@@ -12,6 +12,7 @@ import { PageNotFoundComponent } from './components/page-not-found/page-not-foun
 import { HomeComponent } from './components/home/home.component';
 import { LoginComponent } from './components/login/login.component';
 import { Ng2UiAuthModule } from "ng2-ui-auth/commonjs/ng2-ui-auth.module";
+import { LogoutComponent } from './components/logout/logout.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { Ng2UiAuthModule } from "ng2-ui-auth/commonjs/ng2-ui-auth.module";
     NavbarComponent,
     PageNotFoundComponent,
     HomeComponent,
-    LoginComponent
+    LoginComponent,
+    LogoutComponent
   ],
   imports: [
     BrowserModule,
