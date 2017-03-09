@@ -7,6 +7,7 @@ import (
 	"github.com/foundcenter/moas/backend/controllers"
 	"gopkg.in/mgo.v2"
 	"github.com/foundcenter/moas/backend/repo"
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -14,7 +15,8 @@ func main() {
 
 	router := httprouter.New()
 	controllers.Load(router)
-	log.Fatal(http.ListenAndServe(":8081", router))
+	handler := cors.Default().Handler(router)
+	log.Fatal(http.ListenAndServe(":8081", handler))
 }
 
 func initDatabase() {
