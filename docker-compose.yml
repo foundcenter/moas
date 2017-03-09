@@ -5,6 +5,8 @@ services:
     image: mongo
     volumes:
       - mongodb:/data/db
+    ports:
+      - "27017:27017"
 
   web:
     build: ./backend/
