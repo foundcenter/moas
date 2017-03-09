@@ -23,11 +23,11 @@ func Login(email string, password string) (error, models.User) {
 	return nil, user
 }
 
-func LoginMock(email string, password string) (error, models.User) {
-	if email != "moas@foundcenter.com" || password != "moas123" {
-		return errors.New(BadCredentials), models.User{}
-	}
-
-	return nil, models.User{Email: "moas@foundcenter.com", Id: "1"}
-}
+//func LoginMock(email string, password string) (error, models.User) {
+//	if email != "moas@foundcenter.com" || password != "moas123" {
+//		return errors.New(BadCredentials), models.User{}
+//	}
+//
+//	return nil, models.User{Email: "moas@foundcenter.com", Id: "1"}
+//}
 

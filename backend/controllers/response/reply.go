@@ -32,3 +32,8 @@ func (r *Response) Ok(data interface{}) {
 	meta := &ResponseMeta{Type: reflect.TypeOf(data).Name()}
 	gores.JSON(r.writer, http.StatusOK, map[string]interface{}{"data": data, "meta": meta})
 }
+
+func (r *Response) Created(data interface{}) {
+	meta := &ResponseMeta{Type: reflect.TypeOf(data).Name()}
+	gores.JSON(r.writer, http.StatusCreated, map[string]interface{}{"data": data, "meta": meta})
+}

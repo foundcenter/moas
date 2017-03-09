@@ -6,5 +6,10 @@ export const GOOGLE_CLIENT_ID = '531545236739-hhtfh2m5rcmeph76sabo3mvdupeu5hfa.a
 
 export class MyAuthConfig extends CustomConfig {
     defaultHeaders = {'Content-Type': 'application/json'};
-    providers = {google: {clientId: GOOGLE_CLIENT_ID}};
+    providers = {google: {
+        clientId: GOOGLE_CLIENT_ID,
+        url: "http://localhost:8081/auth/google",
+        scope: "profile email https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/drive.readonly",
+        scopeDelimiter: " "
+    }};
 }
