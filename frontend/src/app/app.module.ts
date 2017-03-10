@@ -13,6 +13,7 @@ import { HomeComponent } from './components/home/home.component';
 import { LoginComponent } from './components/login/login.component';
 import { Ng2UiAuthModule } from "ng2-ui-auth/commonjs/ng2-ui-auth.module";
 import { LogoutComponent } from './components/logout/logout.component';
+import { SearchComponent } from "./components/search/search.component";
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { LogoutComponent } from './components/logout/logout.component';
     PageNotFoundComponent,
     HomeComponent,
     LoginComponent,
-    LogoutComponent
+    LogoutComponent,
+    SearchComponent
   ],
   imports: [
     BrowserModule,

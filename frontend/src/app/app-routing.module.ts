@@ -5,11 +5,13 @@ import { PageNotFoundComponent } from './components/page-not-found/page-not-foun
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LogoutComponent } from "./components/logout/logout.component";
+import { SearchComponent } from "./components/search/search.component";
 
 const appRoutes: Routes = [
     { path: 'home', component: HomeComponent, canActivate:[AuthGuard]},
     { path: 'login', component: LoginComponent },
     { path: 'logout', component: LogoutComponent },
+    { path: 'search', component: SearchComponent },
     { path: '', redirectTo: '/home', pathMatch: 'full' },
     { path: '**', component: PageNotFoundComponent }
 ];
