@@ -51,16 +51,13 @@ func Exchange(code string) (error, models.User) {
 		return errors.New("Could not exchange token"), models.User{}
 	}
 
-	fmt.Printf("Access token is %s \n", accessToken)
-
 	client := conf.Client(context.TODO(), accessToken)
 	userInfo, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
 	if err != nil {
 		log.Printf("Error with auth handler %s \n", err)
 		return errors.New("Could not get user info"), models.User{}
 	}
-	//defer userInfo.Body.Close()
-	//data, _ := ioutil.ReadAll(userInfo.Body)
+	defer userInfo.Body.Close()
 
 	decoder := json.NewDecoder(userInfo.Body)
 	var gu models.User
@@ -68,7 +65,6 @@ func Exchange(code string) (error, models.User) {
 	if err != nil {
 		panic(err)
 	}
-	//fmt.Printf("User info is: %s \n", string(data))
 
 	return nil, gu
 }
