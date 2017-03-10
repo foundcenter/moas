@@ -2,18 +2,19 @@ package repo
 
 import (
 	"fmt"
+
 	"github.com/foundcenter/moas/backend/models"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
 type User struct {
-	Session *mgo.Session
+	Database *mgo.Database
 }
 
 func (u *User) Insert(user models.User) (error, models.User) {
 
-	c := u.Session.DB("local").C("users")
+	c := u.Database.C("users")
 
 	err := c.Insert(user)
 
@@ -29,7 +30,7 @@ func (u *User) Insert(user models.User) (error, models.User) {
 }
 
 func (u *User) FindByEmailPassword(email, password string) (error, models.User) {
-	c := u.Session.DB("local").C("users")
+	c := u.Database.C("users")
 
 	model := models.User{}
 	err := c.Find(bson.M{"email": email, "password": password}).One(&model)
@@ -42,7 +43,7 @@ func (u *User) FindByEmailPassword(email, password string) (error, models.User) 
 }
 
 func (u *User) FindById(id string) (error, models.User) {
-	c := u.Session.DB("local").C("users")
+	c := u.Database.C("users")
 
 	model := models.User{}
 	err := c.Find(bson.M{"sub": id}).One(&model)

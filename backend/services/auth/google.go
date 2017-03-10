@@ -1,38 +1,25 @@
 package auth
 
 import (
-	"io/ioutil"
+	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"log"
+
+	"github.com/foundcenter/moas/backend/config"
+	"github.com/foundcenter/moas/backend/models"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
-	"os"
-	"encoding/json"
-	"log"
-	"fmt"
-	"context"
-	"github.com/foundcenter/moas/backend/models"
-	"errors"
 )
 
-type Credentials struct {
-	Cid string `json:"cid"`
-	Csecret string `json:"csecret"`
-}
-
-var cred Credentials
 var conf *oauth2.Config
 
 func init() {
-	file, err := ioutil.ReadFile("./config/google-credentials.json")
-	if err != nil {
-		log.Printf("File error: %v\n", err)
-		os.Exit(1)
-	}
-	json.Unmarshal(file, &cred)
-
 	conf = &oauth2.Config{
-		ClientID:     cred.Cid,
-		ClientSecret: cred.Csecret,
-		RedirectURL:  "http://localhost:4200",
+		ClientID:     config.Settings.Google.ClientID,
+		ClientSecret: config.Settings.Google.ClientSecret,
+		RedirectURL:  config.Settings.Google.RedirectURL,
 		Scopes: []string{
 			"profile",
 			"email",
