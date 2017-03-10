@@ -8,6 +8,7 @@ import (
 	"gopkg.in/mgo.v2"
 	"github.com/foundcenter/moas/backend/repo"
 	"github.com/rs/cors"
+	"fmt"
 )
 
 func main() {
@@ -22,6 +23,7 @@ func main() {
 func initDatabase() {
 	session, err := mgo.Dial("localhost")
 	if err != nil {
+		fmt.Printf("Error connecting to mongodb \n")
 		panic(err)
 	}
 	//defer session.Close()
