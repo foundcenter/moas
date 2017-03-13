@@ -24,10 +24,11 @@ export class SearchComponent implements OnInit {
     let jira = new Provider("Jira", false);
     let github = new Provider("Github", true);
 
-    this.providers.push(gmail, gdrive, slack, jira);
+    this.providers.push(gmail, gdrive, slack, jira, github);
   }
 
   toggle = (provider: Provider) => {
+    console.log(provider.name + " is in search method");
     provider.toggle();
   }
 }
@@ -36,6 +37,7 @@ class Provider {
   constructor(public name: string, public search: boolean) {
   }
   toggle = () => {
+    console.log(this.name + " is in provider class");
     this.search = !this.search;
   }
 }

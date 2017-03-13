@@ -19,13 +19,11 @@
                 </button>
                 <ul class="dropdown-menu">
                     <li *ngFor="let provider of providers">
-                        <a (onclick)="toggle(provider)">
+                        <a (click)="toggle(provider)">
                             <span [ngClass]="{
                                 'glyphicon-ok text-success': provider.search == true,
                                 'glyphicon-remove text-danger': provider.search == false
-                                }"
-                            class="glyphicon" aria-hidden="true"></span>
-
+                                }" class="glyphicon" aria-hidden="true"></span>
                             {{ provider.name }}
                         </a>
                     </li>
