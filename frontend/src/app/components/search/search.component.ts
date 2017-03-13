@@ -1,14 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, EventEmitter, AfterViewInit } from '@angular/core';
 
 @Component({
   selector: 'a pp-search',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss']
 })
-export class SearchComponent implements OnInit {
+export class SearchComponent implements OnInit, AfterViewInit {
   // protected providers { name: string, search: boolean}[];
   public providers : Provider[] = [];
   public configureProviders: boolean = false;
+  public focusTriggeringEventEmmiter = new EventEmitter<boolean>();
 
   constructor() {
   }
@@ -25,6 +26,14 @@ export class SearchComponent implements OnInit {
     let github = new Provider("Github", true);
 
     this.providers.push(gmail, gdrive, slack, jira, github);
+  }
+
+  ngAfterViewInit() {
+    this.focusSearchBar();
+  }
+  
+  focusSearchBar = () => {
+    this.focusTriggeringEventEmmiter.emit(true);
   }
 
   toggle = (provider: Provider) => {
