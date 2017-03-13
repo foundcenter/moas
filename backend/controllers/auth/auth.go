@@ -3,10 +3,10 @@ package auth
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/alioygur/gores"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/foundcenter/moas/backend/controllers/response"
+	"github.com/foundcenter/moas/backend/middleware/jwt_auth"
 	"github.com/foundcenter/moas/backend/middleware/logger"
 	"github.com/foundcenter/moas/backend/models"
 	"github.com/foundcenter/moas/backend/repo"
@@ -38,11 +38,10 @@ type GoogleAuth struct {
 func Load(router *httprouter.Router) {
 	router.Handler("GET", "/auth", alice.New(logger.Handler).ThenFunc(handleAuth))
 	router.Handler("POST", "/auth/login", alice.New(logger.Handler).ThenFunc(handleAuth))
-	router.Handler("POST", "/auth/google", alice.New(logger.Handler).ThenFunc(handleGoogleAuth))
+	router.Handler("POST", "/auth/google", alice.New(logger.Handler ).ThenFunc(handleGoogleAuth))
 	router.Handler("GET", "/auth/check", alice.New(logger.Handler).ThenFunc(handleAuthMock))
+	router.Handler("GET", "/jwt", alice.New(logger.Handler, jwt_auth.Handler).ThenFunc(handleJwtMock))
 }
-
-
 
 func handleGoogleAuth(w http.ResponseWriter, r *http.Request) {
 
@@ -53,11 +52,9 @@ func handleGoogleAuth(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	fmt.Printf("Code in request is %s \n", ga.Code)
-
 	err, user := auth.Exchange(ga.Code)
 	if err != nil {
-		response.Reply(w).Unauthorized()
+		response.Reply(w).Unauthorized(err)
 		return
 	}
 
@@ -80,11 +77,9 @@ func handleGoogleAuth(w http.ResponseWriter, r *http.Request) {
 
 }
 
-
-
 func IssueToken(user models.User) (error, string) {
 
-	mc := MyClaims{user.Sub, jwt.StandardClaims{ExpiresAt: time.Now().Add(time.Hour*24*30).Unix(), Issuer: "moas"}}
+	mc := MyClaims{user.Sub, jwt.StandardClaims{ExpiresAt: time.Now().Add(time.Hour * 24 * 30).Unix(), Issuer: "moas"}}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, mc)
 
 	// Sign and get the complete encoded token as a string using the secret
@@ -124,7 +119,7 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 		// later use switch
 		// if there are more reasons
 		// err.Error() == auth.BadCredentials
-		response.Reply(w).Unauthorized()
+		response.Reply(w).Unauthorized(err)
 		return
 	}
 
@@ -135,14 +130,28 @@ func handleAuthMock(w http.ResponseWriter, r *http.Request) {
 
 	t := r.Header.Get("Authorization")
 	token := t[7:len(t)]
-	fmt.Println(token)
+
 	err, parsed := ParseToken(token)
 
 	if err != nil {
-		response.Reply(w).Unauthorized()
+		response.Reply(w).Unauthorized(err)
 		return
 	}
 
 	gores.JSON(w, 200, map[string]interface{}{"user_sub": parsed})
 }
 
+func handleJwtMock(w http.ResponseWriter, r *http.Request) {
+
+	t := r.Header.Get("Authorization")
+	token := t[7:len(t)]
+
+	err, parsed := ParseToken(token)
+
+	if err != nil {
+		response.Reply(w).Unauthorized(err)
+		return
+	}
+
+	gores.JSON(w, 200, map[string]interface{}{"user_sub": parsed})
+}

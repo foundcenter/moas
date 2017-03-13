@@ -23,8 +23,8 @@ func (r *Response) BadRequest() {
 	gores.JSON(r.writer, err.Status, map[string]interface{}{"error": err})
 }
 
-func (r *Response) Unauthorized() {
-	err := &Error{"Bad credentials", http.StatusUnauthorized}
+func (r *Response) Unauthorized(e error) {
+	err := &Error{e.Error(), http.StatusUnauthorized}
 	gores.JSON(r.writer, err.Status, map[string]interface{}{"error": err})
 }
 
@@ -42,3 +42,5 @@ func (r *Response) Created(data interface{}) {
 	//meta := &ResponseMeta{Type: reflect.TypeOf(data).Name()}
 	gores.JSON(r.writer, http.StatusCreated, map[string]interface{}{"data": data})
 }
+
+
