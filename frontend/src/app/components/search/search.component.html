@@ -1,10 +1,38 @@
 <div class="row">
-    <div class="col-md-8 col-md-offset-2">
+    <div class="col-sm-6 col-sm-offset-2">
         <form>
             <div class="form-group">
-                <label class="control-label" for="inputLarge">Large input</label>
+                <!--<label class="control-label" for="inputLarge">Large input</label>-->
                 <input class="form-control input-lg" type="text" id="inputLarge">
             </div>
         </form>
+    </div>
+    <div class="col-sm-2">
+        <div class="search-button">
+            <div class="btn-group">
+                <button type="button" class="btn btn-default">
+                    Search
+                </button>
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="caret"></span>
+                    <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li *ngFor="let provider of providers">
+                        <a (onclick)="toggle(provider)">
+                            <span [ngClass]="{
+                                'glyphicon-ok text-success': provider.search == true,
+                                'glyphicon-remove text-danger': provider.search == false
+                                }"
+                            class="glyphicon" aria-hidden="true"></span>
+
+                            {{ provider.name }}
+                        </a>
+                    </li>
+                    <li class="divider"></li>
+                    <li><a href="#">Configure</a></li>
+                </ul>
+            </div>
+        </div>
     </div>
 </div>

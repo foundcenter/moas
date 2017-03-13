@@ -12,7 +12,7 @@ const appRoutes: Routes = [
     { path: 'login', component: LoginComponent },
     { path: 'logout', component: LogoutComponent },
     { path: 'search', component: SearchComponent },
-    { path: '', redirectTo: '/home', pathMatch: 'full' },
+    { path: '', redirectTo: '/search', pathMatch: 'full' },
     { path: '**', component: PageNotFoundComponent }
 ];
 

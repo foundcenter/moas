@@ -18,9 +18,13 @@ export class SearchComponent implements OnInit {
   }
 
   ngOnInit() {
-    let gmail = new Provider("gmail", true);
-    let gdrive = new Provider("gdrive", true);
-    this.providers.push(gmail, gdrive);
+    let gmail = new Provider("Gmail", true);
+    let gdrive = new Provider("Google Drive", false);
+    let slack = new Provider("Slack", true);
+    let jira = new Provider("Jira", false);
+    let github = new Provider("Github", true);
+
+    this.providers.push(gmail, gdrive, slack, jira);
   }
 
   toggle = (provider: Provider) => {

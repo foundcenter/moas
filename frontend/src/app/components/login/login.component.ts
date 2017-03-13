@@ -17,7 +17,7 @@ export class LoginComponent implements OnInit {
   loginWithGoogle() {
         this.auth.authenticate('google')
             .subscribe({
-                complete: () => this.router.navigateByUrl('home'),
+                complete: () => this.router.navigateByUrl('search'),
                 error: (err: any) => console.log(err)
             });
     }
