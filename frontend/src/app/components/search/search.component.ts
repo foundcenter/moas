@@ -3,7 +3,7 @@ import { SearchService } from "../../search.service";
 import { Result } from "../../interfaces/result.interface";
 
 @Component({
-  selector: 'a pp-search',
+  selector: 'app-search',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],
   providers: [SearchService]
