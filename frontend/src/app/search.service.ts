@@ -1,15 +1,9 @@
 import { Injectable } from '@angular/core';
-import { SearchConfig, Provider } from "./components/search/search.component";
+import { SearchConfig } from "./components/search/search.component";
 import { Observable } from "rxjs";
+import { Result } from "./interfaces/result.interface";
 
-export interface Result {
-  accountId: string;
-  service: string;
-  resource: string;
-  title: string;
-  description: string;
-  url: string;
-}
+
 
 @Injectable()
 export class SearchService {

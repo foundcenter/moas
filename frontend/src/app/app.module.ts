@@ -36,8 +36,7 @@ import { SearchService } from "./search.service";
     Ng2UiAuthModule.forRoot(MyAuthConfig),
   ],
   providers: [
-    AuthGuard,
-    SearchService
+    AuthGuard
   ],
   bootstrap: [AppComponent]
 })

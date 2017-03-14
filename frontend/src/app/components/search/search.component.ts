@@ -1,10 +1,12 @@
 import { Component, OnInit, EventEmitter, AfterViewInit } from '@angular/core';
-import { SearchService, Result } from "../../search.service";
+import { SearchService } from "../../search.service";
+import { Result } from "../../interfaces/result.interface";
 
 @Component({
   selector: 'a pp-search',
   templateUrl: './search.component.html',
-  styleUrls: ['./search.component.scss']
+  styleUrls: ['./search.component.scss'],
+  providers: [SearchService]
 })
 export class SearchComponent implements OnInit, AfterViewInit {
   // protected providers { name: string, search: boolean}[];
