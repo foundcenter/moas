@@ -1,16 +1,19 @@
 <div class="row">
     <div class="col-sm-6 col-sm-offset-2">
-        <form>
+        <form (ngSubmit)="search()" #searchForm="ngForm" autocomplete="off">
             <div class="form-group">
                 <!--<label class="control-label" for="inputLarge">Large input</label>-->
-                <input [focus]="focusTriggeringEventEmmiter" class="form-control input-lg" type="text" id="inputLarge">
+                <input [focus]="focusTriggeringEventEmmiter"
+                       [(ngModel)]="query"
+                       name="query"
+                       class="form-control input-lg" type="text" id="inputLarge">
             </div>
         </form>
     </div>
     <div class="col-sm-2">
         <div class="search-button">
             <div class="btn-group">
-                <button type="button" class="btn btn-default">
+                <button type="button" class="btn btn-default" (click)="search()">
                     Search
                 </button>
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -32,5 +35,13 @@
                 </ul>
             </div>
         </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-6 col-sm-offset-2">
+        <p *ngFor="let result of results">
+            {{ result.title }}
+        </p>
     </div>
 </div>

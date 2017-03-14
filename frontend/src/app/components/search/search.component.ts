@@ -1,4 +1,5 @@
 import { Component, OnInit, EventEmitter, AfterViewInit } from '@angular/core';
+import { SearchService, Result } from "../../search.service";
 
 @Component({
   selector: 'a pp-search',
@@ -10,8 +11,10 @@ export class SearchComponent implements OnInit, AfterViewInit {
   public providers : Provider[] = [];
   public configureProviders: boolean = false;
   public focusTriggeringEventEmmiter = new EventEmitter<boolean>();
+  public results: Result[] = [];
+  public query: string = "";
 
-  constructor() {
+  constructor(private searchService: SearchService) {
   }
 
   toggleConfigureProviders = () => {
@@ -40,13 +43,32 @@ export class SearchComponent implements OnInit, AfterViewInit {
     console.log(provider.name + " is in search method");
     provider.toggle();
   }
+
+  search = () => {
+    this.results = [];
+
+    this.searchService.query(this.query, new SearchConfig(this.providers))
+      .subscribe(
+        data => {
+          console.log(data);
+          let result = <Result[]>data;
+          this.results.push.apply(this.results, result);
+        }
+      );
+
+  }
 }
 
-class Provider {
+export class Provider {
   constructor(public name: string, public search: boolean) {
   }
   toggle = () => {
     console.log(this.name + " is in provider class");
     this.search = !this.search;
+  }
+}
+
+export class SearchConfig {
+  constructor(public providers: Provider[]) {
   }
 }

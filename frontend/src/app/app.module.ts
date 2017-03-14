@@ -15,6 +15,7 @@ import { Ng2UiAuthModule } from "ng2-ui-auth/commonjs/ng2-ui-auth.module";
 import { LogoutComponent } from './components/logout/logout.component';
 import { SearchComponent } from "./components/search/search.component";
 import { FocusDirective } from './focus.directive';
+import { SearchService } from "./search.service";
 
 @NgModule({
   declarations: [
@@ -34,7 +35,10 @@ import { FocusDirective } from './focus.directive';
     AppRoutingModule,
     Ng2UiAuthModule.forRoot(MyAuthConfig),
   ],
-  providers: [AuthGuard],
+  providers: [
+    AuthGuard,
+    SearchService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
