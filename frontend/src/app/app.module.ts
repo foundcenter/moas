@@ -15,6 +15,7 @@ import { Ng2UiAuthModule } from "ng2-ui-auth/commonjs/ng2-ui-auth.module";
 import { LogoutComponent } from './components/logout/logout.component';
 import { SearchComponent } from "./components/search/search.component";
 import { FocusDirective } from './focus.directive';
+import { ResultComponent } from './components/search/result/result.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { FocusDirective } from './focus.directive';
     LoginComponent,
     LogoutComponent,
     SearchComponent,
-    FocusDirective
+    FocusDirective,
+    ResultComponent
   ],
   imports: [
     BrowserModule,
