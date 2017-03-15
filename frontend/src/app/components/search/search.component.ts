@@ -1,6 +1,6 @@
 import { Component, OnInit, EventEmitter, AfterViewInit } from '@angular/core';
-import { SearchService } from "../../search.service";
-import { Result } from "../../interfaces/result.interface";
+import { SearchService } from '../../search.service';
+import { Result } from '../../interfaces/result.interface';
 
 @Component({
   selector: 'app-search',
@@ -14,9 +14,9 @@ export class SearchComponent implements OnInit, AfterViewInit {
   public configureProviders: boolean = false;
   public focusTriggeringEventEmmiter = new EventEmitter<boolean>();
   public results: Result[] = [];
-  public presenting: string = "all";
+  public presenting: string = 'all';
   public resultsServices: string[] = [];
-  public query: string = "";
+  public query: string = '';
 
   constructor(private searchService: SearchService) {
   }
@@ -26,11 +26,11 @@ export class SearchComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    let gmail = new Provider("Gmail", true);
-    let gdrive = new Provider("Google Drive", false);
-    let slack = new Provider("Slack", true);
-    let jira = new Provider("Jira", false);
-    let github = new Provider("Github", true);
+    let gmail = new Provider('Gmail', true);
+    let gdrive = new Provider('Google Drive', false);
+    let slack = new Provider('Slack', true);
+    let jira = new Provider('Jira', false);
+    let github = new Provider('Github', true);
 
     this.providers.push(gmail, gdrive, slack, jira, github);
 
@@ -38,7 +38,7 @@ export class SearchComponent implements OnInit, AfterViewInit {
   }
 
   autoSearch() {
-    this.query = "Topditop, packator";
+    this.query = 'Topditop, packator';
     this.search();
   }
 
@@ -51,14 +51,10 @@ export class SearchComponent implements OnInit, AfterViewInit {
   }
 
   toggle = (provider: Provider) => {
-    console.log(provider.name + " is in search method");
     provider.toggle();
   }
 
   viewResultsBy = (service: string) => {
-    if (service != null) {
-      this.presenting = "all";
-    }
     this.presenting = service;
   }
 
@@ -74,7 +70,7 @@ export class SearchComponent implements OnInit, AfterViewInit {
   }
 
   resultBy(service: string): Result[] {
-    if (this.presenting == "all") {
+    if (this.presenting == 'all') {
       return this.results;
     }
 
@@ -86,19 +82,18 @@ export class SearchComponent implements OnInit, AfterViewInit {
   }
 
   resultCountBy(service: string): Number {
-    if (service == null) {
+    if (service == 'all') {
       return this.results.length;
     }
     return this.resultBy(service).length;
   }
 
   search = () => {
-    this.results = [];
+    this.reset();
 
     this.searchService.query(this.query, new SearchConfig(this.providers))
       .subscribe(
         data => {
-          console.log(data);
           let result = <Result[]>data;
           this.results.push.apply(this.results, result);
           this.sortResults();
@@ -106,13 +101,17 @@ export class SearchComponent implements OnInit, AfterViewInit {
       );
 
   }
+
+  reset() {
+    this.results = [];
+    this.presenting = 'all';
+  }
 }
 
 export class Provider {
   constructor(public name: string, public search: boolean) {
   }
   toggle = () => {
-    console.log(this.name + " is in provider class");
     this.search = !this.search;
   }
 }

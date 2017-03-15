@@ -42,7 +42,7 @@
     <div class="col-sm-6 col-sm-offset-2">
         <ul [hidden]="!results" class="nav nav-pills search-services">
             <li role="presentation" [ngClass]="{active: presenting=='all'}">
-                <a (click)="viewResultsBy('all')">All ({{ results.length }})</a>
+                <a (click)="viewResultsBy('all')">All ({{ resultCountBy('all') }})</a>
             </li>
             <li *ngFor="let service of resultsServices"
                 [ngClass]="{active: presenting==service}"
