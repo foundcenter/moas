@@ -53,5 +53,10 @@ func Exchange(code string) (error, models.User) {
 		panic(err)
 	}
 
+	gu.Accounts = map[string]*oauth2.Token{ "google": accessToken}
+
 	return nil, gu
+}
+func GetConfig() (*oauth2.Config, error) {
+	return conf, nil
 }

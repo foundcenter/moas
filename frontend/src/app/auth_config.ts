@@ -11,9 +11,10 @@ export class MyAuthConfig extends CustomConfig {
     providers = {
         google: {
             clientId: GOOGLE_CLIENT_ID,
-            url: "http://localhost:8081/auth/google",
-            scope: "profile email https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/drive.readonly",
-            scopeDelimiter: " "
+            url: 'http://localhost:8081/auth/google',
+            scope: 'profile email https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/drive.readonly',
+            scopeDelimiter: ' ',
+            accessType: 'offline'
         }
     };
 }
