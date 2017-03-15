@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col-sm-6 col-sm-offset-2">
-        <form (ngSubmit)="search()" #searchForm="ngForm" autocomplete="off">
+        <form (ngSubmit)="search()" #searchForm="ngForm" autocomplete="off" class="search-form">
             <div class="form-group">
                 <!--<label class="control-label" for="inputLarge">Large input</label>-->
                 <input [focus]="focusTriggeringEventEmmiter"
@@ -40,7 +40,17 @@
 
 <div class="row">
     <div class="col-sm-6 col-sm-offset-2">
-        <search-result *ngFor="let result of results" [result]="result">
+        <ul [hidden]="!results" class="nav nav-pills search-services">
+            <li role="presentation" [ngClass]="{active: presenting=='all'}">
+                <a (click)="viewResultsBy('all')">All ({{ results.length }})</a>
+            </li>
+            <li *ngFor="let service of resultsServices"
+                [ngClass]="{active: presenting==service}"
+                role="presentation">
+                <a (click)="viewResultsBy(service)">{{ service }} ({{ resultCountBy(service) }})</a>
+            </li>
+        </ul>
+        <search-result *ngFor="let result of resultBy(presenting)" [result]="result">
         </search-result>
     </div>
 </div>

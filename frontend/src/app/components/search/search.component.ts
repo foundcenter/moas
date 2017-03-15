@@ -14,6 +14,8 @@ export class SearchComponent implements OnInit, AfterViewInit {
   public configureProviders: boolean = false;
   public focusTriggeringEventEmmiter = new EventEmitter<boolean>();
   public results: Result[] = [];
+  public presenting: string = "all";
+  public resultsServices: string[] = [];
   public query: string = "";
 
   constructor(private searchService: SearchService) {
@@ -53,6 +55,43 @@ export class SearchComponent implements OnInit, AfterViewInit {
     provider.toggle();
   }
 
+  viewResultsBy = (service: string) => {
+    if (service != null) {
+      this.presenting = "all";
+    }
+    this.presenting = service;
+  }
+
+  sortResults = () => {
+    let all = this.results;
+    let services = [];
+    all.forEach((result: Result) => {
+      if (!services.includes(result.service)) {
+        services.push((result.service));
+      }
+    });
+    this.resultsServices = services;
+  }
+
+  resultBy(service: string): Result[] {
+    if (this.presenting == "all") {
+      return this.results;
+    }
+
+    return this.results.filter((result: Result) => {
+      if (result.service == service) {
+        return result;
+      }
+    });
+  }
+
+  resultCountBy(service: string): Number {
+    if (service == null) {
+      return this.results.length;
+    }
+    return this.resultBy(service).length;
+  }
+
   search = () => {
     this.results = [];
 
@@ -62,6 +101,7 @@ export class SearchComponent implements OnInit, AfterViewInit {
           console.log(data);
           let result = <Result[]>data;
           this.results.push.apply(this.results, result);
+          this.sortResults();
         }
       );
 
