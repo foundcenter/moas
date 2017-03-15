@@ -21,23 +21,23 @@ export class SearchService {
     return new Observable(observer => {
       setTimeout(() => {
         observer.next( gmailRS);
-      }, 500);
+      }, 200);
 
       setTimeout(() => {
         observer.next( googleDriveRS);
-      }, 1000);
+      }, 400);
 
       setTimeout(() => {
         observer.next( slackRS);
-      }, 1500);
+      }, 600);
 
       setTimeout(() => {
         observer.next( githubRS);
-      }, 2000);
+      }, 800);
 
       setTimeout(() => {
         observer.complete();
-      }, 2500);
+      }, 1000);
     });
   }
 

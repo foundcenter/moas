@@ -31,6 +31,13 @@ export class SearchComponent implements OnInit, AfterViewInit {
     let github = new Provider("Github", true);
 
     this.providers.push(gmail, gdrive, slack, jira, github);
+
+    this.autoSearch();
+  }
+
+  autoSearch() {
+    this.query = "Topditop, packator";
+    this.search();
   }
 
   ngAfterViewInit() {
