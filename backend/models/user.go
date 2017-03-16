@@ -2,7 +2,6 @@ package models
 
 import "golang.org/x/oauth2"
 
-//import "gopkg.in/mgo.v2/bson"
 
 type User struct {
 	//Id            bson.ObjectId `json:"id,omitempty" bson:"_id,omitempty"`
@@ -18,3 +17,6 @@ type User struct {
 	Locale        string                   `json:"locale"`
 	Accounts      map[string]*oauth2.Token `json:"accounts"`
 }
+
+
+

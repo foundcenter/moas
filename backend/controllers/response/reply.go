@@ -33,6 +33,10 @@ func (r *Response) Ok(data interface{}) {
 	gores.JSON(r.writer, http.StatusOK, map[string]interface{}{"data": data, "meta": meta})
 }
 
+func (r *Response) SearchResult(data interface{}) {
+	gores.JSON(r.writer, http.StatusOK, map[string]interface{}{"data": data})
+}
+
 func (r *Response) Logged(data interface{}) {
 	//meta := &ResponseMeta{Type: reflect.TypeOf(data).Name()}
 	gores.JSON(r.writer, http.StatusOK, map[string]interface{}{"data": data})
