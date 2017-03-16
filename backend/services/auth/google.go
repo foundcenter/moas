@@ -57,6 +57,6 @@ func Exchange(code string) (error, models.User) {
 
 	return nil, gu
 }
-func GetConfig() (*oauth2.Config, error) {
-	return conf, nil
+func GetConfig() *oauth2.Config {
+	return conf
 }

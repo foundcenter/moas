@@ -1,12 +1,19 @@
 package search
 
 import (
+	"github.com/foundcenter/moas/backend/controllers/response"
 	"github.com/foundcenter/moas/backend/middleware/jwt_auth"
 	"github.com/foundcenter/moas/backend/middleware/logger"
+	"github.com/foundcenter/moas/backend/models"
+	"github.com/foundcenter/moas/backend/services/gmail"
 	"github.com/julienschmidt/httprouter"
 	"github.com/justinas/alice"
 	"net/http"
-	"github.com/foundcenter/moas/backend/services/gmail"
+	"sync"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/gorilla/context"
+	"github.com/foundcenter/moas/backend/services/auth"
 )
 
 func Load(router *httprouter.Router) {
@@ -15,5 +22,33 @@ func Load(router *httprouter.Router) {
 }
 
 func handleSearch(w http.ResponseWriter, r *http.Request) {
-	gmail.HandleGmailSearch(w,r)
+
+	resultOfSearch := make([]models.ResultResponse, 0)
+	var wg sync.WaitGroup
+	query:=r.URL.Query().Get("q")
+
+	wg.Add(1)
+	// gmail search
+	go func() {
+		token := context.Get(r, "user").(*jwt.Token).Raw
+		_, user_sub:= auth.ParseToken(token)
+
+		result := gmail.Search(user_sub, query)
+		resultOfSearch = append(resultOfSearch, result...)
+		wg.Done()
+	}()
+
+	// drive search
+	//go func() {
+	//	result := drive.Search(user_sub, query)
+	//	resultOfSearch = append(resultOfSearch, result...)
+	//	wg.Done()
+	//}()
+
+	// and other providers...
+
+	wg.Wait()
+
+	response.Reply(w).SearchResult(resultOfSearch)
+
 }
