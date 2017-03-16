@@ -16,6 +16,7 @@ import { LogoutComponent } from './components/logout/logout.component';
 import { SearchComponent } from "./components/search/search.component";
 import { FocusDirective } from './focus.directive';
 import { ResultComponent } from './components/search/result/result.component';
+import { IntegrateComponent } from './components/integrate/integrate.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { ResultComponent } from './components/search/result/result.component';
     LogoutComponent,
     SearchComponent,
     FocusDirective,
-    ResultComponent
+    ResultComponent,
+    IntegrateComponent
   ],
   imports: [
     BrowserModule,
