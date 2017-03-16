@@ -42,7 +42,7 @@ func init() {
 	Settings = &Configuration{
 		Mongo: &mgo.DialInfo{
 			Addrs:    strings.Split(os.Getenv("MONGO_HOSTS"), ","),
-			Timeout:  60 * time.Second,
+			Timeout:  10 * time.Second,
 			Database: os.Getenv("MONGO_DATABASE"),
 			Username: os.Getenv("MONGO_USERNAME"),
 			Password: os.Getenv("MONGO_PASSWORD"),
