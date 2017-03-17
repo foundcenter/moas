@@ -19,8 +19,9 @@ export class IntegrateComponent implements OnInit {
 }
 
 export class Service {
+  public accounts: Account[] = [];
 
-  constructor(public name: string, public status: string,public  logo: string) {
+  constructor(public name: string, public logo: string) {
   }
 
   getLogoUrl = () => {
@@ -29,7 +30,18 @@ export class Service {
 }
 
 export class Account {
+  static readonly statusOk: string = "Ok";
+  static readonly statusExpired: string = "Expired";
 
-  constructor(public email: string) {
+  constructor(public email: string, public id: string, public status: string) {
   }
+
+  isOk = () => {
+    return this.status == Account.statusOk;
+  }
+
+  isExpired = () => {
+    return this.status == Account.statusExpired;
+  }
+
 }

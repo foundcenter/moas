@@ -14,7 +14,7 @@ const appRoutes: Routes = [
     { path: 'logout', component: LogoutComponent },
     { path: 'search', component: SearchComponent },
     { path: 'integrate', component: IntegrateComponent },
-    { path: '', redirectTo: '/search', pathMatch: 'full' },
+    { path: '', redirectTo: '/integrate', pathMatch: 'full' },
     { path: '**', component: PageNotFoundComponent }
 ];
 
