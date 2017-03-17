@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { IntegrationService } from '../../services/integration.service';
 import { AuthService } from "ng2-ui-auth";
+import { ModalDirective } from "ng2-bootstrap";
 
 @Component({
   selector: 'app-integrate',
@@ -9,12 +10,21 @@ import { AuthService } from "ng2-ui-auth";
   providers: [IntegrationService]
 })
 export class IntegrateComponent implements OnInit {
+  @ViewChild('childModal') public childModal: ModalDirective;
   public services: Service [] = [];
 
   constructor(private integrationService: IntegrationService, private auth: AuthService) { }
 
   ngOnInit() {
     this.services = this.integrationService.mockServices();
+  }
+
+  public showChildModal():void {
+    this.childModal.show();
+  }
+
+  public hideChildModal():void {
+    this.childModal.hide();
   }
 
   handle = (serviceName: string) => {
@@ -42,7 +52,7 @@ export class IntegrateComponent implements OnInit {
         
       case 'jira':
         console.log('trigger modal for jira now');
-        
+        this.showChildModal();
         break;
 
       default:
