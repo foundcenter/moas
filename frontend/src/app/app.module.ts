@@ -17,6 +17,7 @@ import { SearchComponent } from "./components/search/search.component";
 import { FocusDirective } from './focus.directive';
 import { ResultComponent } from './components/search/result/result.component';
 import { IntegrateComponent } from './components/integrate/integrate.component';
+import { CreateComponent } from './components/integrate/create/create.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,8 @@ import { IntegrateComponent } from './components/integrate/integrate.component';
     SearchComponent,
     FocusDirective,
     ResultComponent,
-    IntegrateComponent
+    IntegrateComponent,
+    CreateComponent
   ],
   imports: [
     BrowserModule,

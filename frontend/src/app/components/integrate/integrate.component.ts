@@ -16,6 +16,13 @@ export class IntegrateComponent implements OnInit {
     this.services = this.integrationService.mockServices();
   }
 
+  slug = (providerName: string) => {
+    return providerName
+      .toLowerCase()
+      .replace(/ /g,'-')
+      .replace(/[^\w-]+/g,'');
+  }
+
 }
 
 export class Service {

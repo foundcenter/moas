@@ -7,6 +7,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { LogoutComponent } from "./components/logout/logout.component";
 import { SearchComponent } from "./components/search/search.component";
 import { IntegrateComponent } from "./components/integrate/integrate.component";
+import { CreateComponent } from "./components/integrate/create/create.component";
 
 const appRoutes: Routes = [
     { path: 'home', component: HomeComponent, canActivate:[AuthGuard]},
@@ -14,6 +15,7 @@ const appRoutes: Routes = [
     { path: 'logout', component: LogoutComponent },
     { path: 'search', component: SearchComponent },
     { path: 'integrate', component: IntegrateComponent },
+    { path: 'integrate/create/:service', component: CreateComponent },
     { path: '', redirectTo: '/integrate', pathMatch: 'full' },
     { path: '**', component: PageNotFoundComponent }
 ];
