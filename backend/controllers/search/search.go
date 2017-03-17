@@ -6,6 +6,7 @@ import (
 	"github.com/foundcenter/moas/backend/middleware/logger"
 	"github.com/foundcenter/moas/backend/models"
 	"github.com/foundcenter/moas/backend/services/gmail"
+	"github.com/foundcenter/moas/backend/services/drive"
 	"github.com/julienschmidt/httprouter"
 	"github.com/justinas/alice"
 	"net/http"
@@ -27,25 +28,34 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 	var wg sync.WaitGroup
 	query:=r.URL.Query().Get("q")
 
-	wg.Add(1)
+	queueOfResults := make(chan []models.ResultResponse,2)
+
+	token := context.Get(r, "user").(*jwt.Token).Raw
+	_, user_sub:= auth.ParseToken(token)
+
+	wg.Add(2)
+
 	// gmail search
 	go func() {
-		token := context.Get(r, "user").(*jwt.Token).Raw
-		_, user_sub:= auth.ParseToken(token)
-
 		result := gmail.Search(user_sub, query)
-		resultOfSearch = append(resultOfSearch, result...)
-		wg.Done()
+		queueOfResults<-result
 	}()
 
 	// drive search
-	//go func() {
-	//	result := drive.Search(user_sub, query)
-	//	resultOfSearch = append(resultOfSearch, result...)
-	//	wg.Done()
-	//}()
+	go func() {
+		result := drive.Search(user_sub, query)
+		queueOfResults<-result
+	}()
 
 	// and other providers...
+
+	//here we wait result of search from all services
+	go func() {
+		for r := range queueOfResults {
+			resultOfSearch = append(resultOfSearch, r...)
+			wg.Done()
+		}
+	}()
 
 	wg.Wait()
 

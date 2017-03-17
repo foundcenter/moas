@@ -14,7 +14,8 @@ import (
 func Search(user_sub string, query string) []models.ResultResponse {
 
 	var wg sync.WaitGroup
-	var searchResult []models.ResultResponse = make([]models.ResultResponse, 0)
+	searchResult := make([]models.ResultResponse, 0)
+	queueOfResults := make(chan []models.ResultResponse,2)
 	gmailService := CreateGmailService(user_sub)
 
 	user, _ := FindUserById(user_sub)
@@ -23,15 +24,21 @@ func Search(user_sub string, query string) []models.ResultResponse {
 	wg.Add(2)
 	go func() {
 		result := SearchMessages(gmailService, userEmail, query)
-		searchResult = append(searchResult, result...)
-		wg.Done()
+		queueOfResults<-result
 	}()
 
 	go func() {
 		result := SearchThreads(gmailService, userEmail, query)
-		searchResult = append(searchResult, result...)
-		wg.Done()
+		queueOfResults<-result
 	}()
+
+	go func() {
+		for r := range queueOfResults {
+			searchResult = append(searchResult, r...)
+			wg.Done()
+		}
+	}()
+
 	wg.Wait()
 
 	return searchResult
@@ -57,7 +64,7 @@ func SearchMessages(gmailService *gmail.Service, userEmail string, query string)
 			searchResult = append(searchResult, s)
 		}
 	} else {
-		fmt.Print("No messages found.")
+		fmt.Print("No messages found.  \n")
 	}
 	return searchResult
 }
@@ -82,7 +89,7 @@ func SearchThreads(gmailService *gmail.Service, userEmail string, query string) 
 			searchResult = append(searchResult, s)
 		}
 	} else {
-		fmt.Print("No threads found.")
+		fmt.Print("No threads found. \n")
 	}
 	return searchResult
 }
