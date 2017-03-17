@@ -7,6 +7,7 @@ export const SLACK_CLIENT_ID = '16724837808.155634746450';
 export const GITHUB_CLIENT_ID = '469a838ef4c6048510b6';
 
 export const BACKEND_MOCK = 'https://httpbin.org/post';
+export const REDIRECT_URI = 'http://localhost:4200';
 
 export class MyAuthConfig extends CustomConfig {
     defaultHeaders = {'Content-Type': 'application/json'};
@@ -17,12 +18,46 @@ export class MyAuthConfig extends CustomConfig {
             scope: "profile email https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/drive.readonly",
             scopeDelimiter: " "
         },
+        gmail: {
+            name: 'gmail',
+            clientId: GOOGLE_CLIENT_ID,
+            url: BACKEND_MOCK,
+            authorizationEndpoint: 'https://accounts.google.com/o/oauth2/auth',
+            redirectUri: REDIRECT_URI,
+            requiredUrlParams: ['scope'],
+            optionalUrlParams: ['display', 'state', 'prompt', 'login_hint', 'access_type',
+                'include_granted_scopes', 'openid.realm', 'hd'],
+            scope: "profile email https://www.googleapis.com/auth/gmail.readonly",
+            scopePrefix: 'openid',
+            scopeDelimiter: ' ',
+            display: 'popup',
+            oauthType: '2.0',
+            popupOptions: {width: 452, height: 633},
+            state: () => encodeURIComponent(Math.random().toString(36).substr(2)),
+        },
+        "google-drive": {
+            name: 'google-drive',
+            clientId: GOOGLE_CLIENT_ID,
+            url: BACKEND_MOCK,
+            authorizationEndpoint: 'https://accounts.google.com/o/oauth2/auth',
+            redirectUri: REDIRECT_URI,
+            requiredUrlParams: ['scope'],
+            optionalUrlParams: ['display', 'state', 'prompt', 'login_hint', 'access_type',
+                'include_granted_scopes', 'openid.realm', 'hd'],
+            scope: "profile email https://www.googleapis.com/auth/drive.readonly",
+            scopePrefix: 'openid',
+            scopeDelimiter: ' ',
+            display: 'popup',
+            oauthType: '2.0',
+            popupOptions: {width: 452, height: 633},
+            state: () => encodeURIComponent(Math.random().toString(36).substr(2)),
+        },
         slack: {
             clientId: SLACK_CLIENT_ID,
             url: BACKEND_MOCK,
             authorizationEndpoint: 'https://slack.com/oauth/authorize',
             requiredUrlParams: ['scope'],
-            redirectUri: 'http://localhost:4200',
+            redirectUri: REDIRECT_URI,
             scope: 'files:read mpim:read search:read',
             scopePrefix: '',
             scopeDelimiter: ',',
