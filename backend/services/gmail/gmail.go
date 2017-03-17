@@ -16,21 +16,22 @@ func Search(user_sub string, query string) []models.ResultResponse {
 
 	var wg sync.WaitGroup
 	searchResult := make([]models.ResultResponse, 0)
-	queueOfResults := make(chan []models.ResultResponse,2)
+	queueOfResults := make(chan []models.ResultResponse, 2)
 	gmailService := CreateGmailService(user_sub)
 
 	user, _ := FindUserById(user_sub)
-	userEmail := user.Email
+	// TODO: Fix
+	userEmail := user.Emails[0]
 
 	wg.Add(2)
 	go func() {
 		result := SearchMessages(gmailService, userEmail, query)
-		queueOfResults<-result
+		queueOfResults <- result
 	}()
 
 	go func() {
 		result := SearchThreads(gmailService, userEmail, query)
-		queueOfResults<-result
+		queueOfResults <- result
 	}()
 
 	go func() {
@@ -106,7 +107,8 @@ func CreateGmailService(user_sub string) *gmail.Service {
 	}
 
 	config := authService.GetConfig()
-	client := config.Client(ctx, user.Accounts["google"])
+	//TODO: Fix
+	client := config.Client(ctx, user.Accounts[0].Token)
 
 	gmailService, err := gmail.New(client)
 

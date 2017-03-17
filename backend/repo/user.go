@@ -19,6 +19,15 @@ func (u *User) Insert(user models.User) (models.User, error) {
 	return user, err
 }
 
+func (u *User) Update(user models.User) (models.User, error) {
+
+	c := u.Database.C("users")
+
+	err := c.UpdateId(user.ID, user)
+
+	return user, err
+}
+
 func (u *User) FindByEmailPassword(email, password string) (models.User, error) {
 	c := u.Database.C("users")
 
@@ -42,6 +51,15 @@ func (u *User) FindByEmail(email string) (models.User, error) {
 
 	model := models.User{}
 	err := c.Find(bson.M{"emails": bson.M{"$in": [1]string{email}}}).One(&model)
+
+	return model, err
+}
+
+func (u *User) FindByAccount(accountID string, accountType string) (models.User, error) {
+	c := u.Database.C("users")
+
+	model := models.User{}
+	err := c.Find(bson.M{"accounts": bson.M{"type": accountType, "id": accountID}}).One(&model)
 
 	return model, err
 }

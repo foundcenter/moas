@@ -39,7 +39,7 @@ func Login(email string, password string) (error, models.User) {
 
 func IssueToken(user models.User) (error, string) {
 
-	mc := MyClaims{user.Sub, jwt.StandardClaims{ExpiresAt: time.Now().Add(time.Hour * 24 * 30).Unix(), Issuer: "moas"}}
+	mc := MyClaims{user.ID.String(), jwt.StandardClaims{ExpiresAt: time.Now().Add(time.Hour * 24 * 30).Unix(), Issuer: "moas"}}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, mc)
 
 	// Sign and get the complete encoded token as a string using the secret

@@ -16,8 +16,9 @@ func Search(user_sub string, query string) []models.ResultResponse {
 	var searchResult []models.ResultResponse = make([]models.ResultResponse, 0)
 	driveService := CreateDriveService(user_sub)
 
-	user, err := FindUserById(user_sub)
-	userEmail := user.Email
+	_, err := FindUserById(user_sub)
+	// TODO: Fix
+	userEmail := "test@test.com"
 
 	ref, err := driveService.Files.List().Q("fullText contains '" + query + "'").Do()
 	if err != nil {
@@ -53,7 +54,8 @@ func CreateDriveService(user_sub string) *drive.Service {
 	}
 
 	config := authService.GetConfig()
-	client := config.Client(ctx, user.Accounts["google"])
+	// TODO: Fix
+	client := config.Client(ctx, user.Accounts[0].Token)
 
 	driveService, err := drive.New(client)
 

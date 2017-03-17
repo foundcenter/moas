@@ -6,18 +6,16 @@ import (
 )
 
 type User struct {
-	//Id            bson.ObjectId `json:"id,omitempty" bson:"_id,omitempty"`
-	ID            bson.ObjectId            `json:"id" bson:"_id,omitempty"`
-	Sub           string                   `json:"sub"`
-	Name          string                   `json:"name"`
-	GivenName     string                   `json:"given_name"`
-	FamilyName    string                   `json:"family_name"`
-	Profile       string                   `json:"profile"`
-	Picture       string                   `json:"picture"`
-	Email         string                   `json:"email"`
-	Emails        []string                 `json:"emails"`
-	EmailVerified bool                     `json:"email_verified"`
-	Gender        string                   `json:"gender"`
-	Locale        string                   `json:"locale"`
-	Accounts      map[string]*oauth2.Token `json:"accounts"`
+	ID       bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	Name     string        `json:"name"`
+	Picture  string        `json:"picture"`
+	Emails   []string      `json:"emails"`
+	Accounts []AccountInfo `json:"accounts"`
+}
+
+type AccountInfo struct {
+	Type  string        `json:"type"`
+	ID    string        `json:"id"`
+	Data  interface{}   `json:"data"`
+	Token *oauth2.Token `json:"token"`
 }

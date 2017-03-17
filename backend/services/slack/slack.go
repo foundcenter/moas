@@ -3,15 +3,17 @@ package slack
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/foundcenter/moas/backend/config"
 	"github.com/foundcenter/moas/backend/models"
 	"github.com/foundcenter/moas/backend/repo"
+	"github.com/foundcenter/moas/backend/utils"
 	"github.com/nlopes/slack"
 	"golang.org/x/oauth2"
 	slackAuth "golang.org/x/oauth2/slack"
 )
+
+const AccountType = "slack"
 
 var conf *oauth2.Config
 
@@ -29,11 +31,12 @@ func init() {
 	}
 }
 
-func Connect(ctx context.Context, code string) (error, models.User) {
+func Login(ctx context.Context, code string) (models.User, error) {
+
+	var user models.User
 	accessToken, err := conf.Exchange(ctx, code)
 	if err != nil {
-		fmt.Printf("Error with auth handler %s with code %s \n", err, code)
-		return errors.New("Could not exchange token"), models.User{}
+		return user, err
 	}
 
 	client := slack.New(accessToken.AccessToken)
@@ -41,29 +44,69 @@ func Connect(ctx context.Context, code string) (error, models.User) {
 	res, err := client.GetUserIdentity()
 
 	if err != nil {
-		return err, models.User{}
+		return user, err
 	}
 
 	db := repo.New()
 	defer db.Destroy()
 
-	err, user := db.UserRepo.FindByEmail(res.User.Email)
+	user, err = db.UserRepo.FindByAccount(AccountType, res.User.ID)
 
 	if err != nil {
-		return err, user
+		return user, err
 	}
 
 	// If user is already registered merge data
 	if !user.ID.Valid() {
 		user.Name = res.User.Name
-		user.Email = res.User.Email
 		user.Picture = res.User.Image512
 	}
 
-	user.Emails = append(user.Emails, user.Email)
-	user.Accounts["slack"] = accessToken
+	addAccount(ctx, &user, res, accessToken)
+	db.UserRepo.Update(user)
 
-	return nil, user
+	return user, err
+}
+
+func Connect(ctx context.Context, userID string, code string) (models.User, error) {
+	var user models.User
+	accessToken, err := conf.Exchange(ctx, code)
+
+	if err != nil {
+		return user, err
+	}
+
+	client := slack.New(accessToken.AccessToken)
+	res, err := client.GetUserIdentity()
+
+	db := repo.New()
+	defer db.Destroy()
+
+	user, err = db.UserRepo.FindById(userID)
+
+	if err != nil {
+		return user, err
+	}
+
+	addAccount(ctx, &user, res, accessToken)
+	db.UserRepo.Update(user)
+
+	return user, nil
+}
+
+func addAccount(ctx context.Context, user *models.User, res *slack.UserIdentityResponse, token *oauth2.Token) {
+	a := models.AccountInfo{
+		Type:  AccountType,
+		ID:    res.User.ID,
+		Data:  res,
+		Token: token,
+	}
+
+	user.Accounts = append(user.Accounts, a)
+
+	if res.User.Email != "" && !utils.Contains(user.Emails, res.User.Email) {
+		user.Emails = append(user.Emails, user.Email)
+	}
 }
 
 func Search(ctx context.Context, userID string, query string) ([]models.ResultResponse, error) {
