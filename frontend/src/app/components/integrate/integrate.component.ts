@@ -26,9 +26,17 @@ export class IntegrateComponent implements OnInit {
         console.log('integrating ' + serviceName);
         this.auth.authenticate(serviceName)
           .subscribe(
-            data => console.log(data),
-            error => console.log(error),
-            () => console.log(`Integrated ${serviceName} successfuly`)
+            data => {
+              console.log(`Data of ${serviceName} auth`);
+              console.log(data);
+            },
+            error => {
+              console.log(`Error of ${serviceName} auth`);
+              console.log(error);
+            },
+            () => {
+              console.log(`Finally of ${serviceName} auth`)
+            }
           );
         break;
         
