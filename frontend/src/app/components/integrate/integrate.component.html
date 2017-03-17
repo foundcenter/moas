@@ -14,25 +14,33 @@
 
 <div class="row integrate">
   <div *ngFor="let service of services" class="col-md-4">
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <img src="{{ service.getLogoUrl() }}" alt=""> <span class="integrate__service-title">{{ service.name }}</span>
 
-    <img src="{{ service.getLogoUrl() }}" alt=""> <span class="integrate__service-title">{{ service.name }}</span>
+        <hr>
 
-    <hr>
+        <div *ngIf="service.accounts" class="list-group">
+          <a *ngFor="let account of service.accounts" href="#" class="list-group-item">
+            <h5 class="list-group-item-heading">{{ account.email }}</h5>
+            <p>
+              AccountId: <small>({{ account.id}})</small>
 
-    <div *ngIf="service.accounts" class="list-group">
-      <a *ngFor="let account of service.accounts" href="#" class="list-group-item">
-        <h5 class="list-group-item-heading">{{ account.email }}</h5>
-        <p>
-          AccountId: <small>({{ account.id}})</small>
-
-          <span class="label pull-right" [ngClass]="{
+              <span class="label pull-right" [ngClass]="{
             'label-success': account.isOk(),
             'label-danger': account.isExpired()}">{{ account.status }}</span>
-        </p>
-        <p class="list-group-item-text">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-      </a>
+            </p>
+            <p class="list-group-item-text">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
+          </a>
+        </div>
+
+        <div *ngIf="service.accounts.length == 0">
+          <p>No accounts for this service.</p>
+        </div>
+
+        <a href="#" class="btn btn-default btn-lg"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a>
+      </div>
     </div>
-
-
   </div>
+
 </div>
