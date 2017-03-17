@@ -2,12 +2,13 @@ package drive
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/foundcenter/moas/backend/models"
 	"github.com/foundcenter/moas/backend/repo"
-	authService "github.com/foundcenter/moas/backend/services/auth"
+	authService "github.com/foundcenter/moas/backend/services/auth/google"
 	"golang.org/x/net/context"
 	"google.golang.org/api/drive/v2"
-	"log"
 )
 
 func Search(user_sub string, query string) []models.ResultResponse {
@@ -66,6 +67,6 @@ func CreateDriveService(user_sub string) *drive.Service {
 func FindUserById(id string) (models.User, error) {
 	db := repo.New()
 	defer db.Destroy()
-	err, user := db.UserRepo.FindById(id)
+	user, err := db.UserRepo.FindById(id)
 	return user, err
 }

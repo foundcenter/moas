@@ -2,17 +2,19 @@ package auth
 
 import (
 	"errors"
+	"time"
+
 	"github.com/foundcenter/moas/backend/models"
 	"github.com/foundcenter/moas/backend/repo"
-	"time"
 
 	"github.com/dgrijalva/jwt-go"
 )
 
 const (
-	BadCredentials = "Bad Credentials"
+	BadCredentials   = "Bad Credentials"
 	hmacSampleSecret = "818DC95A5C27370654E087E0CFEFC13C876F7B3D0B5BF9ACE7F3FBE385D16EF9"
 )
+
 type MyClaims struct {
 	User_sub string `json:"user_sub"`
 	jwt.StandardClaims
@@ -26,7 +28,7 @@ func Login(email string, password string) (error, models.User) {
 	db := repo.New()
 	defer db.Destroy()
 
-	err, user := db.UserRepo.FindByEmailPassword(email, password)
+	user, err := db.UserRepo.FindByEmailPassword(email, password)
 
 	if err != nil {
 		return errors.New(BadCredentials), models.User{}

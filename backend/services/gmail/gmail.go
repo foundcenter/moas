@@ -2,13 +2,14 @@ package gmail
 
 import (
 	"fmt"
-	"github.com/foundcenter/moas/backend/models"
-	"github.com/foundcenter/moas/backend/repo"
-	authService "github.com/foundcenter/moas/backend/services/auth"
-	"golang.org/x/net/context"
-	"google.golang.org/api/gmail/v1"
 	"log"
 	"sync"
+
+	"github.com/foundcenter/moas/backend/models"
+	"github.com/foundcenter/moas/backend/repo"
+	authService "github.com/foundcenter/moas/backend/services/auth/google"
+	"golang.org/x/net/context"
+	"google.golang.org/api/gmail/v1"
 )
 
 func Search(user_sub string, query string) []models.ResultResponse {
@@ -119,6 +120,6 @@ func CreateGmailService(user_sub string) *gmail.Service {
 func FindUserById(id string) (models.User, error) {
 	db := repo.New()
 	defer db.Destroy()
-	err, user := db.UserRepo.FindById(id)
+	user, err := db.UserRepo.FindById(id)
 	return user, err
 }

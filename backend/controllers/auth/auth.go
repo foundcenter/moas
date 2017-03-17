@@ -2,15 +2,17 @@ package auth
 
 import (
 	"encoding/json"
+	"net/http"
+
 	"github.com/alioygur/gores"
 	"github.com/foundcenter/moas/backend/controllers/response"
 	"github.com/foundcenter/moas/backend/middleware/jwt_auth"
 	"github.com/foundcenter/moas/backend/middleware/logger"
 	"github.com/foundcenter/moas/backend/repo"
 	"github.com/foundcenter/moas/backend/services/auth"
+	"github.com/foundcenter/moas/backend/services/auth/google"
 	"github.com/julienschmidt/httprouter"
 	"github.com/justinas/alice"
-	"net/http"
 )
 
 type loginRequest struct {
@@ -23,8 +25,9 @@ func Load(router *httprouter.Router) {
 	router.Handler("GET", "/auth", stdChain.ThenFunc(handleAuth))
 	router.Handler("POST", "/auth/login", stdChain.ThenFunc(handleAuth))
 	router.Handler("POST", "/auth/google", stdChain.ThenFunc(handleGoogleAuth))
+	router.Handler("POST", "/auth/slack", stdChain.ThenFunc(handleSlackAuth))
 	router.Handler("GET", "/auth/check", stdChain.ThenFunc(handleAuthMock))
-	router.Handler("GET", "/jwt",  stdChain.Append(jwt_auth.Handler).ThenFunc(handleJwtMock))
+	router.Handler("GET", "/jwt", stdChain.Append(jwt_auth.Handler).ThenFunc(handleJwtMock))
 }
 
 func handleGoogleAuth(w http.ResponseWriter, r *http.Request) {
@@ -36,7 +39,7 @@ func handleGoogleAuth(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	err, user := auth.Exchange(ga.Code)
+	err, user := google.Exchange(ga.Code)
 	if err != nil {
 		response.Reply(w).Unauthorized(err)
 		return
@@ -51,13 +54,23 @@ func handleGoogleAuth(w http.ResponseWriter, r *http.Request) {
 	//find or insert in DB
 	db := repo.New()
 	defer db.Destroy()
-	user, action := db.UserRepo.FindByIdOrInsert(user)
+	user, action, err := db.UserRepo.FindByIdOrInsert(user)
+
+	if err != nil {
+		response.Reply(w).ServerInternalError()
+		return
+	}
+
 	if action == "login" {
 		response.Reply(w).Logged(map[string]interface{}{"user": user, "token": tokenString})
 		return
 	}
 	// register
 	response.Reply(w).Created(map[string]interface{}{"user": user, "token": tokenString})
+
+}
+
+func handleSlackAuth(w http.ResponseWriter, r *http.Request) {
 
 }
 

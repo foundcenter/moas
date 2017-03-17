@@ -1,4 +1,4 @@
-package auth
+package google
 
 import (
 	"context"
@@ -53,7 +53,7 @@ func Exchange(code string) (error, models.User) {
 		panic(err)
 	}
 
-	gu.Accounts = map[string]*oauth2.Token{ "google": accessToken}
+	gu.Accounts = map[string]*oauth2.Token{"google": accessToken}
 
 	return nil, gu
 }

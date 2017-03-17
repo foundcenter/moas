@@ -14,12 +14,20 @@ import (
 // Configuration for whole application
 type Configuration struct {
 	Google *GoogleConfiguration
+	Slack  *SlackConfiguration
 	Mongo  *mgo.DialInfo
 	App    *ApplicationConfiguration
 }
 
 // GoogleConfiguration settings
 type GoogleConfiguration struct {
+	ClientID     string
+	ClientSecret string
+	RedirectURL  string
+}
+
+// SlackConfiguration settings
+type SlackConfiguration struct {
 	ClientID     string
 	ClientSecret string
 	RedirectURL  string
@@ -51,6 +59,11 @@ func init() {
 			ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
 			ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
 			RedirectURL:  os.Getenv("GOOGLE_REDIRECT_URL"),
+		},
+		Slack: &SlackConfiguration{
+			ClientID:     os.Getenv("SLACK_CLIENT_ID"),
+			ClientSecret: os.Getenv("SLACK_CLIENT_SECRET"),
+			RedirectURL:  os.Getenv("SLACK_REDIRECT_URL"),
 		},
 		App: &ApplicationConfiguration{
 			URL: os.Getenv("APP_URL"),

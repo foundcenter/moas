@@ -1,9 +1,10 @@
 package response
 
 import (
-	"github.com/alioygur/gores"
 	"net/http"
 	"reflect"
+
+	"github.com/alioygur/gores"
 )
 
 type Response struct {
@@ -20,6 +21,11 @@ func Reply(w http.ResponseWriter) *Response {
 
 func (r *Response) BadRequest() {
 	err := &Error{"Bad request", http.StatusBadRequest}
+	gores.JSON(r.writer, err.Status, map[string]interface{}{"error": err})
+}
+
+func (r *Response) ServerInternalError() {
+	err := &Error{"Internal server error", http.StatusInternalServerError}
 	gores.JSON(r.writer, err.Status, map[string]interface{}{"error": err})
 }
 
@@ -46,5 +52,3 @@ func (r *Response) Created(data interface{}) {
 	//meta := &ResponseMeta{Type: reflect.TypeOf(data).Name()}
 	gores.JSON(r.writer, http.StatusCreated, map[string]interface{}{"data": data})
 }
-
-
