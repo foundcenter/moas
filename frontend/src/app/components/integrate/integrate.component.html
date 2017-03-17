@@ -12,8 +12,8 @@
 
 <hr>
 
-<div class="row integrate">
-  <div *ngFor="let service of services" class="col-md-4">
+<div *ngFor="let set of getRows(); let i = index" class="row integrate">
+  <div *ngFor="let service of set" class="col-md-4">
     <div class="panel panel-default">
       <div class="panel-body">
         <img src="{{ service.getLogoUrl() }}" alt=""> <span class="integrate__service-title">{{ service.name }}</span>

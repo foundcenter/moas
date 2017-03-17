@@ -13,10 +13,29 @@ export class IntegrateComponent implements OnInit {
   @ViewChild('childModal') public childModal: ModalDirective;
   public services: Service [] = [];
 
+
   constructor(private integrationService: IntegrationService, private auth: AuthService) { }
 
   ngOnInit() {
     this.services = this.integrationService.mockServices();
+  }
+
+  getRows() {
+    let totalAdded = 0;
+    let rows : Service[][] = [];
+    let row: Service[] = [];
+    for (let i = 0; i < this.services.length; i = i + 3) {
+      row = [this.services[i]];
+      if (this.services[i+1]) {
+        row.push(this.services[i+1]);
+      }
+      if (this.services[i+2]) {
+        row.push(this.services[i+2]);
+      }
+      rows.push(row);
+    }
+
+    return rows;
   }
 
   public showChildModal():void {
@@ -27,7 +46,7 @@ export class IntegrateComponent implements OnInit {
     this.childModal.hide();
   }
 
-  handle = (serviceName: string) => {
+  handle(serviceName: string) {
     switch (serviceName) {
       case 'gmail':
       case 'google-drive':
