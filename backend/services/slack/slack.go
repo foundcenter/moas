@@ -3,14 +3,14 @@ package slack
 import (
 	"context"
 
+	"fmt"
 	"github.com/foundcenter/moas/backend/config"
 	"github.com/foundcenter/moas/backend/models"
 	"github.com/foundcenter/moas/backend/repo"
 	"github.com/foundcenter/moas/backend/utils"
+	"github.com/nlopes/slack"
 	"golang.org/x/oauth2"
 	slackAuth "golang.org/x/oauth2/slack"
-	"github.com/nlopes/slack"
-	"fmt"
 )
 
 const AccountType = "slack"
@@ -63,7 +63,7 @@ func Login(ctx context.Context, code string) (models.User, error) {
 	}
 
 	addAccount(ctx, &user, res, accessToken)
-	// TODO: fix should insert or update
+
 	db.UserRepo.Upsert(user)
 
 	return user, err
@@ -103,6 +103,12 @@ func addAccount(ctx context.Context, user *models.User, res *slack.UserIdentityR
 		Token: token,
 	}
 
+	for _, acc := range user.Accounts {
+		if acc.ID == a.ID && acc.Type == a.Type {
+			return
+		}
+	}
+
 	user.Accounts = append(user.Accounts, a)
 
 	if res.User.Email != "" && !utils.Contains(user.Emails, res.User.Email) {
@@ -110,7 +116,7 @@ func addAccount(ctx context.Context, user *models.User, res *slack.UserIdentityR
 	}
 }
 
-func Search(ctx context.Context, userID string, accountInfo models.AccountInfo, query string) ([]models.SearchResult, error) {
+func Search(ctx context.Context, accountInfo models.AccountInfo, query string) ([]models.SearchResult, error) {
 	db := repo.New()
 	defer db.Destroy()
 
@@ -118,20 +124,9 @@ func Search(ctx context.Context, userID string, accountInfo models.AccountInfo, 
 		return nil, fmt.Errorf("AccountInfo type %s not valid. Should be %s.", accountInfo.Type, AccountType)
 	}
 
-	user, err := db.UserRepo.FindById(userID)
-
-	if !user.ID.Valid() {
-		return nil, fmt.Errorf("User %s not found", userID)
-	}
-
-	if err != nil {
-		return nil, err
-	}
-
 	client := slack.New(accountInfo.Token.AccessToken)
 
-	messages, files, err := client.Search(query, slack.SearchParameters{})
-
+	messages, files, _ := client.Search(query, slack.SearchParameters{})
 
 	var results []models.SearchResult
 

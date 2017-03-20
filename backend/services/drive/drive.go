@@ -1,24 +1,147 @@
 package drive
 
 import (
+	"encoding/json"
 	"fmt"
-	"log"
-
+	"github.com/foundcenter/moas/backend/config"
 	"github.com/foundcenter/moas/backend/models"
 	"github.com/foundcenter/moas/backend/repo"
-	authService "github.com/foundcenter/moas/backend/services/auth/google"
+	"github.com/foundcenter/moas/backend/utils"
 	"golang.org/x/net/context"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 	"google.golang.org/api/drive/v2"
+	"log"
 )
 
-func Search(user_sub string, query string) []models.SearchResult {
+const AccountType = "drive"
+
+var conf *oauth2.Config
+
+type UserDriveInfo struct {
+	Email   string `json:"email"`
+	Name    string `json:"name"`
+	Picture string `json:"picture"`
+}
+
+func init() {
+	conf = &oauth2.Config{
+		ClientID:     config.Settings.Google.ClientID,
+		ClientSecret: config.Settings.Google.ClientSecret,
+		RedirectURL:  config.Settings.Google.RedirectURL,
+		Scopes: []string{
+			"profile",
+			"email",
+			"https://www.googleapis.com/auth/drive.readonly",
+		},
+		Endpoint: google.Endpoint,
+	}
+}
+
+func Login(ctx context.Context, code string) (models.User, error) {
+
+	var user models.User
+	accessToken, err := conf.Exchange(ctx, code)
+	if err != nil {
+		return user, err
+	}
+
+	client := conf.Client(ctx, accessToken)
+
+	userInfo, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
+	if err != nil {
+		return user, err
+	}
+	defer userInfo.Body.Close()
+
+	decoder := json.NewDecoder(userInfo.Body)
+	var gu UserDriveInfo
+	err = decoder.Decode(&gu)
+	if err != nil {
+		return user, err
+	}
+
+	db := repo.New()
+	defer db.Destroy()
+
+	user, _ = db.UserRepo.FindByAccount(gu.Email, AccountType)
+
+	// If user is already registered merge data
+	if !user.ID.Valid() {
+		user.Name = gu.Name
+		user.Picture = gu.Picture
+	}
+
+	addAccount(ctx, &user, &gu, accessToken)
+
+	db.UserRepo.Upsert(user)
+
+	return user, err
+}
+
+func Connect(ctx context.Context, userID string, code string) (models.User, error) {
+	var user models.User
+	accessToken, err := conf.Exchange(ctx, code)
+
+	if err != nil {
+		return user, err
+	}
+
+	client := conf.Client(ctx, accessToken)
+	userInfo, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
+	if err != nil {
+		return user, err
+	}
+	defer userInfo.Body.Close()
+
+	decoder := json.NewDecoder(userInfo.Body)
+	var gu UserDriveInfo
+	err = decoder.Decode(&gu)
+	if err != nil {
+		return user, err
+	}
+
+	db := repo.New()
+	defer db.Destroy()
+
+	user, err = db.UserRepo.FindById(userID)
+
+	if err != nil {
+		return user, err
+	}
+
+	addAccount(ctx, &user, &gu, accessToken)
+	db.UserRepo.Update(user)
+
+	return user, nil
+}
+
+func addAccount(ctx context.Context, user *models.User, res *UserDriveInfo, token *oauth2.Token) {
+	a := models.AccountInfo{
+		Type:  AccountType,
+		ID:    res.Email,
+		Data:  res,
+		Token: token,
+	}
+
+	for _, acc := range user.Accounts {
+		if acc.ID == a.ID && acc.Type == a.Type {
+			return
+		}
+	}
+
+	user.Accounts = append(user.Accounts, a)
+
+	if res.Email != "" && !utils.Contains(user.Emails, res.Email) {
+		user.Emails = append(user.Emails, res.Email)
+	}
+}
+
+func Search(ctx context.Context, account models.AccountInfo, query string) []models.SearchResult {
 
 	var searchResult []models.SearchResult = make([]models.SearchResult, 0)
-	driveService := CreateDriveService(user_sub)
+	driveService := CreateDriveService(ctx, account.Token)
 
-	_, err := FindUserById(user_sub)
-	// TODO: Fix
-	userEmail := "test@test.com"
 
 	ref, err := driveService.Files.List().Q("fullText contains '" + query + "'").Do()
 	if err != nil {
@@ -28,7 +151,7 @@ func Search(user_sub string, query string) []models.SearchResult {
 	if len(ref.Items) > 0 {
 		for _, f := range ref.Items {
 			s := models.SearchResult{}
-			s.AccountID = userEmail
+			s.AccountID = account.ID
 			s.Service = "drive"
 			s.Resource = "file"
 			s.Description = f.Description
@@ -43,32 +166,15 @@ func Search(user_sub string, query string) []models.SearchResult {
 	return searchResult
 }
 
-func CreateDriveService(user_sub string) *drive.Service {
+func CreateDriveService(ctx context.Context, token *oauth2.Token) *drive.Service {
 
-	ctx := context.Background()
-
-	//get user from db with user_sub=sub
-	user, err := FindUserById(user_sub)
-	if err != nil {
-		log.Fatalf("Unable to get user: %v", err)
-	}
-
-	config := authService.GetConfig()
-	// TODO: Fix
-	client := config.Client(ctx, user.Accounts[0].Token)
-
+	client := conf.Client(ctx, token)
 	driveService, err := drive.New(client)
 
 	if err != nil {
-		log.Fatalf("Unable to retrieve gmail Client %v", err)
+		log.Fatalf("Unable to retrieve drive client %v", err)
 	}
 
 	return driveService
 }
 
-func FindUserById(id string) (models.User, error) {
-	db := repo.New()
-	defer db.Destroy()
-	user, err := db.UserRepo.FindById(id)
-	return user, err
-}

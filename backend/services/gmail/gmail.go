@@ -34,7 +34,6 @@ func init() {
 			"profile",
 			"email",
 			"https://www.googleapis.com/auth/gmail.readonly",
-			"https://www.googleapis.com/auth/drive.readonly",
 		},
 		Endpoint: google.Endpoint,
 	}
