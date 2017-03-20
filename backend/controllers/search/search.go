@@ -32,7 +32,7 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 	queueOfResults := make(chan []models.SearchResult, 2)
 
 	token := context.Get(r, "user").(*jwt.Token).Raw
-	_, user_id := auth.ParseToken(token)
+	user_id, _ := auth.ParseToken(token)
 
 	db := repo.New()
 	defer db.Destroy()

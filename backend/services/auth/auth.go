@@ -57,7 +57,7 @@ func IssueToken(user models.User) (error, string) {
 	return nil, tokenString
 }
 
-func ParseToken(tokenString string) (error, string) {
+func ParseToken(tokenString string) (string, error) {
 
 	myClaims := MyClaims{}
 	token, _ := jwt.ParseWithClaims(tokenString, &myClaims, func(token *jwt.Token) (interface{}, error) {
@@ -65,8 +65,8 @@ func ParseToken(tokenString string) (error, string) {
 	})
 
 	if !token.Valid {
-		return errors.New("Token not valid!"), ""
+		return "", errors.New("Token not valid!")
 	} else {
-		return nil, myClaims.User_ID
+		return  myClaims.User_ID, nil
 	}
 }
