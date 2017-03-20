@@ -17,7 +17,7 @@
     <div class="panel panel-default">
       <div class="panel-body">
         <img src="{{ service.getLogoUrl() }}" alt=""> <span class="integrate__service-title">{{ service.name }}</span>
-
+        <p class="text-muted integrate__service--info">{{ service.info }}</p>
         <hr>
 
         <div *ngIf="service.accounts" class="list-group">
@@ -30,7 +30,6 @@
             'label-success': account.isOk(),
             'label-danger': account.isExpired()}">{{ account.status }}</span>
             </p>
-            <p class="list-group-item-text">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
           </a>
         </div>
 
