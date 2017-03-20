@@ -17,7 +17,7 @@ import { SearchComponent } from "./components/search/search.component";
 import { FocusDirective } from './focus.directive';
 import { ResultComponent } from './components/search/result/result.component';
 import { IntegrateComponent } from './components/integrate/integrate.component';
-import { ModalModule } from "ng2-bootstrap";
+import { ModalModule, AlertModule } from "ng2-bootstrap";
 
 @NgModule({
   declarations: [
@@ -39,6 +39,7 @@ import { ModalModule } from "ng2-bootstrap";
     AppRoutingModule,
     Ng2UiAuthModule.forRoot(MyAuthConfig),
     ModalModule.forRoot(),
+    AlertModule.forRoot(),
   ],
   providers: [
     AuthGuard

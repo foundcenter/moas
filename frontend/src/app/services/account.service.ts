@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Account } from '../models/account';
 import { Service } from '../models/service';
+import { Observable } from "rxjs";
 
 @Injectable()
 export class AccountService {
@@ -9,6 +10,25 @@ export class AccountService {
 
   getAccounts(): Account[] {
     return this.mockAccounts();
+  }
+
+  addJira(email: string, password: string): Observable<Account> {
+    if (!password) {
+      return Observable.throw(new Error('Bad credentials'));
+    }
+
+    if (email == 'already.connected') {
+      return Observable.throw(new Error('Already connected'));
+    }
+
+    let newJira = new Account(email, "989898", Account.statusOk, Service.JIRA());
+
+    return new Observable((observer) => {
+      setTimeout(() => {
+        observer.next(newJira);
+        observer.complete();
+      }, 500);
+    })
   }
 
   private mockAccounts(): Account[] {

@@ -16,6 +16,7 @@ export class IntegrateComponent implements OnInit, AfterContentInit {
   @ViewChild('childModal') public childModal: ModalDirective;
   public services: Service[] = [];
   public accounts: Account[] = [];
+  public jira: {email, password, error} = {email: '', password: '', error: null};
   constructor(private integrationService: IntegrationService, private auth: AuthService, private accountService: AccountService) { }
 
   ngOnInit() {
@@ -24,15 +25,18 @@ export class IntegrateComponent implements OnInit, AfterContentInit {
   }
 
   ngAfterContentInit(): void {
-    this.sortAccountsToServices();
+    this.assignAccountsToServices();
   }
 
 
-  sortAccountsToServices(): void {
+  assignAccountsToServices(): void {
     this.accounts.forEach((account: Account) => {
-      let service = this.findServiceByName(account.service);
-      service.accounts.push(account);
+      this.assignAccountToService(account);
     })
+  }
+  assignAccountToService(account: Account): void {
+    let service = this.findServiceByName(account.service);
+    service.accounts.push(account);
   }
 
   findServiceByName(service: Service): Service {
@@ -69,6 +73,7 @@ export class IntegrateComponent implements OnInit, AfterContentInit {
 
   public hideChildModal():void {
     this.childModal.hide();
+    this.jira.error = null;
   }
 
   handle(serviceName: string) {
@@ -102,6 +107,20 @@ export class IntegrateComponent implements OnInit, AfterContentInit {
       default:
         console.log('Integration not handled for ' + serviceName);
     }
+  }
+
+  addJira(){
+    console.log(`Jira submit ${this.jira.email} ${this.jira.password}`);
+    this.accountService.addJira(this.jira.email, this.jira.password)
+      .subscribe(
+        data => {
+          this.assignAccountToService(<Account>data);
+          this.hideChildModal();
+        },
+        error => {
+          this.jira.error = error;
+        }
+      );
   }
 
   slug(providerName: string): string{

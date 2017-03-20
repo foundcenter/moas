@@ -9,4 +9,8 @@ export class Service {
   getLogoUrl(): string{
     return 'assets/images/'+this.logo+'_logo.png';
   }
+
+  static JIRA(): Service {
+    return new Service('Jira', 'jira');
+  }
 }

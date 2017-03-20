@@ -57,22 +57,29 @@
       </div>
       <div class="modal-body">
 
-        <form class="form-horizontal">
+        <form class="form-horizontal" (ngSubmit)="addJira()" #jiraForm="ngForm">
           <div class="form-group">
             <div class="col-lg-6 col-lg-offset-4">
               <img src="/assets/images/jira_logo.png" alt="">
             </div>
           </div>
           <div class="form-group">
-            <label for="inputEmail" class="col-lg-4 control-label">Email</label>
+            <label for="emailField" class="col-lg-4 control-label">Email</label>
             <div class="col-lg-6">
-              <input type="text" class="form-control" id="inputEmail" placeholder="Email">
+              <input type="text" [(ngModel)]="jira.email" class="form-control" id="emailField" name="email">
             </div>
           </div>
           <div class="form-group">
-            <label for="inputPassword" class="col-lg-4 control-label">Password</label>
+            <label for="passwordField" class="col-lg-4 control-label">Password</label>
             <div class="col-lg-6">
-              <input type="password" class="form-control" id="inputPassword" placeholder="Password">
+              <input type="password" [(ngModel)]="jira.password" class="form-control" id="passwordField" name="password">
+            </div>
+          </div>
+          <div class="form-group" *ngIf="jira.error">
+            <div class="col-lg-6 col-lg-offset-4">
+              <alert type="danger">
+                {{ jira.error }}
+              </alert>
             </div>
           </div>
           <div class="form-group">
