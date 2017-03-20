@@ -1,24 +1,48 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterContentInit } from '@angular/core';
 import { IntegrationService } from '../../services/integration.service';
 import { AuthService } from "ng2-ui-auth";
 import { ModalDirective } from "ng2-bootstrap";
 import { Service } from "../../models/service";
+import { AccountService } from "../../services/account.service";
+import { Account } from "../../models/account";
 
 @Component({
   selector: 'app-integrate',
   templateUrl: './integrate.component.html',
   styleUrls: ['./integrate.component.scss'],
-  providers: [IntegrationService]
+  providers: [IntegrationService, AccountService]
 })
-export class IntegrateComponent implements OnInit {
+export class IntegrateComponent implements OnInit, AfterContentInit {
   @ViewChild('childModal') public childModal: ModalDirective;
-  public services: Service [] = [];
-
-
-  constructor(private integrationService: IntegrationService, private auth: AuthService) { }
+  public services: Service[] = [];
+  public accounts: Account[] = [];
+  constructor(private integrationService: IntegrationService, private auth: AuthService, private accountService: AccountService) { }
 
   ngOnInit() {
-    this.services = this.integrationService.mockServices();
+    this.accounts = this.accountService.getAccounts();
+    this.services = this.integrationService.getAvailableServices();
+  }
+
+  ngAfterContentInit(): void {
+    this.sortAccountsToServices();
+  }
+
+
+  sortAccountsToServices() {
+    this.accounts.forEach((account: Account) => {
+      let service = this.findServiceByName(account.service);
+      service.accounts.push(account);
+    })
+  }
+
+  findServiceByName(service: Service): Service {
+    let result = null;
+    this.services.forEach((current: Service) => {
+      if (service.name == current.name) {
+        result = current;
+      }
+    });
+    return result;
   }
 
   getRows() {
