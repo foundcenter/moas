@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { IntegrationService } from '../../services/integration.service';
 import { AuthService } from "ng2-ui-auth";
 import { ModalDirective } from "ng2-bootstrap";
+import { Service } from "../../models/service";
 
 @Component({
   selector: 'app-integrate',
@@ -84,34 +85,6 @@ export class IntegrateComponent implements OnInit {
       .toLowerCase()
       .replace(/ /g,'-')
       .replace(/[^\w-]+/g,'');
-  }
-
-}
-
-export class Service {
-  public accounts: Account[] = [];
-
-  constructor(public name: string, public logo: string) {
-  }
-
-  getLogoUrl = () => {
-    return 'assets/images/'+this.logo+'_logo.png';
-  }
-}
-
-export class Account {
-  static readonly statusOk: string = 'Ok';
-  static readonly statusExpired: string = 'Expired';
-
-  constructor(public email: string, public id: string, public status: string) {
-  }
-
-  isOk = () => {
-    return this.status == Account.statusOk;
-  }
-
-  isExpired = () => {
-    return this.status == Account.statusExpired;
   }
 
 }

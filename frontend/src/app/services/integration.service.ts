@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Service, Account } from "../components/integrate/integrate.component";
+import { Account } from "../models/account";
+import { Service } from "../models/service";
 
 @Injectable()
 export class IntegrationService {
