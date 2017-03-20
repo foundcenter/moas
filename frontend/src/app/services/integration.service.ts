@@ -11,11 +11,11 @@ export class IntegrationService {
   }
 
   private mockServices(): Service[] {
-    let gmail = new Service('Gmail', 'gmail');
-    let googleDrive = new Service('Google Drive', 'google_drive');
-    let jira = new Service('Jira', 'jira');
-    let slack = new Service('Slack', 'slack');
-    let github = new Service('Github', 'github');
+    let gmail = Service.GMAIL();
+    let googleDrive = Service.GOOGLEDRIVE();
+    let jira = Service.JIRA();
+    let slack = Service.SLACK();
+    let github = Service.GITHUB();
 
     return [gmail, googleDrive, jira, slack, github];
   }

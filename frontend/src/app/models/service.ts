@@ -13,4 +13,18 @@ export class Service {
   static JIRA(): Service {
     return new Service('Jira', 'jira');
   }
-}
+  static GMAIL(): Service {
+    return new Service('Gmail', 'gmail');
+  }
+  static GOOGLEDRIVE(): Service {
+    return new Service('Google Drive', 'google_drive');
+  }
+  static SLACK(): Service {
+    return new Service('Slack', 'slack');
+  }
+  static GITHUB(): Service {
+    return new Service('GitHub', 'github');
+  }
+
+
+  }

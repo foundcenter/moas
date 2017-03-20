@@ -34,21 +34,17 @@ export class AccountService {
   private mockAccounts(): Account[] {
     let accounts: Account[] = [];
 
-    let gmailService = new Service('Gmail', 'gmail');
-    let gmailAcc1 = new Account('neb.vojvodic@gmail.com', '12312312', Account.statusOk, gmailService);
-    let gmailAcc2 = new Account('nv@foundcenter.com', '7654234', Account.statusOk, gmailService);
+    let gmailAcc1 = new Account('neb.vojvodic@gmail.com', '12312312', Account.statusOk, Service.GMAIL());
+    let gmailAcc2 = new Account('nv@foundcenter.com', '7654234', Account.statusOk, Service.GMAIL());
     accounts.push(gmailAcc1, gmailAcc2);
 
-    let googleDriveService = new Service('Google Drive', 'google_drive');
-    let googleDriveAcc1 = new Account('neb.vojvodic@gmail.com', '12312312', Account.statusOk, googleDriveService);
+    let googleDriveAcc1 = new Account('neb.vojvodic@gmail.com', '12312312', Account.statusOk, Service.GOOGLEDRIVE());
     accounts.push(googleDriveAcc1);
 
-    let jiraService = new Service('Jira', 'jira');
-    let jiraAccount = new Account('neb.vojvodic@gmail.com', '4353352', Account.statusExpired, jiraService);
+    let jiraAccount = new Account('neb.vojvodic@gmail.com', '4353352', Account.statusExpired, Service.JIRA());
     accounts.push(jiraAccount);
 
-    let githubService = new Service('Github', 'github');
-    let githubAcc1 = new Account('neb.vojvodic@gmail.com', '7878782', Account.statusOk, githubService);
+    let githubAcc1 = new Account('neb.vojvodic@gmail.com', '7878782', Account.statusOk, Service.GITHUB());
     accounts.push(githubAcc1);
 
     return accounts;
