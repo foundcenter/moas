@@ -110,12 +110,13 @@ export class IntegrateComponent implements OnInit, AfterContentInit {
   }
 
   addJira(){
-    console.log(`Jira submit ${this.jira.email} ${this.jira.password}`);
     this.accountService.addJira(this.jira.email, this.jira.password)
       .subscribe(
         data => {
           this.assignAccountToService(<Account>data);
           this.hideChildModal();
+          this.jira.email = '';
+          this.jira.password = '';
         },
         error => {
           this.jira.error = error;
