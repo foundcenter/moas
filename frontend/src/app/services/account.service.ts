@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Account } from '../models/account';
 import { Service } from '../models/service';
 import { Observable } from "rxjs";
+import { Response } from "@angular/http";
 
 @Injectable()
 export class AccountService {
@@ -12,7 +13,7 @@ export class AccountService {
     return this.mockAccounts();
   }
 
-  addJira(email: string, password: string): Observable<Account> {
+  mockAddJira(email: string, password: string): Observable<Account> {
     if (!password) {
       return Observable.throw(new Error('Bad credentials'));
     }
@@ -29,6 +30,19 @@ export class AccountService {
         observer.complete();
       }, 500);
     })
+  }
+
+
+
+  mockAddOauthAccount(response: Response, service: Service): Observable<Account> {
+    let account = new Account('somename@gmail.com', '77665544', Account.statusOk, service);
+
+    return new Observable(observer => {
+      setTimeout(() => {
+        observer.next(account);
+        observer.complete();
+      }, 1000)
+    });
   }
 
   private mockAccounts(): Account[] {

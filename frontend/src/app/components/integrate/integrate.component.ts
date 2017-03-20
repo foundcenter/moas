@@ -76,7 +76,9 @@ export class IntegrateComponent implements OnInit, AfterContentInit {
     this.jira.error = null;
   }
 
-  handle(serviceName: string) {
+  handle(service: Service) {
+    let serviceName = this.slug(service.name);
+
     switch (serviceName) {
       case 'gmail':
       case 'google-drive':
@@ -88,6 +90,12 @@ export class IntegrateComponent implements OnInit, AfterContentInit {
             data => {
               console.log(`Data of ${serviceName} auth`);
               console.log(data);
+              this.accountService.mockAddOauthAccount(data, service)
+                .subscribe(
+                  (account) => {
+                    this.assignAccountToService(<Account>account);
+                  }
+                );
             },
             error => {
               console.log(`Error of ${serviceName} auth`);
@@ -110,7 +118,7 @@ export class IntegrateComponent implements OnInit, AfterContentInit {
   }
 
   addJira(){
-    this.accountService.addJira(this.jira.email, this.jira.password)
+    this.accountService.mockAddJira(this.jira.email, this.jira.password)
       .subscribe(
         data => {
           this.assignAccountToService(<Account>data);
