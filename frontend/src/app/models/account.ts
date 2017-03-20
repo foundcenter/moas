@@ -6,11 +6,11 @@ export class Account {
   constructor(public email: string, public id: string, public status: string, public service: Service) {
   }
 
-  isOk = () => {
+  isOk(): boolean{
     return this.status == Account.statusOk;
   }
 
-  isExpired = () => {
+  isExpired(): boolean{
     return this.status == Account.statusExpired;
   }
 

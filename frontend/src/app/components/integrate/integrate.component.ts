@@ -1,10 +1,10 @@
 import { Component, OnInit, ViewChild, AfterContentInit } from '@angular/core';
 import { IntegrationService } from '../../services/integration.service';
-import { AuthService } from "ng2-ui-auth";
-import { ModalDirective } from "ng2-bootstrap";
-import { Service } from "../../models/service";
-import { AccountService } from "../../services/account.service";
-import { Account } from "../../models/account";
+import { AuthService } from 'ng2-ui-auth';
+import { ModalDirective } from 'ng2-bootstrap';
+import { Service } from '../../models/service';
+import { AccountService } from '../../services/account.service';
+import { Account } from '../../models/account';
 
 @Component({
   selector: 'app-integrate',
@@ -28,7 +28,7 @@ export class IntegrateComponent implements OnInit, AfterContentInit {
   }
 
 
-  sortAccountsToServices() {
+  sortAccountsToServices(): void {
     this.accounts.forEach((account: Account) => {
       let service = this.findServiceByName(account.service);
       service.accounts.push(account);
@@ -45,7 +45,7 @@ export class IntegrateComponent implements OnInit, AfterContentInit {
     return result;
   }
 
-  getRows() {
+  getRows(): Service[][] {
     let totalAdded = 0;
     let rows : Service[][] = [];
     let row: Service[] = [];
@@ -104,7 +104,7 @@ export class IntegrateComponent implements OnInit, AfterContentInit {
     }
   }
 
-  slug = (providerName: string) => {
+  slug(providerName: string): string{
     return providerName
       .toLowerCase()
       .replace(/ /g,'-')

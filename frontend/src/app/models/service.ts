@@ -1,4 +1,4 @@
-import { Account } from "./account";
+import { Account } from './account';
 
 export class Service {
   public accounts: Account[] = [];
@@ -6,7 +6,7 @@ export class Service {
   constructor(public name: string, public logo: string) {
   }
 
-  getLogoUrl = () => {
+  getLogoUrl(): string{
     return 'assets/images/'+this.logo+'_logo.png';
   }
 }
