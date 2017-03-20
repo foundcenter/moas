@@ -1,6 +1,6 @@
 import { Component, OnInit, EventEmitter, AfterViewInit } from '@angular/core';
 import { SearchService } from '../../search.service';
-import { Result } from '../../interfaces/result.interface';
+import { Result } from "../../models/result.interface";
 
 @Component({
   selector: 'app-search',

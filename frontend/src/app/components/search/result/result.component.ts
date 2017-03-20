@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Result } from "../../../interfaces/result.interface";
+import { Result } from "../../../models/result.interface";
 
 @Component({
   selector: 'search-result',

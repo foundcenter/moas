@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SearchConfig } from "./components/search/search.component";
 import { Observable } from "rxjs";
-import { Result } from "./interfaces/result.interface";
+import { Result } from "./models/result.interface";
 
 
 
