@@ -2,15 +2,15 @@ package slack
 
 import (
 	"context"
-	"errors"
 
 	"github.com/foundcenter/moas/backend/config"
 	"github.com/foundcenter/moas/backend/models"
 	"github.com/foundcenter/moas/backend/repo"
 	"github.com/foundcenter/moas/backend/utils"
-	"github.com/nlopes/slack"
 	"golang.org/x/oauth2"
 	slackAuth "golang.org/x/oauth2/slack"
+	"github.com/nlopes/slack"
+	"fmt"
 )
 
 const AccountType = "slack"
@@ -63,7 +63,8 @@ func Login(ctx context.Context, code string) (models.User, error) {
 	}
 
 	addAccount(ctx, &user, res, accessToken)
-	db.UserRepo.Update(user)
+	// TODO: fix should insert or update
+	db.UserRepo.Upsert(user)
 
 	return user, err
 }
@@ -105,31 +106,37 @@ func addAccount(ctx context.Context, user *models.User, res *slack.UserIdentityR
 	user.Accounts = append(user.Accounts, a)
 
 	if res.User.Email != "" && !utils.Contains(user.Emails, res.User.Email) {
-		user.Emails = append(user.Emails, user.Email)
+		user.Emails = append(user.Emails, res.User.Email)
 	}
 }
 
-func Search(ctx context.Context, userID string, query string) ([]models.ResultResponse, error) {
+func Search(ctx context.Context, userID string, accountInfo models.AccountInfo, query string) ([]models.SearchResult, error) {
 	db := repo.New()
 	defer db.Destroy()
 
+	if accountInfo.Type != AccountType {
+		return nil, fmt.Errorf("AccountInfo type %s not valid. Should be %s.", accountInfo.Type, AccountType)
+	}
+
 	user, err := db.UserRepo.FindById(userID)
+
+	if !user.ID.Valid() {
+		return nil, fmt.Errorf("User %s not found", userID)
+	}
+
 	if err != nil {
 		return nil, err
 	}
 
-	token := user.Accounts["slack"]
+	client := slack.New(accountInfo.Token.AccessToken)
 
-	if token == nil {
-		return nil, errors.New("Slack account not defined")
-	}
+	messages, files, err := client.Search(query, slack.SearchParameters{})
 
-	messages, files, err := slack.Search(query, slack.SearchParameters{})
 
-	var results []models.ResultResponse
+	var results []models.SearchResult
 
-	for m := range messages.Matches {
-		results = append(results, models.ResultResponse{
+	for _, m := range messages.Matches {
+		results = append(results, models.SearchResult{
 			AccountID:   "slack",
 			Service:     "slack",
 			Resource:    "message",
@@ -139,8 +146,8 @@ func Search(ctx context.Context, userID string, query string) ([]models.ResultRe
 		})
 	}
 
-	for f := range files.Matches {
-		results = append(results, models.ResultResponse{
+	for _, f := range files.Matches {
+		results = append(results, models.SearchResult{
 			AccountID:   "slack",
 			Service:     "slack",
 			Resource:    "file",

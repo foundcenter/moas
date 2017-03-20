@@ -11,9 +11,9 @@ import (
 	"google.golang.org/api/drive/v2"
 )
 
-func Search(user_sub string, query string) []models.ResultResponse {
+func Search(user_sub string, query string) []models.SearchResult {
 
-	var searchResult []models.ResultResponse = make([]models.ResultResponse, 0)
+	var searchResult []models.SearchResult = make([]models.SearchResult, 0)
 	driveService := CreateDriveService(user_sub)
 
 	_, err := FindUserById(user_sub)
@@ -27,7 +27,7 @@ func Search(user_sub string, query string) []models.ResultResponse {
 
 	if len(ref.Items) > 0 {
 		for _, f := range ref.Items {
-			s := models.ResultResponse{}
+			s := models.SearchResult{}
 			s.AccountID = userEmail
 			s.Service = "drive"
 			s.Resource = "file"

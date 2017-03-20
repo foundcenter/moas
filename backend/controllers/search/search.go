@@ -1,20 +1,19 @@
 package search
 
 import (
+	"github.com/dgrijalva/jwt-go"
 	"github.com/foundcenter/moas/backend/controllers/response"
 	"github.com/foundcenter/moas/backend/middleware/jwt_auth"
 	"github.com/foundcenter/moas/backend/middleware/logger"
 	"github.com/foundcenter/moas/backend/models"
+	"github.com/foundcenter/moas/backend/repo"
+	"github.com/foundcenter/moas/backend/services/auth"
 	"github.com/foundcenter/moas/backend/services/gmail"
-	"github.com/foundcenter/moas/backend/services/drive"
+	"github.com/gorilla/context"
 	"github.com/julienschmidt/httprouter"
 	"github.com/justinas/alice"
 	"net/http"
 	"sync"
-
-	"github.com/dgrijalva/jwt-go"
-	"github.com/gorilla/context"
-	"github.com/foundcenter/moas/backend/services/auth"
 )
 
 func Load(router *httprouter.Router) {
@@ -24,30 +23,41 @@ func Load(router *httprouter.Router) {
 
 func handleSearch(w http.ResponseWriter, r *http.Request) {
 
-	resultOfSearch := make([]models.ResultResponse, 0)
+	resultOfSearch := make([]models.SearchResult, 0)
 	var wg sync.WaitGroup
-	query:=r.URL.Query().Get("q")
+	query := r.URL.Query().Get("q")
 
-	queueOfResults := make(chan []models.ResultResponse,2)
+	queueOfResults := make(chan []models.SearchResult, 2)
 
 	token := context.Get(r, "user").(*jwt.Token).Raw
-	_, user_sub:= auth.ParseToken(token)
+	_, user_id := auth.ParseToken(token)
 
-	wg.Add(2)
+	db := repo.New()
+	defer db.Destroy()
+	user, err := db.UserRepo.FindById(user_id)
+	if err != nil {
+		response.Reply(w).Unauthorized(err)
+		return
+	}
 
-	// gmail search
-	go func() {
-		result := gmail.Search(user_sub, query)
-		queueOfResults<-result
-	}()
-
-	// drive search
-	go func() {
-		result := drive.Search(user_sub, query)
-		queueOfResults<-result
-	}()
-
-	// and other providers...
+	wg.Add(len(user.Accounts))
+	for _, provider := range user.Accounts {
+		switch provider.Type {
+		case "gmail":
+			// gmail search
+			go func() {
+				result := gmail.Search(r.Context(), user.Accounts[0], query)
+				queueOfResults <- result
+			}()
+		case "drive":
+			// drive search
+			//go func() {
+			//	result := drive.Search(user_sub, query)
+			//	queueOfResults<-result
+			//}()
+			// and other providers...
+		}
+	}
 
 	//here we wait result of search from all services
 	go func() {

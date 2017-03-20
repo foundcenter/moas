@@ -16,11 +16,15 @@ const (
 )
 
 type MyClaims struct {
-	User_sub string `json:"user_sub"`
+	User_ID string `json:"user_id"`
 	jwt.StandardClaims
 }
 
 type GoogleAuth struct {
+	Code string `json:"code"`
+}
+
+type SlackAuth struct {
 	Code string `json:"code"`
 }
 
@@ -39,7 +43,9 @@ func Login(email string, password string) (error, models.User) {
 
 func IssueToken(user models.User) (error, string) {
 
-	mc := MyClaims{user.ID.String(), jwt.StandardClaims{ExpiresAt: time.Now().Add(time.Hour * 24 * 30).Unix(), Issuer: "moas"}}
+
+	mc := MyClaims{user.ID.Hex(), jwt.StandardClaims{ExpiresAt: time.Now().Add(time.Hour * 24 * 30).Unix(), Issuer: "moas"}}
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, mc)
 
 	// Sign and get the complete encoded token as a string using the secret
@@ -61,6 +67,6 @@ func ParseToken(tokenString string) (error, string) {
 	if !token.Valid {
 		return errors.New("Token not valid!"), ""
 	} else {
-		return nil, myClaims.User_sub
+		return nil, myClaims.User_ID
 	}
 }

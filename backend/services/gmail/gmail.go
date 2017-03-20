@@ -1,27 +1,151 @@
 package gmail
 
 import (
+	"encoding/json"
 	"fmt"
-	"log"
-	"sync"
-
+	"github.com/foundcenter/moas/backend/config"
 	"github.com/foundcenter/moas/backend/models"
 	"github.com/foundcenter/moas/backend/repo"
-	authService "github.com/foundcenter/moas/backend/services/auth/google"
+	"github.com/foundcenter/moas/backend/utils"
 	"golang.org/x/net/context"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 	"google.golang.org/api/gmail/v1"
+	"log"
+	"sync"
 )
 
-func Search(user_sub string, query string) []models.ResultResponse {
+const AccountType = "gmail"
+
+var conf *oauth2.Config
+
+type UserGmailInfo struct {
+	Email   string `json:"email"`
+	Name    string `json:"name"`
+	Picture string `json:"picture"`
+}
+
+func init() {
+	conf = &oauth2.Config{
+		ClientID:     config.Settings.Google.ClientID,
+		ClientSecret: config.Settings.Google.ClientSecret,
+		RedirectURL:  config.Settings.Google.RedirectURL,
+		Scopes: []string{
+			"profile",
+			"email",
+			"https://www.googleapis.com/auth/gmail.readonly",
+			"https://www.googleapis.com/auth/drive.readonly",
+		},
+		Endpoint: google.Endpoint,
+	}
+}
+
+func Login(ctx context.Context, code string) (models.User, error) {
+
+	var user models.User
+	accessToken, err := conf.Exchange(ctx, code)
+	if err != nil {
+		return user, err
+	}
+
+	client := conf.Client(ctx, accessToken)
+
+	userInfo, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
+	if err != nil {
+		return user, err
+	}
+	defer userInfo.Body.Close()
+
+	decoder := json.NewDecoder(userInfo.Body)
+	var gu UserGmailInfo
+	err = decoder.Decode(&gu)
+	if err != nil {
+		return user, err
+	}
+
+	db := repo.New()
+	defer db.Destroy()
+
+	user, _ = db.UserRepo.FindByAccount(gu.Email, AccountType)
+
+	// If user is already registered merge data
+	if !user.ID.Valid() {
+		user.Name = gu.Name
+		user.Picture = gu.Picture
+	}
+
+	addAccount(ctx, &user, &gu, accessToken)
+
+	db.UserRepo.Upsert(user)
+
+	return user, err
+}
+
+func Connect(ctx context.Context, userID string, code string) (models.User, error) {
+	var user models.User
+	accessToken, err := conf.Exchange(ctx, code)
+
+	if err != nil {
+		return user, err
+	}
+
+	client := conf.Client(ctx, accessToken)
+	userInfo, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
+	if err != nil {
+		return user, err
+	}
+	defer userInfo.Body.Close()
+
+	decoder := json.NewDecoder(userInfo.Body)
+	var gu UserGmailInfo
+	err = decoder.Decode(&gu)
+	if err != nil {
+		return user, err
+	}
+
+	db := repo.New()
+	defer db.Destroy()
+
+	user, err = db.UserRepo.FindById(userID)
+
+	if err != nil {
+		return user, err
+	}
+
+	addAccount(ctx, &user, &gu, accessToken)
+	db.UserRepo.Update(user)
+
+	return user, nil
+}
+
+func addAccount(ctx context.Context, user *models.User, res *UserGmailInfo, token *oauth2.Token) {
+	a := models.AccountInfo{
+		Type:  AccountType,
+		ID:    res.Email,
+		Data:  res,
+		Token: token,
+	}
+
+	for _, acc := range user.Accounts {
+		if acc.ID == a.ID && acc.Type == a.Type {
+			return
+		}
+	}
+
+	user.Accounts = append(user.Accounts, a)
+
+	if res.Email != "" && !utils.Contains(user.Emails, res.Email) {
+		user.Emails = append(user.Emails, res.Email)
+	}
+}
+
+func Search(ctx context.Context, account models.AccountInfo, query string) []models.SearchResult {
 
 	var wg sync.WaitGroup
-	searchResult := make([]models.ResultResponse, 0)
-	queueOfResults := make(chan []models.ResultResponse, 2)
-	gmailService := CreateGmailService(user_sub)
-
-	user, _ := FindUserById(user_sub)
-	// TODO: Fix
-	userEmail := user.Emails[0]
+	searchResult := make([]models.SearchResult, 0)
+	queueOfResults := make(chan []models.SearchResult, 2)
+	gmailService := CreateGmailService(ctx, account.Token)
+	userEmail := account.ID
 
 	wg.Add(2)
 	go func() {
@@ -46,9 +170,9 @@ func Search(user_sub string, query string) []models.ResultResponse {
 	return searchResult
 }
 
-func SearchMessages(gmailService *gmail.Service, userEmail string, query string) []models.ResultResponse {
+func SearchMessages(gmailService *gmail.Service, userEmail string, query string) []models.SearchResult {
 
-	var searchResult []models.ResultResponse = make([]models.ResultResponse, 0)
+	var searchResult []models.SearchResult = make([]models.SearchResult, 0)
 
 	ref, err := gmailService.Users.Messages.List(userEmail).Q(query).MaxResults(50).Do()
 	if err != nil {
@@ -57,7 +181,7 @@ func SearchMessages(gmailService *gmail.Service, userEmail string, query string)
 
 	if len(ref.Messages) > 0 {
 		for _, m := range ref.Messages {
-			s := models.ResultResponse{}
+			s := models.SearchResult{}
 			s.Service = "gmail"
 			s.Resource = "messages"
 			s.AccountID = userEmail
@@ -71,9 +195,9 @@ func SearchMessages(gmailService *gmail.Service, userEmail string, query string)
 	return searchResult
 }
 
-func SearchThreads(gmailService *gmail.Service, userEmail string, query string) []models.ResultResponse {
+func SearchThreads(gmailService *gmail.Service, userEmail string, query string) []models.SearchResult {
 
-	var searchResult []models.ResultResponse = make([]models.ResultResponse, 0)
+	var searchResult []models.SearchResult = make([]models.SearchResult, 0)
 
 	ref, err := gmailService.Users.Threads.List(userEmail).Q(query).MaxResults(50).Do()
 	if err != nil {
@@ -82,7 +206,7 @@ func SearchThreads(gmailService *gmail.Service, userEmail string, query string) 
 
 	if len(ref.Threads) > 0 {
 		for _, m := range ref.Threads {
-			s := models.ResultResponse{}
+			s := models.SearchResult{}
 			s.Service = "gmail"
 			s.Resource = "thread"
 			s.AccountID = userEmail
@@ -96,20 +220,9 @@ func SearchThreads(gmailService *gmail.Service, userEmail string, query string) 
 	return searchResult
 }
 
-func CreateGmailService(user_sub string) *gmail.Service {
+func CreateGmailService(ctx context.Context, token *oauth2.Token) *gmail.Service {
 
-	ctx := context.Background()
-
-	//get user from db with user_sub=sub
-	user, err := FindUserById(user_sub)
-	if err != nil {
-		log.Fatalf("Unable to get user: %v", err)
-	}
-
-	config := authService.GetConfig()
-	//TODO: Fix
-	client := config.Client(ctx, user.Accounts[0].Token)
-
+	client := conf.Client(ctx, token)
 	gmailService, err := gmail.New(client)
 
 	if err != nil {
@@ -117,11 +230,4 @@ func CreateGmailService(user_sub string) *gmail.Service {
 	}
 
 	return gmailService
-}
-
-func FindUserById(id string) (models.User, error) {
-	db := repo.New()
-	defer db.Destroy()
-	user, err := db.UserRepo.FindById(id)
-	return user, err
 }

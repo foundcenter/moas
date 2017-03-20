@@ -30,19 +30,19 @@ func init() {
 	}
 }
 
-func Exchange(code string) (error, models.User) {
+func Exchange(code string) (models.User, error) {
 
 	accessToken, err := conf.Exchange(context.TODO(), code)
 	if err != nil {
 		fmt.Printf("Error with auth handler %s with code %s \n", err, code)
-		return errors.New("Could not exchange token"), models.User{}
+		return  models.User{}, errors.New("Could not exchange token")
 	}
 
 	client := conf.Client(context.TODO(), accessToken)
 	userInfo, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
 	if err != nil {
 		log.Printf("Error with auth handler %s \n", err)
-		return errors.New("Could not get user info"), models.User{}
+		return models.User{}, errors.New("Could not get user info")
 	}
 	defer userInfo.Body.Close()
 
@@ -55,7 +55,7 @@ func Exchange(code string) (error, models.User) {
 
 	// gu.Accounts = map[string]*oauth2.Token{"google": accessToken}
 
-	return nil, gu
+	return gu, nil
 }
 func GetConfig() *oauth2.Config {
 	return conf

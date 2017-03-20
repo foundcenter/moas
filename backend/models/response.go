@@ -1,6 +1,6 @@
 package models
 
-type ResultResponse struct {
+type SearchResult struct {
 	AccountID   string `json:"account_id"`
 	Service     string `json:"service"`
 	Resource    string `json:"resource"`
