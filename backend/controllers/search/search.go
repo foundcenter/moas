@@ -8,14 +8,15 @@ import (
 	"github.com/foundcenter/moas/backend/models"
 	"github.com/foundcenter/moas/backend/repo"
 	"github.com/foundcenter/moas/backend/services/auth"
-	"github.com/foundcenter/moas/backend/services/gmail"
 	"github.com/foundcenter/moas/backend/services/drive"
+	"github.com/foundcenter/moas/backend/services/github"
+	"github.com/foundcenter/moas/backend/services/gmail"
+	"github.com/foundcenter/moas/backend/services/slack"
 	"github.com/gorilla/context"
 	"github.com/julienschmidt/httprouter"
 	"github.com/justinas/alice"
 	"net/http"
 	"sync"
-	"github.com/foundcenter/moas/backend/services/slack"
 )
 
 func Load(router *httprouter.Router) {
@@ -55,18 +56,23 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 			// drive search
 			go func() {
 				result := drive.Search(r.Context(), provider, query)
-				queueOfResults<-result
+				queueOfResults <- result
 			}()
 		case "slack":
 			// slack search
 			go func() {
 				result, _ := slack.Search(r.Context(), provider, query)
-				queueOfResults<-result
+				queueOfResults <- result
+			}()
+		case "github":
+			// github search
+			go func() {
+				result, _ := github.Search(r.Context(), provider, query)
+				queueOfResults <- result
 			}()
 			// and other providers...
 		}
 	}
-
 	//here we wait result of search from all services
 	go func() {
 		for r := range queueOfResults {

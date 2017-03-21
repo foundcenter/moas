@@ -12,6 +12,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/justinas/alice"
 	"net/http"
+	"github.com/foundcenter/moas/backend/services/github"
 )
 
 type loginRequest struct {
@@ -29,6 +30,7 @@ func Load(router *httprouter.Router) {
 	router.Handler("POST", "/connect/slack", extendedChain.ThenFunc(handleSlackConnect))
 	router.Handler("POST", "/connect/gmail", extendedChain.ThenFunc(handleGmailConnect))
 	router.Handler("POST", "/connect/drive", extendedChain.ThenFunc(handleDriveConnect))
+	router.Handler("POST", "/connect/github", extendedChain.ThenFunc(handleGithubConnect))
 }
 
 func handleGoogleAuth(w http.ResponseWriter, r *http.Request) {
@@ -182,6 +184,29 @@ func handleSlackConnect(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user, err := slack.Connect(r.Context(), user_id, ga.Code)
+	if err != nil {
+		response.Reply(w).ServerInternalError()
+		return
+	}
+
+	response.Reply(w).Logged(map[string]interface{}{"user": user, "token": token})
+
+}
+
+func handleGithubConnect(w http.ResponseWriter, r *http.Request) {
+
+	decoder := json.NewDecoder(r.Body)
+	var ga auth.GoogleAuth
+	err := decoder.Decode(&ga)
+
+	token := r.Header.Get("Authorization")
+	user_id, err := auth.ParseToken(token[7:])
+	if err != nil {
+		response.Reply(w).ServerInternalError()
+		return
+	}
+
+	user, err := github.Connect(r.Context(), user_id, ga.Code)
 	if err != nil {
 		response.Reply(w).ServerInternalError()
 		return

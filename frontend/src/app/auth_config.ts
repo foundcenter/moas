@@ -10,6 +10,7 @@ export const GITHUB_CLIENT_ID = '469a838ef4c6048510b6';
 
 export const BACKEND_MOCK = 'https://httpbin.org/post';
 export const REDIRECT_URI = 'http://localhost:4200';
+export const API_URL ='http://localhost:8081';
 
 export class MyAuthConfig extends CustomConfig {
     defaultHeaders = {'Content-Type': 'application/json'};
@@ -72,7 +73,7 @@ export class MyAuthConfig extends CustomConfig {
         github: {
             clientId: GITHUB_CLIENT_ID,
             name: 'github',
-            url: BACKEND_MOCK,
+            url: `${API_URL}/auth/github`,
             authorizationEndpoint: 'https://github.com/login/oauth/authorize',
             redirectUri: 'http://localhost:4200',
             requiredUrlParams: ['scope'],
