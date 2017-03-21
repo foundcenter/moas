@@ -1,0 +1,43 @@
+{
+    "dependencies": {
+        "github.com/alioygur/gores": {
+            "branch": "master"
+        },
+        "github.com/auth0/go-jwt-middleware": {
+            "branch": "master"
+        },
+        "github.com/dgrijalva/jwt-go": {
+            "branch": "master"
+        },
+        "github.com/gorilla/context": {
+            "branch": "master"
+        },
+        "github.com/joho/godotenv": {
+            "branch": "master"
+        },
+        "github.com/julienschmidt/httprouter": {
+            "branch": "master"
+        },
+        "github.com/justinas/alice": {
+            "branch": "master"
+        },
+        "github.com/nlopes/slack": {
+            "branch": "master"
+        },
+        "github.com/rs/cors": {
+            "branch": "master"
+        },
+        "golang.org/x/net": {
+            "branch": "master"
+        },
+        "golang.org/x/oauth2": {
+            "branch": "master"
+        },
+        "google.golang.org/api": {
+            "branch": "master"
+        },
+        "gopkg.in/mgo.v2": {
+            "branch": "v2"
+        }
+    }
+}
