@@ -12,7 +12,6 @@ import (
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/gmail/v1"
 	"log"
-	"sync"
 )
 
 const (
@@ -146,65 +145,11 @@ func addAccount(ctx context.Context, user *models.User, res *UserGmailInfo, toke
 
 func Search(ctx context.Context, account models.AccountInfo, query string) []models.SearchResult {
 
-	var wg sync.WaitGroup
 	searchResult := make([]models.SearchResult, 0)
-	queueOfResults := make(chan []models.SearchResult, 2)
 	gmailService := CreateGmailService(ctx, account.Token)
 	userEmail := account.ID
 
-	wg.Add(2)
-	go func() {
-		result := SearchMessages(gmailService, userEmail, query)
-		queueOfResults <- result
-	}()
-
-	go func() {
-		result := SearchThreads(gmailService, userEmail, query)
-		queueOfResults <- result
-	}()
-
-	go func() {
-		for r := range queueOfResults {
-			searchResult = append(searchResult, r...)
-			wg.Done()
-		}
-	}()
-
-	wg.Wait()
-
-	return searchResult
-}
-
-func SearchMessages(gmailService *gmail.Service, userEmail string, query string) []models.SearchResult {
-
-	var searchResult []models.SearchResult = make([]models.SearchResult, 0)
-
-	ref, err := gmailService.Users.Messages.List(userEmail).Q(query).MaxResults(50).Do()
-	if err != nil {
-		log.Fatalf("Unable to retrieve messages. %v", err)
-	}
-
-	if len(ref.Messages) > 0 {
-		for _, m := range ref.Messages {
-			s := models.SearchResult{}
-			s.Service = "gmail"
-			s.Resource = "messages"
-			s.AccountID = userEmail
-			s.Description = m.Snippet
-			s.Url = "https://mail.google.com/mail/u/" + userEmail + "/#inbox/" + m.Id
-			searchResult = append(searchResult, s)
-		}
-	} else {
-		fmt.Print("No messages found.  \n")
-	}
-	return searchResult
-}
-
-func SearchThreads(gmailService *gmail.Service, userEmail string, query string) []models.SearchResult {
-
-	var searchResult []models.SearchResult = make([]models.SearchResult, 0)
-
-	ref, err := gmailService.Users.Threads.List(userEmail).Q(query).MaxResults(50).Do()
+	ref, err := gmailService.Users.Threads.List(userEmail).Q(query).MaxResults(100).Do()
 	if err != nil {
 		log.Fatalf("Unable to retrieve messages. %v", err)
 	}
@@ -222,6 +167,7 @@ func SearchThreads(gmailService *gmail.Service, userEmail string, query string) 
 	} else {
 		fmt.Print("No threads found. \n")
 	}
+
 	return searchResult
 }
 
