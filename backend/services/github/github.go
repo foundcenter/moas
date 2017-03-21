@@ -10,7 +10,6 @@ import (
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 	"sync"
-	"os/user"
 )
 
 const AccountType = "slack"
@@ -45,7 +44,7 @@ func Login(ctx context.Context, code string) (models.User, error) {
 	client := github.NewClient(tc)
 
 	github_user, _, err := client.Users.Get(ctx, "")
-	github_account_id := string(github_user.ID)
+	github_account_id := string(github_user.GetID())
 
 	if err != nil {
 		return user, err
