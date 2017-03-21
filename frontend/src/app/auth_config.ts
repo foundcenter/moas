@@ -1,4 +1,6 @@
-import {CustomConfig} from 'ng2-ui-auth';
+import { CustomConfig } from 'ng2-ui-auth';
+import { Response } from '@angular/http';
+
 /**
  * Created by Ron on 03/10/2016.
  */
@@ -14,9 +16,10 @@ export class MyAuthConfig extends CustomConfig {
     providers = {
         google: {
             clientId: GOOGLE_CLIENT_ID,
-            url: "http://localhost:8081/auth/google",
-            scope: "profile email https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/drive.readonly",
-            scopeDelimiter: " "
+            url: 'http://localhost:8081/auth/google',
+            scope: 'profile email https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/drive.readonly',
+            scopeDelimiter: ' ',
+            accessType: 'offline'
         },
         gmail: {
             name: 'gmail',
@@ -27,15 +30,16 @@ export class MyAuthConfig extends CustomConfig {
             requiredUrlParams: ['scope'],
             optionalUrlParams: ['display', 'state', 'prompt', 'login_hint', 'access_type',
                 'include_granted_scopes', 'openid.realm', 'hd'],
-            scope: "profile email https://www.googleapis.com/auth/gmail.readonly",
+            scope: 'profile email https://www.googleapis.com/auth/gmail.readonly',
             scopePrefix: 'openid',
             scopeDelimiter: ' ',
+            accessType: 'offline',
             display: 'popup',
             oauthType: '2.0',
             popupOptions: {width: 452, height: 633},
             state: () => encodeURIComponent(Math.random().toString(36).substr(2)),
         },
-        "google-drive": {
+        'google-drive': {
             name: 'google-drive',
             clientId: GOOGLE_CLIENT_ID,
             url: BACKEND_MOCK,
@@ -44,9 +48,10 @@ export class MyAuthConfig extends CustomConfig {
             requiredUrlParams: ['scope'],
             optionalUrlParams: ['display', 'state', 'prompt', 'login_hint', 'access_type',
                 'include_granted_scopes', 'openid.realm', 'hd'],
-            scope: "profile email https://www.googleapis.com/auth/drive.readonly",
+            scope: 'profile email https://www.googleapis.com/auth/drive.readonly',
             scopePrefix: 'openid',
             scopeDelimiter: ' ',
+            accessType: 'offline',
             display: 'popup',
             oauthType: '2.0',
             popupOptions: {width: 452, height: 633},
@@ -75,6 +80,6 @@ export class MyAuthConfig extends CustomConfig {
             scopeDelimiter: ' ',
             oauthType: '2.0',
             popupOptions: {width: 1020, height: 720}
-        },
+        }
     };
 }

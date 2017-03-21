@@ -1,15 +1,17 @@
 package auth
 
 import (
+	"encoding/json"
+	"github.com/foundcenter/moas/backend/controllers/response"
+	"github.com/foundcenter/moas/backend/middleware/jwt_auth"
+	"github.com/foundcenter/moas/backend/middleware/logger"
+	"github.com/foundcenter/moas/backend/services/auth"
+	"github.com/foundcenter/moas/backend/services/drive"
+	"github.com/foundcenter/moas/backend/services/gmail"
+	"github.com/foundcenter/moas/backend/services/slack"
 	"github.com/julienschmidt/httprouter"
 	"github.com/justinas/alice"
 	"net/http"
-	"github.com/foundcenter/moas/backend/middleware/logger"
-	"encoding/json"
-	"github.com/foundcenter/moas/backend/services/auth"
-	"github.com/foundcenter/moas/backend/controllers/response"
-	"github.com/foundcenter/moas/backend/repo"
-	"fmt"
 )
 
 type loginRequest struct {
@@ -18,108 +20,173 @@ type loginRequest struct {
 }
 
 func Load(router *httprouter.Router) {
-	router.Handler("GET", "/auth", alice.New(logger.Handler).ThenFunc(handleAuth))
-	router.Handler("POST", "/auth/login", alice.New(logger.Handler).ThenFunc(handleAuth))
-	router.Handler("POST", "/auth/google", alice.New(logger.Handler).ThenFunc(handleGoogleAuth))
-	//router.Handler("POST", "/auth/login/mock", alice.New(logger.Handler).ThenFunc(handleAuthMock))
-	//router.Handler("GET", "/user/test", alice.New(logger.Handler).ThenFunc(insertDummyUser))
+	standardChain := alice.New(logger.Handler)
+	extendedChain := standardChain.Append(jwt_auth.Handler)
+	router.Handler("POST", "/auth/google", standardChain.ThenFunc(handleGoogleAuth))
+	//router.Handler("POST", "/auth/slack", standardChain.ThenFunc(handleSlackAuth))
+	//router.Handler("POST", "/auth/gmail", standardChain.ThenFunc(handleGmailAuth))
+	//router.Handler("POST", "/auth/drive", standardChain.ThenFunc(handleDriveAuth))
+	router.Handler("POST", "/connect/slack", extendedChain.ThenFunc(handleSlackConnect))
+	router.Handler("POST", "/connect/gmail", extendedChain.ThenFunc(handleGmailConnect))
+	router.Handler("POST", "/connect/drive", extendedChain.ThenFunc(handleDriveConnect))
 }
 
-type GoogleAuth struct {
-	Code string `json:"code"`
-}
-func handleGoogleAuth(w http.ResponseWriter, r *http.Request)  {
+func handleGoogleAuth(w http.ResponseWriter, r *http.Request) {
 
 	decoder := json.NewDecoder(r.Body)
-	var ga GoogleAuth
+	var ga auth.GoogleAuth
 	err := decoder.Decode(&ga)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Printf("Code in request is %s \n", ga.Code)
-
-	// error, user, registe/login
-	// error, data (user . register/login)
-
-	err, user := auth.Exchange(ga.Code)
+	user, err := gmail.Login(r.Context(), ga.Code)
 	if err != nil {
-		//didnt exchange user
-		response.Reply(w).Unauthorized()
+		response.Reply(w).ServerInternalError()
 		return
 	}
 
-	//find or insert in DB
-	db := repo.New()
-	defer db.Destroy()
-	user, action := db.UserRepo.FindByIdOrInsert(user)
-	if action == "login" {
-		response.Reply(w).Ok(ga.Code)
+	err, tokenString := auth.IssueToken(user)
+	if err != nil {
+		response.Reply(w).BadRequest()
 		return
 	}
-	// register
-	response.Reply(w).Created(ga.Code)
+
+	response.Reply(w).Logged(map[string]interface{}{"user": user, "token": tokenString})
 
 }
 
-func handleAuth(w http.ResponseWriter, r *http.Request) {
+func handleGmailAuth(w http.ResponseWriter, r *http.Request) {
+
 	decoder := json.NewDecoder(r.Body)
-	var l loginRequest
-	err := decoder.Decode(&l)
-	if err != nil {
-		panic(err)
-	}
+	var ga auth.GoogleAuth
+	err := decoder.Decode(&ga)
 
-	err, user := auth.Login(l.Email, l.Password)
-
+	user, err := gmail.Login(r.Context(), ga.Code)
 	if err != nil {
-		// later use switch
-		// if there are more reasons
-		// err.Error() == auth.BadCredentials
-		response.Reply(w).Unauthorized()
+		response.Reply(w).ServerInternalError()
 		return
 	}
 
-	//issue jwt
+	err, tokenString := auth.IssueToken(user)
+	if err != nil {
+		response.Reply(w).BadRequest()
+		return
+	}
 
-	response.Reply(w).Ok(user)
+	response.Reply(w).Logged(map[string]interface{}{"user": user, "token": tokenString})
+
 }
 
-//func handleAuthMock(w http.ResponseWriter, r *http.Request) {
-//	decoder := json.NewDecoder(r.Body)
-//	var l loginRequest
-//	err := decoder.Decode(&l)
-//	if err != nil {
-//		panic(err)
-//	}
-//
-//	err, user := auth.LoginMock(l.Email, l.Password)
-//
-//	if err != nil {
-//		// later use switch
-//		// if there are more reasons
-//		// err.Error() == auth.BadCredentials
-//		response.Reply(w).Unauthorized()
-//		return
-//	}
-//
-//	//issue jwt
-//
-//	response.Reply(w).Ok(user)
-//}
+func handleGmailConnect(w http.ResponseWriter, r *http.Request) {
 
-//func insertDummyUser(w http.ResponseWriter, r *http.Request)  {
-//	db := repo.New()
-//	defer db.Destroy()
-//
-//	err, user := db.UserRepo.Insert()
-//
-//	if err != nil {
-//		response.Reply(w).BadRequest()
-//		return
-//	}
-//
-//	//issue jwt
-//
-//	response.Reply(w).Ok(user)
-//}
+	decoder := json.NewDecoder(r.Body)
+	var ga auth.GoogleAuth
+	err := decoder.Decode(&ga)
+
+	token := r.Header.Get("Authorization")
+	user_id, err := auth.ParseToken(token[7:])
+	if err != nil {
+		response.Reply(w).ServerInternalError()
+		return
+	}
+
+	user, err := gmail.Connect(r.Context(), user_id, ga.Code)
+	if err != nil {
+		response.Reply(w).ServerInternalError()
+		return
+	}
+
+	response.Reply(w).Logged(map[string]interface{}{"user": user, "token": token})
+
+}
+
+func handleDriveAuth(w http.ResponseWriter, r *http.Request) {
+
+	decoder := json.NewDecoder(r.Body)
+	var ga auth.GoogleAuth
+	err := decoder.Decode(&ga)
+
+	user, err := drive.Login(r.Context(), ga.Code)
+	if err != nil {
+		response.Reply(w).ServerInternalError()
+		return
+	}
+
+	err, tokenString := auth.IssueToken(user)
+	if err != nil {
+		response.Reply(w).BadRequest()
+		return
+	}
+
+	response.Reply(w).Logged(map[string]interface{}{"user": user, "token": tokenString})
+
+}
+
+func handleDriveConnect(w http.ResponseWriter, r *http.Request) {
+
+	decoder := json.NewDecoder(r.Body)
+	var ga auth.GoogleAuth
+	err := decoder.Decode(&ga)
+
+	token := r.Header.Get("Authorization")
+	user_id, err := auth.ParseToken(token[7:])
+	if err != nil {
+		response.Reply(w).ServerInternalError()
+		return
+	}
+
+	user, err := drive.Connect(r.Context(), user_id, ga.Code)
+	if err != nil {
+		response.Reply(w).ServerInternalError()
+		return
+	}
+
+	response.Reply(w).Logged(map[string]interface{}{"user": user, "token": token})
+
+}
+
+func handleSlackAuth(w http.ResponseWriter, r *http.Request) {
+
+	decoder := json.NewDecoder(r.Body)
+	var ga auth.SlackAuth
+	err := decoder.Decode(&ga)
+
+	user, err := slack.Login(r.Context(), ga.Code)
+	if err != nil {
+		response.Reply(w).ServerInternalError()
+		return
+	}
+
+	err, tokenString := auth.IssueToken(user)
+	if err != nil {
+		response.Reply(w).BadRequest()
+		return
+	}
+
+	response.Reply(w).Logged(map[string]interface{}{"user": user, "token": tokenString})
+
+}
+
+func handleSlackConnect(w http.ResponseWriter, r *http.Request) {
+
+	decoder := json.NewDecoder(r.Body)
+	var ga auth.GoogleAuth
+	err := decoder.Decode(&ga)
+
+	token := r.Header.Get("Authorization")
+	user_id, err := auth.ParseToken(token[7:])
+	if err != nil {
+		response.Reply(w).ServerInternalError()
+		return
+	}
+
+	user, err := slack.Connect(r.Context(), user_id, ga.Code)
+	if err != nil {
+		response.Reply(w).ServerInternalError()
+		return
+	}
+
+	response.Reply(w).Logged(map[string]interface{}{"user": user, "token": token})
+
+}

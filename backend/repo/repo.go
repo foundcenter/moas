@@ -1,25 +1,27 @@
 package repo
 
 import "gopkg.in/mgo.v2"
+import "github.com/foundcenter/moas/backend/config"
 
 var masterSession *mgo.Session
 
-func InitMasterSession(session *mgo.Session)  {
-	masterSession = session
-}
-
-func GetSession() *mgo.Session {
-	return masterSession.Copy()
-}
-
 type DB struct {
-	Session *mgo.Session
+	Session  *mgo.Session
 	UserRepo *User
 }
 
+func init() {
+	session, err := mgo.DialWithInfo(config.Settings.Mongo)
+	if err != nil {
+		panic(err)
+	}
+	session.SetMode(mgo.Monotonic, true)
+	masterSession = session
+}
+
 func New() *DB {
-	db :=  &DB{Session:masterSession.Copy()}
-	db.UserRepo = &User{Session:db.Session}
+	db := &DB{Session: masterSession.Copy()}
+	db.UserRepo = &User{Database: db.Session.DB(config.Settings.Mongo.Database)}
 	return db
 }
 
