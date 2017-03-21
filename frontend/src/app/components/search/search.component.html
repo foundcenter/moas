@@ -36,11 +36,11 @@
 
 <div class="row">
     <div class="col-sm-6 col-sm-offset-2">
-        <ul [hidden]="results.length == 0" class="nav nav-pills search-services">
+        <ul [hidden]="results.length == 0" class="nav nav-tabs search__services">
             <li *ngFor="let service of resultsServices"
-                [ngClass]="{active: selected==service}"
-                role="presentation">
-                <a (click)="select(service)">{{ service }} ({{ countBy(service) }})</a>
+                class="search__service"
+                [ngClass]="{active: selected==service}">
+                <a (click)="select(service)">{{ service }} <sup>{{ countBy(service) }}</sup></a>
             </li>
         </ul>
         <search-result *ngFor="let result of filterBy(selected)" [result]="result">

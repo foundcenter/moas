@@ -10,9 +10,15 @@
   margin-bottom: 40px;
 }
 
-.search-services {
-  margin-bottom: 24px;
+.search {
+  &__service {
+    cursor: pointer;
+  }
+  &__services {
+    margin-bottom: 42px;
+  }
 }
+
 .card {
   border-radius: 2px;
   position: relative;
