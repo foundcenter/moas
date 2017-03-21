@@ -1,5 +1,5 @@
 export interface Result {
-  accountId: string;
+  account_id: string;
   service: string;
   resource: string;
   title: string;

@@ -2,13 +2,22 @@ import { Injectable } from '@angular/core';
 import { SearchConfig } from "./components/search/search.component";
 import { Observable } from "rxjs";
 import { Result } from "./models/result.interface";
+import { JwtHttp } from "ng2-ui-auth";
+import { Response } from "@angular/http";
 
 
 
 @Injectable()
 export class SearchService {
+  private uri: string = 'http://localhost:8081';
 
-  constructor() { }
+  constructor(private http: JwtHttp) { }
+
+  search(query: string): Observable<Object[]> {
+    return this.http.get(`${this.uri}/search?q=${query}`)
+      .map((res: Response) => res.json().data)
+      .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
+  }
 
   query = (query: string, config: SearchConfig): Observable<Result[]> => {
     console.log(`Searching for ${query}`);
@@ -44,7 +53,7 @@ export class SearchService {
   private mockGmailResults(): Result[] {
     return [
       {
-        accountId: "123123123",
+        account_id: "123123123",
         service: "Gmail",
         resource: "Message",
         title: "Tuesday appointment with CTO",
@@ -52,7 +61,7 @@ export class SearchService {
         url: "https://mail.google.com/"
       },
       {
-        accountId: "123123123",
+        account_id: "123123123",
         service: "Gmail",
         resource: "Thread",
         title: "Topditop feature discussion",
@@ -65,7 +74,7 @@ export class SearchService {
   private mockSlackResults(): Result[] {
     return [
       {
-        accountId: "123123123",
+        account_id: "123123123",
         service: "Slack",
         resource: "Channel",
         title: "Development",
@@ -73,7 +82,7 @@ export class SearchService {
         url: "https://foundcenter.slack.com/messages/development/"
       },
       {
-        accountId: "123123123",
+        account_id: "123123123",
         service: "Slack",
         resource: "Mpim",
         title: "Topditop is now live",
@@ -81,7 +90,7 @@ export class SearchService {
         url: "https://foundcenter.slack.com/archives/topditop/p1489409529254206"
       },
       {
-        accountId: "123123123",
+        account_id: "123123123",
         service: "Slack",
         resource: "User",
         title: "Marko Arsic",
@@ -94,7 +103,7 @@ export class SearchService {
   private mockGithubResults(): Result[] {
     return [
       {
-        accountId: "123123123",
+        account_id: "123123123",
         service: "Github",
         resource: "Commit",
         title: "TOP-152 Fix header",
@@ -102,7 +111,7 @@ export class SearchService {
         url: "https://github.com/foundcenter/topditop/commit/b29019f8c64d9a57dd864f72e21e77b194a75693"
       },
       {
-        accountId: "123123123",
+        account_id: "123123123",
         service: "Github",
         resource: "Repository",
         title: "TopDiTop",
@@ -116,7 +125,7 @@ export class SearchService {
   private mockGoogleDriveResults(): Result[] {
     return [
       {
-        accountId: "54233123",
+        account_id: "54233123",
         service: "Google Drive",
         resource: "Directory",
         title: "Packator design files",
@@ -124,7 +133,7 @@ export class SearchService {
         url: "https://drive.google.com/drive/#my-drive"
       },
       {
-        accountId: "4324222",
+        account_id: "4324222",
         service: "Google Drive",
         resource: "File",
         title: "Packator project specification",

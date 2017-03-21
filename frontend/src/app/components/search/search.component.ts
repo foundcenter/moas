@@ -33,8 +33,6 @@ export class SearchComponent implements OnInit, AfterViewInit {
     let github = new Provider('Github', true);
 
     this.providers.push(gmail, gdrive, slack, jira, github);
-
-    this.autoSearch();
   }
 
   autoSearch() {
@@ -91,7 +89,7 @@ export class SearchComponent implements OnInit, AfterViewInit {
   search(): void{
     this.reset();
 
-    this.searchService.query(this.query, new SearchConfig(this.providers))
+    this.searchService.search(this.query)
       .subscribe(
         data => {
           let result = <Result[]>data;
