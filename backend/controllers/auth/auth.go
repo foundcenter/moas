@@ -23,11 +23,11 @@ func Load(router *httprouter.Router) {
 	standardChain := alice.New(logger.Handler)
 	extendedChain := standardChain.Append(jwt_auth.Handler)
 	router.Handler("POST", "/auth/google", standardChain.ThenFunc(handleGoogleAuth))
-	router.Handler("POST", "/auth/slack", standardChain.ThenFunc(handleSlackAuth))
+	//router.Handler("POST", "/auth/slack", standardChain.ThenFunc(handleSlackAuth))
+	//router.Handler("POST", "/auth/gmail", standardChain.ThenFunc(handleGmailAuth))
+	//router.Handler("POST", "/auth/drive", standardChain.ThenFunc(handleDriveAuth))
 	router.Handler("POST", "/connect/slack", extendedChain.ThenFunc(handleSlackConnect))
-	router.Handler("POST", "/auth/gmail", standardChain.ThenFunc(handleGmailAuth))
 	router.Handler("POST", "/connect/gmail", extendedChain.ThenFunc(handleGmailConnect))
-	router.Handler("POST", "/auth/drive", standardChain.ThenFunc(handleDriveAuth))
 	router.Handler("POST", "/connect/drive", extendedChain.ThenFunc(handleDriveConnect))
 }
 
@@ -40,7 +40,7 @@ func handleGoogleAuth(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	user, err := drive.Login(r.Context(), ga.Code)
+	user, err := gmail.Login(r.Context(), ga.Code)
 	if err != nil {
 		response.Reply(w).ServerInternalError()
 		return

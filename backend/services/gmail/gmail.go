@@ -15,7 +15,11 @@ import (
 	"sync"
 )
 
-const AccountType = "gmail"
+const (
+	AccountTypeGmail = "gmail"
+	AccountTypeDrive = "drive"
+
+)
 
 var conf *oauth2.Config
 
@@ -34,6 +38,7 @@ func init() {
 			"profile",
 			"email",
 			"https://www.googleapis.com/auth/gmail.readonly",
+			"https://www.googleapis.com/auth/drive.readonly",
 		},
 		Endpoint: google.Endpoint,
 	}
@@ -65,7 +70,7 @@ func Login(ctx context.Context, code string) (models.User, error) {
 	db := repo.New()
 	defer db.Destroy()
 
-	user, _ = db.UserRepo.FindByAccount(gu.Email, AccountType)
+	user, _ = db.UserRepo.FindByAccount(gu.Email, AccountTypeGmail)
 
 	// If user is already registered merge data
 	if !user.ID.Valid() {
@@ -73,9 +78,10 @@ func Login(ctx context.Context, code string) (models.User, error) {
 		user.Picture = gu.Picture
 	}
 
-	addAccount(ctx, &user, &gu, accessToken)
+	addAccount(ctx, &user, &gu, accessToken, AccountTypeGmail)
+	addAccount(ctx, &user, &gu, accessToken, AccountTypeDrive)
 
-	db.UserRepo.Upsert(user)
+	user, err = db.UserRepo.Upsert(user)
 
 	return user, err
 }
@@ -111,15 +117,15 @@ func Connect(ctx context.Context, userID string, code string) (models.User, erro
 		return user, err
 	}
 
-	addAccount(ctx, &user, &gu, accessToken)
+	addAccount(ctx, &user, &gu, accessToken,AccountTypeGmail)
 	db.UserRepo.Update(user)
 
 	return user, nil
 }
 
-func addAccount(ctx context.Context, user *models.User, res *UserGmailInfo, token *oauth2.Token) {
+func addAccount(ctx context.Context, user *models.User, res *UserGmailInfo, token *oauth2.Token, account_type string ) {
 	a := models.AccountInfo{
-		Type:  AccountType,
+		Type:  account_type,
 		ID:    res.Email,
 		Data:  res,
 		Token: token,
