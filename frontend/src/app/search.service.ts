@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { SearchConfig } from "./components/search/search.component";
 import { Observable } from "rxjs";
 import { Result } from "./models/result.interface";
 import { JwtHttp } from "ng2-ui-auth";
@@ -19,7 +18,7 @@ export class SearchService {
       .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
   }
 
-  query = (query: string, config: SearchConfig): Observable<Result[]> => {
+  query = (query: string): Observable<Result[]> => {
     console.log(`Searching for ${query}`);
 
     let gmailRS = this.mockGmailResults();

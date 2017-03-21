@@ -1,7 +1,10 @@
 <div class="search-result">
-  <h4><a href="{{ result.url }}" target="_blank">{{ result.title }}</a></h4>
-  <p>{{ result.description }}</p>
+  <h4><a href="{{ result.url }}" target="_blank">
+    <span *ngIf="result.title">{{ result.title }}</span>
+    <span *ngIf="!result.title">{{ result.resource }} from {{ result.service }}</span>
+  </a></h4>
+  <p [innerHTML]="result.description"></p>
   <p>
-    {{ result.resource }} from {{ result.service }} @ {{ result.accountId }}
+    {{ result.resource }} from {{ result.service }} @ {{ result.account_id }}
   </p>
 </div>
