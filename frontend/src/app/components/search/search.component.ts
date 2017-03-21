@@ -46,11 +46,11 @@ export class SearchComponent implements OnInit, AfterViewInit {
     this.focusSearchBar();
   }
   
-  focusSearchBar = () => {
+  focusSearchBar(): void{
     this.focusTriggeringEventEmmiter.emit(true);
   }
 
-  toggle = (provider: Provider) => {
+  toggle(provider: Provider): void{
     provider.toggle();
   }
 
@@ -58,7 +58,7 @@ export class SearchComponent implements OnInit, AfterViewInit {
     this.presenting = service;
   }
 
-  sortResults = () => {
+  sortResults(): void{
     let all = this.results;
     let services = [];
     all.forEach((result: Result) => {
@@ -88,7 +88,7 @@ export class SearchComponent implements OnInit, AfterViewInit {
     return this.resultBy(service).length;
   }
 
-  search = () => {
+  search(): void{
     this.reset();
 
     this.searchService.query(this.query, new SearchConfig(this.providers))
@@ -99,10 +99,9 @@ export class SearchComponent implements OnInit, AfterViewInit {
           this.sortResults();
         }
       );
-
   }
 
-  reset() {
+  reset(): void {
     this.results = [];
     this.presenting = 'all';
   }
