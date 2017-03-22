@@ -6,30 +6,16 @@
                 <input [focus]="focusTriggeringEventEmmiter"
                        [(ngModel)]="query"
                        name="query"
+                       placeholder="Search..."
                        class="form-control input-lg" type="text" id="inputLarge">
             </div>
         </form>
     </div>
-    <div class="col-sm-2">
+    <div class="col-sm-2" *ngIf="results.length">
         <div class="search-button">
-            <div class="btn-group">
-                <button type="button" class="btn btn-default" (click)="search()">
-                    Search
-                </button>
-                <ul class="dropdown-menu">
-                    <li *ngFor="let provider of providers">
-                        <a (click)="toggle(provider)">
-                            <span [ngClass]="{
-                                'glyphicon-ok text-success': provider.search == true,
-                                'glyphicon-remove text-danger': provider.search == false
-                                }" class="glyphicon" aria-hidden="true"></span>
-                            {{ provider.name }}
-                        </a>
-                    </li>
-                    <li class="divider"></li>
-                    <li><a href="#">Configure</a></li>
-                </ul>
-            </div>
+            <button type="button" class="btn btn-link" (click)="reset()">
+                <span class="text-danger"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></span>
+            </button>
         </div>
     </div>
 </div>
