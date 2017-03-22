@@ -74,8 +74,16 @@ export class SearchComponent implements OnInit, AfterViewInit {
     }
   }
 
+  private isValidQuery(): boolean {
+    return this.query.length > 0;
+  }
+
   search(): void{
     this.reset();
+
+    if (!this.isValidQuery()) {
+      return;
+    }
 
     this.searchService.search(this.query)
       .subscribe(
