@@ -83,6 +83,6 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 
 	wg.Wait()
 
-	response.Reply(w).SearchResult(resultOfSearch)
+	response.Reply(w).Ok(resultOfSearch)
 
 }

@@ -54,7 +54,7 @@ func handleGoogleAuth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Reply(w).Logged(map[string]interface{}{"user": user, "token": tokenString})
+	response.Reply(w).Ok(map[string]interface{}{"user": user, "token": tokenString})
 
 }
 
@@ -76,7 +76,7 @@ func handleGmailAuth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Reply(w).Logged(map[string]interface{}{"user": user, "token": tokenString})
+	response.Reply(w).Ok(map[string]interface{}{"user": user, "token": tokenString})
 
 }
 
@@ -99,7 +99,7 @@ func handleGmailConnect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Reply(w).Logged(map[string]interface{}{"user": user, "token": token})
+	response.Reply(w).Ok(map[string]interface{}{"user": user, "token": token})
 
 }
 
@@ -121,7 +121,7 @@ func handleDriveAuth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Reply(w).Logged(map[string]interface{}{"user": user, "token": tokenString})
+	response.Reply(w).Ok(map[string]interface{}{"user": user, "token": tokenString})
 
 }
 
@@ -144,7 +144,7 @@ func handleDriveConnect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Reply(w).Logged(map[string]interface{}{"user": user, "token": token})
+	response.Reply(w).Ok(map[string]interface{}{"user": user, "token": token})
 
 }
 
@@ -166,7 +166,7 @@ func handleSlackAuth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Reply(w).Logged(map[string]interface{}{"user": user, "token": tokenString})
+	response.Reply(w).Ok(map[string]interface{}{"user": user, "token": tokenString})
 
 }
 
@@ -189,7 +189,7 @@ func handleSlackConnect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Reply(w).Logged(map[string]interface{}{"user": user, "token": token})
+	response.Reply(w).Ok(map[string]interface{}{"user": user, "token": token})
 
 }
 
@@ -212,6 +212,6 @@ func handleGithubConnect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Reply(w).Logged(map[string]interface{}{"user": user, "token": token})
+	response.Reply(w).Ok(map[string]interface{}{"user": user, "token": token})
 
 }

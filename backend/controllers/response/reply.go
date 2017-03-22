@@ -1,10 +1,8 @@
 package response
 
 import (
-	"net/http"
-	"reflect"
-
 	"github.com/alioygur/gores"
+	"net/http"
 )
 
 type Response struct {
@@ -35,20 +33,9 @@ func (r *Response) Unauthorized(e error) {
 }
 
 func (r *Response) Ok(data interface{}) {
-	meta := &ResponseMeta{Type: reflect.TypeOf(data).Name()}
-	gores.JSON(r.writer, http.StatusOK, map[string]interface{}{"data": data, "meta": meta})
-}
-
-func (r *Response) SearchResult(data interface{}) {
-	gores.JSON(r.writer, http.StatusOK, map[string]interface{}{"data": data})
-}
-
-func (r *Response) Logged(data interface{}) {
-	//meta := &ResponseMeta{Type: reflect.TypeOf(data).Name()}
 	gores.JSON(r.writer, http.StatusOK, map[string]interface{}{"data": data})
 }
 
 func (r *Response) Created(data interface{}) {
-	//meta := &ResponseMeta{Type: reflect.TypeOf(data).Name()}
 	gores.JSON(r.writer, http.StatusCreated, map[string]interface{}{"data": data})
 }
