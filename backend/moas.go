@@ -15,7 +15,10 @@ import (
 func main() {
 	router := httprouter.New()
 	controllers.Load(router)
-	handler := cors.Default().Handler(router)
+	handler := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowedHeaders: []string{"*"},
+	}).Handler(router)
 
 	fmt.Printf("Starting server on: %s\n", config.Settings.App.URL)
 
