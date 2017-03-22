@@ -44,32 +44,32 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 	}
 
 	wg.Add(len(user.Accounts))
-	for _, provider := range user.Accounts {
-		switch provider.Type {
+	for _, account := range user.Accounts {
+		switch account.Type {
 		case "gmail":
 			// gmail search
-			go func() {
-				result := gmail.Search(r.Context(), provider, query)
+			go func(account models.AccountInfo) {
+				result := gmail.Search(r.Context(), account, query)
 				queueOfResults <- result
-			}()
+			}(account)
 		case "drive":
 			// drive search
-			go func() {
-				result := drive.Search(r.Context(), provider, query)
+			go func(account models.AccountInfo) {
+				result := drive.Search(r.Context(), account, query)
 				queueOfResults <- result
-			}()
+			}(account)
 		case "slack":
 			// slack search
-			go func() {
-				result, _ := slack.Search(r.Context(), provider, query)
+			go func(account models.AccountInfo) {
+				result, _ := slack.Search(r.Context(), account, query)
 				queueOfResults <- result
-			}()
+			}(account)
 		case "github":
 			// github search
-			go func() {
-				result, _ := github.Search(r.Context(), provider, query)
+			go func(account models.AccountInfo) {
+				result, _ := github.Search(r.Context(), account, query)
 				queueOfResults <- result
-			}()
+			}(account)
 			// and other providers...
 		}
 	}

@@ -60,11 +60,11 @@ export class MyAuthConfig extends CustomConfig {
         },
         slack: {
             clientId: SLACK_CLIENT_ID,
-            url: BACKEND_MOCK,
+            url:  `${API_URL}/connect/slack`,
             authorizationEndpoint: 'https://slack.com/oauth/authorize',
             requiredUrlParams: ['scope'],
             redirectUri: REDIRECT_URI,
-            scope: 'files:read mpim:read search:read',
+            scope: 'search:read identity.basic identity.email',
             scopePrefix: '',
             scopeDelimiter: ',',
             oauthType: '2.0',
@@ -73,11 +73,11 @@ export class MyAuthConfig extends CustomConfig {
         github: {
             clientId: GITHUB_CLIENT_ID,
             name: 'github',
-            url: `${API_URL}/auth/github`,
+            url: `${API_URL}/connect/github`,
             authorizationEndpoint: 'https://github.com/login/oauth/authorize',
             redirectUri: 'http://localhost:4200',
             requiredUrlParams: ['scope'],
-            scope: ['user:email'],
+            scope: 'user:email',
             scopeDelimiter: ' ',
             oauthType: '2.0',
             popupOptions: {width: 1020, height: 720}

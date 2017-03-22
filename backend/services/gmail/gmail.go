@@ -150,7 +150,7 @@ func Search(ctx context.Context, account models.AccountInfo, query string) []mod
 
 	ref, err := gmailService.Users.Threads.List(userEmail).Q(query).MaxResults(100).Do()
 	if err != nil {
-		log.Fatalf("Unable to retrieve messages. %v", err)
+		fmt.Printf("Unable to retrieve threads. %v", err)
 	}
 
 	if len(ref.Threads) > 0 {

@@ -212,6 +212,6 @@ func handleGithubConnect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Reply(w).Ok(map[string]interface{}{"user": user, "token": token})
+	response.Reply(w).Ok(map[string]interface{}{"user": user, "token": token[7:]})
 
 }
