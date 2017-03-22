@@ -4,6 +4,7 @@
             <div class="form-group">
                 <!--<label class="control-label" for="inputLarge">Large input</label>-->
                 <input [focus]="focusTriggeringEventEmmiter"
+                       (keyup)="onKey($event)"
                        [(ngModel)]="query"
                        name="query"
                        placeholder="Search..."
@@ -11,7 +12,7 @@
             </div>
         </form>
     </div>
-    <div class="col-sm-2" *ngIf="results.length">
+    <div class="col-sm-2" *ngIf="results.length || noResults">
         <div class="search-button">
             <button type="button" class="btn btn-link" (click)="reset()">
                 <span class="text-danger"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></span>
@@ -29,6 +30,10 @@
                 <a (click)="select(service)">{{ service }} <sup>{{ countBy(service) }}</sup></a>
             </li>
         </ul>
+        <div *ngIf="results.length == 0 && noResults == true">
+            <h3>No results</h3>
+            <p class="text-danger">Did not find anything.</p>
+        </div>
         <search-result *ngFor="let result of filterBy(selected)" [result]="result">
         </search-result>
     </div>

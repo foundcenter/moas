@@ -16,6 +16,7 @@ export class SearchComponent implements OnInit, AfterViewInit {
   public resultsServices: string[] = [ALL];
   public selected: string = ALL;
   public query: string = '';
+  public noResults: boolean = false;
 
   constructor(private searchService: SearchService) {
   }
@@ -33,11 +34,16 @@ export class SearchComponent implements OnInit, AfterViewInit {
   }
 
   private sortResults(): void{
+    if (this.results.length == 0) {
+      this.noResults = true;
+      return;
+    }
     this.results.forEach((result: Result) => {
       if (!this.resultsServices.includes(result.service)) {
         this.resultsServices.push((result.service));
       }
     });
+    this.noResults = false;
   }
 
   select(service: string): void {
@@ -62,6 +68,12 @@ export class SearchComponent implements OnInit, AfterViewInit {
     return this.filterBy(service).length;
   }
 
+  onKey(event: KeyboardEvent): void {
+    if (this.query.length == 0 && this.noResults) {
+      this.reset();
+    }
+  }
+
   search(): void{
     this.reset();
 
@@ -79,6 +91,7 @@ export class SearchComponent implements OnInit, AfterViewInit {
     this.results = [];
     this.resultsServices = [ALL];
     this.selected = ALL;
+    this.noResults = false;
   }
 }
 
