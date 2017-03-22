@@ -17,7 +17,6 @@ import (
 const (
 	AccountTypeGmail = "gmail"
 	AccountTypeDrive = "drive"
-
 )
 
 var conf *oauth2.Config
@@ -116,13 +115,13 @@ func Connect(ctx context.Context, userID string, code string) (models.User, erro
 		return user, err
 	}
 
-	addAccount(ctx, &user, &gu, accessToken,AccountTypeGmail)
-	db.UserRepo.Update(user)
+	addAccount(ctx, &user, &gu, accessToken, AccountTypeGmail)
+	user, err = db.UserRepo.Update(user)
 
 	return user, nil
 }
 
-func addAccount(ctx context.Context, user *models.User, res *UserGmailInfo, token *oauth2.Token, account_type string ) {
+func addAccount(ctx context.Context, user *models.User, res *UserGmailInfo, token *oauth2.Token, account_type string) {
 	a := models.AccountInfo{
 		Type:  account_type,
 		ID:    res.Email,

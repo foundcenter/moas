@@ -90,7 +90,7 @@ func Connect(ctx context.Context, userID string, code string) (models.User, erro
 	}
 
 	addAccount(ctx, &user, res, accessToken)
-	db.UserRepo.Update(user)
+	user, err = db.UserRepo.Update(user)
 
 	return user, nil
 }

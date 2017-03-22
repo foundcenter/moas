@@ -111,7 +111,7 @@ func Connect(ctx context.Context, userID string, code string) (models.User, erro
 	}
 
 	addAccount(ctx, &user, &gu, accessToken)
-	db.UserRepo.Update(user)
+	user, err = db.UserRepo.Update(user)
 
 	return user, nil
 }
@@ -141,7 +141,6 @@ func Search(ctx context.Context, account models.AccountInfo, query string) []mod
 
 	var searchResult []models.SearchResult = make([]models.SearchResult, 0)
 	driveService := CreateDriveService(ctx, account.Token)
-
 
 	ref, err := driveService.Files.List().Q("fullText contains '" + query + "'").Do()
 	if err != nil {
@@ -177,4 +176,3 @@ func CreateDriveService(ctx context.Context, token *oauth2.Token) *drive.Service
 
 	return driveService
 }
-

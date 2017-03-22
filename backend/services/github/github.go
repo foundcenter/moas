@@ -9,6 +9,7 @@ import (
 	"github.com/foundcenter/moas/backend/utils"
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
+	githubAuth "golang.org/x/oauth2/github"
 	"sync"
 )
 
@@ -24,7 +25,7 @@ func init() {
 		Scopes: []string{
 			"user:email",
 		},
-		//Endpoint: github.Endpoint,
+		Endpoint: githubAuth.Endpoint,
 	}
 }
 
@@ -67,7 +68,7 @@ func Login(ctx context.Context, code string) (models.User, error) {
 
 	addAccount(ctx, &user, github_user, accessToken)
 
-	db.UserRepo.Upsert(user)
+	user, err = db.UserRepo.Upsert(user)
 
 	return user, err
 }
@@ -99,7 +100,7 @@ func Connect(ctx context.Context, userID string, code string) (models.User, erro
 	}
 
 	addAccount(ctx, &user, github_user, accessToken)
-	db.UserRepo.Update(user)
+	user, err = db.UserRepo.Update(user)
 
 	return user, nil
 }
