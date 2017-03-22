@@ -1,5 +1,5 @@
 {
-    "memo": "55e4bb1003ab81fb6d5e6e8c2ff3ecea86f86896b234fa54d507c344bbd76dc6",
+    "memo": "76319239563283e555818850f542d79f4b4f23c9c30eea6bd125d9edcba2687e",
     "projects": [
         {
             "name": "cloud.google.com/go",
@@ -40,6 +40,22 @@
             "revision": "8ee79997227bf9b34611aee7946ae64735e6fd93",
             "packages": [
                 "proto"
+            ]
+        },
+        {
+            "name": "github.com/google/go-github",
+            "branch": "master",
+            "revision": "d683a1c6198d75c6be7a7ab5e2f9834cb6408834",
+            "packages": [
+                "github"
+            ]
+        },
+        {
+            "name": "github.com/google/go-querystring",
+            "branch": "master",
+            "revision": "53e6ce116135b80d037921a7fdd5138cf32d7a8a",
+            "packages": [
+                "query"
             ]
         },
         {
