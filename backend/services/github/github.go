@@ -171,8 +171,8 @@ func Search(ctx context.Context, accountInfo models.AccountInfo, query string) (
 				s.Service = "github"
 				s.Resource = "commit"
 				s.AccountID = accountInfo.ID
-				s.Description = c.GetMessage()
-				s.Url = "https://api.github.com/repos/" + c.GetAuthorName() + "/" + c.Repository.GetName() + "/git/commits/" + c.GetHash()
+				s.Title = c.Commit.GetMessage()
+				s.Url = *c.HTMLURL
 				searchResult = append(searchResult, s)
 			}
 		} else {
