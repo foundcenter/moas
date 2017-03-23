@@ -43,7 +43,7 @@ export class MyAuthConfig extends CustomConfig {
         'google-drive': {
             name: 'google-drive',
             clientId: GOOGLE_CLIENT_ID,
-            url: BACKEND_MOCK,
+            url: `${API_URL}/connect/drive`,
             authorizationEndpoint: 'https://accounts.google.com/o/oauth2/auth',
             redirectUri: REDIRECT_URI,
             requiredUrlParams: ['scope'],
