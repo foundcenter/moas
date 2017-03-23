@@ -7,12 +7,12 @@ import (
 	"github.com/foundcenter/moas/backend/middleware/logger"
 	"github.com/foundcenter/moas/backend/services/auth"
 	"github.com/foundcenter/moas/backend/services/drive"
+	"github.com/foundcenter/moas/backend/services/github"
 	"github.com/foundcenter/moas/backend/services/gmail"
 	"github.com/foundcenter/moas/backend/services/slack"
 	"github.com/julienschmidt/httprouter"
 	"github.com/justinas/alice"
 	"net/http"
-	"github.com/foundcenter/moas/backend/services/github"
 )
 
 type loginRequest struct {
@@ -99,8 +99,7 @@ func handleGmailConnect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Reply(w).Ok(map[string]interface{}{"user": user, "token": token})
-
+	response.Reply(w).Ok(map[string]interface{}{"user": user})
 }
 
 func handleDriveAuth(w http.ResponseWriter, r *http.Request) {
@@ -122,7 +121,6 @@ func handleDriveAuth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response.Reply(w).Ok(map[string]interface{}{"user": user, "token": tokenString})
-
 }
 
 func handleDriveConnect(w http.ResponseWriter, r *http.Request) {
@@ -144,8 +142,7 @@ func handleDriveConnect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Reply(w).Ok(map[string]interface{}{"user": user, "token": token})
-
+	response.Reply(w).Ok(map[string]interface{}{"user": user})
 }
 
 func handleSlackAuth(w http.ResponseWriter, r *http.Request) {
@@ -189,7 +186,7 @@ func handleSlackConnect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Reply(w).Ok(map[string]interface{}{"user": user, "token": token})
+	response.Reply(w).Ok(map[string]interface{}{"user": user})
 
 }
 
@@ -212,6 +209,6 @@ func handleGithubConnect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Reply(w).Ok(map[string]interface{}{"user": user, "token": token[7:]})
+	response.Reply(w).Ok(map[string]interface{}{"user": user})
 
 }
