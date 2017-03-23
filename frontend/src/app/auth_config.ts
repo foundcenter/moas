@@ -25,7 +25,7 @@ export class MyAuthConfig extends CustomConfig {
         gmail: {
             name: 'gmail',
             clientId: GOOGLE_CLIENT_ID,
-            url: BACKEND_MOCK,
+            url: `${API_URL}/connect/gmail`,
             authorizationEndpoint: 'https://accounts.google.com/o/oauth2/auth',
             redirectUri: REDIRECT_URI,
             requiredUrlParams: ['scope'],
