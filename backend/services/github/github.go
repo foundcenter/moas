@@ -163,7 +163,8 @@ func Search(ctx context.Context, accountInfo models.AccountInfo, query string) (
 
 	wg.Add(3)
 	go func() {
-		result, _, _ := client.Search.Commits(ctx, query, nil)
+		userQuery := fmt.Sprintf("%s+user:%s", query, accountInfo.ID)
+		result, _, _ := client.Search.Commits(ctx, userQuery, nil)
 		searchResult := make([]models.SearchResult, 0)
 		if len(result.Commits) > 0 {
 			for _, c := range result.Commits {
