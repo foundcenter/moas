@@ -1,5 +1,5 @@
 {
-    "memo": "76319239563283e555818850f542d79f4b4f23c9c30eea6bd125d9edcba2687e",
+    "memo": "47ebeb85fc39d72c4ae022d36d71662b0f60bf9be41ad7c8b42fea777ab25ace",
     "projects": [
         {
             "name": "cloud.google.com/go",
@@ -144,6 +144,7 @@
             "revision": "314dd2c0bf3ebd592ec0d20847d27e79d0dbe8dd",
             "packages": [
                 ".",
+                "github",
                 "google",
                 "internal",
                 "jws",
