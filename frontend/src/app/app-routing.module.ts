@@ -9,11 +9,11 @@ import { SearchComponent } from "./components/search/search.component";
 import { IntegrateComponent } from "./components/integrate/integrate.component";
 
 const appRoutes: Routes = [
-    { path: 'home', component: HomeComponent, canActivate:[AuthGuard]},
     { path: 'login', component: LoginComponent },
-    { path: 'logout', component: LogoutComponent },
-    { path: 'search', component: SearchComponent },
-    { path: 'integrate', component: IntegrateComponent },
+    { path: 'home', component: HomeComponent, canActivate:[AuthGuard]},
+    { path: 'logout', component: LogoutComponent, canActivate:[AuthGuard]},
+    { path: 'search', component: SearchComponent, canActivate:[AuthGuard]},
+    { path: 'integrate', component: IntegrateComponent, canActivate:[AuthGuard]},
     { path: '', redirectTo: '/integrate', pathMatch: 'full' },
     { path: '**', component: PageNotFoundComponent }
 ];
