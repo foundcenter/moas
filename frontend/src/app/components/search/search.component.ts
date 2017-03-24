@@ -1,5 +1,5 @@
 import { Component, OnInit, EventEmitter, AfterViewInit } from '@angular/core';
-import { SearchService } from '../../search.service';
+import { SearchService } from '../../services/search.service';
 import { Result } from "../../models/result.interface";
 
 const ALL = 'All';

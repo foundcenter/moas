@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from "rxjs";
-import { Result } from "./models/result.interface";
+import { Result } from "../models/result.interface";
 import { JwtHttp } from "ng2-ui-auth";
 import { Response } from "@angular/http";
 
