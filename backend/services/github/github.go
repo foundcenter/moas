@@ -129,10 +129,10 @@ func Connect(ctx context.Context, userID string, code string) (models.User, erro
 	return user, nil
 }
 
-func addAccount(ctx context.Context, user *models.User, res *github.User, githubAccountId string, token *oauth2.Token) {
+func addAccount(ctx context.Context, user *models.User, res *github.User, primaryEmail string, token *oauth2.Token) {
 	a := models.AccountInfo{
 		Type:  AccountType,
-		ID:    githubAccountId,
+		ID:    res.GetLogin(),
 		Data:  res,
 		Token: token,
 	}
@@ -145,8 +145,8 @@ func addAccount(ctx context.Context, user *models.User, res *github.User, github
 
 	user.Accounts = append(user.Accounts, a)
 
-	if res.GetEmail() != "" && !utils.Contains(user.Emails, res.GetEmail()) {
-		user.Emails = append(user.Emails, res.GetEmail())
+	if primaryEmail != "" && !utils.Contains(user.Emails, primaryEmail) {
+		user.Emails = append(user.Emails, primaryEmail)
 	}
 }
 
@@ -183,7 +183,8 @@ func Search(ctx context.Context, accountInfo models.AccountInfo, query string) (
 	}()
 
 	go func() {
-		result, _, _ := client.Search.Issues(ctx, query, nil)
+		issuesQuery := fmt.Sprintf("%s+assignee:%s", query, accountInfo.ID)
+		result, _, _ := client.Search.Issues(ctx, issuesQuery, nil)
 		searchResult := make([]models.SearchResult, 0)
 		if len(result.Issues) > 0 {
 			for _, i := range result.Issues {
@@ -202,7 +203,8 @@ func Search(ctx context.Context, accountInfo models.AccountInfo, query string) (
 	}()
 
 	go func() {
-		result, _, _ := client.Search.Repositories(ctx, query, nil)
+		reposQuery := fmt.Sprintf("%s+user:%s", query, accountInfo.ID)
+		result, _, _ := client.Search.Repositories(ctx, reposQuery, nil)
 		searchResult := make([]models.SearchResult, 0)
 		if len(result.Repositories) > 0 {
 			for _, r := range result.Repositories {
