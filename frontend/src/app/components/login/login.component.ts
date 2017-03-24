@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from 'ng2-ui-auth';
 import { Router } from "@angular/router";
+import { AuthService } from "../../services/auth.service";
 
 @Component({
   selector: 'app-login',
@@ -9,17 +9,20 @@ import { Router } from "@angular/router";
 })
 export class LoginComponent implements OnInit {
 
-  constructor( private router: Router, private auth: AuthService ) { }
+  constructor(private router: Router, private auth: AuthService) {
+  }
 
   ngOnInit() {
   }
 
   loginWithGoogle() {
-        this.auth.authenticate('google')
-            .subscribe({
-                complete: () => this.router.navigateByUrl('search'),
-                error: (err: any) => console.log(err)
-            });
-    }
+    this.auth.login()
+      .then(() => {
+        this.router.navigateByUrl('search');
+      })
+      .catch(() => {
+        console.log("show toastr that login failed");
+      });
+  }
 
 }

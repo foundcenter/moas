@@ -17,6 +17,7 @@ import { FocusDirective } from './focus.directive';
 import { ResultComponent } from './components/search/result/result.component';
 import { IntegrateComponent } from './components/integrate/integrate.component';
 import { ModalModule, AlertModule } from "ng2-bootstrap";
+import { AuthService } from "./services/auth.service";
 
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ import { ModalModule, AlertModule } from "ng2-bootstrap";
     AlertModule.forRoot(),
   ],
   providers: [
-    AuthGuard
+    AuthGuard,
+    AuthService
   ],
   bootstrap: [AppComponent]
 })
