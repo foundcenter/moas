@@ -26,8 +26,8 @@ func Load(router *httprouter.Router) {
 	standardChain := alice.New(logger.Handler)
 	extendedChain := standardChain.Append(jwt_auth.Handler)
 
-	router.Handler("POST", "/auth/check", extendedChain.ThenFunc(handleAuthCheck))
-	router.Handler("GET", "/auth/google", standardChain.ThenFunc(handleGoogleAuth))
+	router.Handler("GET", "/auth/check", extendedChain.ThenFunc(handleAuthCheck))
+	router.Handler("POST", "/auth/google", standardChain.ThenFunc(handleGoogleAuth))
 	//router.Handler("POST", "/auth/slack", standardChain.ThenFunc(handleSlackAuth))
 	//router.Handler("POST", "/auth/gmail", standardChain.ThenFunc(handleGmailAuth))
 	//router.Handler("POST", "/auth/drive", standardChain.ThenFunc(handleDriveAuth))
