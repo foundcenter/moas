@@ -161,7 +161,7 @@ func Search(ctx context.Context, accountInfo models.AccountInfo, query string) (
 	tc := oauth2.NewClient(ctx, ts)
 	client := github.NewClient(tc)
 
-	wg.Add(3)
+	wg.Add(5)
 	go func() {
 		userQuery := fmt.Sprintf("%s+user:%s", query, accountInfo.ID)
 		result, _, _ := client.Search.Commits(ctx, userQuery, nil)
@@ -194,6 +194,7 @@ func Search(ctx context.Context, accountInfo models.AccountInfo, query string) (
 				s.AccountID = accountInfo.ID
 				s.Description = i.Milestone.GetDescription()
 				s.Url = i.GetHTMLURL()
+				s.Title = i.GetTitle()
 				searchResult = append(searchResult, s)
 			}
 		} else {
@@ -203,7 +204,49 @@ func Search(ctx context.Context, accountInfo models.AccountInfo, query string) (
 	}()
 
 	go func() {
-		reposQuery := fmt.Sprintf("%s+user:%s", query, accountInfo.ID)
+		issuesQuery := fmt.Sprintf("%s+author:%s", query, accountInfo.ID)
+		result, _, _ := client.Search.Issues(ctx, issuesQuery, nil)
+		searchResult := make([]models.SearchResult, 0)
+		if len(result.Issues) > 0 {
+			for _, i := range result.Issues {
+				s := models.SearchResult{}
+				s.Service = "github"
+				s.Resource = "issue"
+				s.AccountID = accountInfo.ID
+				s.Description = i.Milestone.GetDescription()
+				s.Url = i.GetHTMLURL()
+				s.Title = i.GetTitle()
+				searchResult = append(searchResult, s)
+			}
+		} else {
+			fmt.Print("No issues found. \n")
+		}
+		queueOfResults <- searchResult
+	}()
+
+	go func() {
+		issuesQuery := fmt.Sprintf("%s+mentions:%s", query, accountInfo.ID)
+		result, _, _ := client.Search.Issues(ctx, issuesQuery, nil)
+		searchResult := make([]models.SearchResult, 0)
+		if len(result.Issues) > 0 {
+			for _, i := range result.Issues {
+				s := models.SearchResult{}
+				s.Service = "github"
+				s.Resource = "issue"
+				s.AccountID = accountInfo.ID
+				s.Description = i.Milestone.GetDescription()
+				s.Url = i.GetHTMLURL()
+				s.Title = i.GetTitle()
+				searchResult = append(searchResult, s)
+			}
+		} else {
+			fmt.Print("No issues found. \n")
+		}
+		queueOfResults <- searchResult
+	}()
+
+	go func() {
+		reposQuery := fmt.Sprintf("%s user:%s", query, accountInfo.ID)
 		result, _, _ := client.Search.Repositories(ctx, reposQuery, nil)
 		searchResult := make([]models.SearchResult, 0)
 		if len(result.Repositories) > 0 {
