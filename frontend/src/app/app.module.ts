@@ -9,7 +9,6 @@ import { HttpModule } from '@angular/http';
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
-import { HomeComponent } from './components/home/home.component';
 import { LoginComponent } from './components/login/login.component';
 import { Ng2UiAuthModule } from "ng2-ui-auth/commonjs/ng2-ui-auth.module";
 import { LogoutComponent } from './components/logout/logout.component';
@@ -24,7 +23,6 @@ import { ModalModule, AlertModule } from "ng2-bootstrap";
     AppComponent,
     NavbarComponent,
     PageNotFoundComponent,
-    HomeComponent,
     LoginComponent,
     LogoutComponent,
     SearchComponent,
