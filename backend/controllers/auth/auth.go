@@ -5,6 +5,7 @@ import (
 	"github.com/foundcenter/moas/backend/controllers/response"
 	"github.com/foundcenter/moas/backend/middleware/jwt_auth"
 	"github.com/foundcenter/moas/backend/middleware/logger"
+	"github.com/foundcenter/moas/backend/repo"
 	"github.com/foundcenter/moas/backend/services/auth"
 	"github.com/foundcenter/moas/backend/services/drive"
 	"github.com/foundcenter/moas/backend/services/github"
@@ -21,8 +22,11 @@ type loginRequest struct {
 }
 
 func Load(router *httprouter.Router) {
+
 	standardChain := alice.New(logger.Handler)
 	extendedChain := standardChain.Append(jwt_auth.Handler)
+
+	router.Handler("POST", "/auth/check", extendedChain.ThenFunc(handleAuthCheck))
 	router.Handler("POST", "/auth/google", standardChain.ThenFunc(handleGoogleAuth))
 	//router.Handler("POST", "/auth/slack", standardChain.ThenFunc(handleSlackAuth))
 	//router.Handler("POST", "/auth/gmail", standardChain.ThenFunc(handleGmailAuth))
@@ -31,6 +35,26 @@ func Load(router *httprouter.Router) {
 	router.Handler("POST", "/connect/gmail", extendedChain.ThenFunc(handleGmailConnect))
 	router.Handler("POST", "/connect/drive", extendedChain.ThenFunc(handleDriveConnect))
 	router.Handler("POST", "/connect/github", extendedChain.ThenFunc(handleGithubConnect))
+}
+func handleAuthCheck(w http.ResponseWriter, r *http.Request) {
+
+	token := r.Header.Get("Authorization")
+	user_id, err := auth.ParseToken(token[7:])
+	if err != nil {
+		response.Reply(w).Unauthorized(err)
+		return
+	}
+
+	db := repo.New()
+	defer db.Destroy()
+	user, err := db.UserRepo.FindById(user_id)
+	if err != nil {
+		response.Reply(w).Unauthorized(err)
+		return
+	}
+
+	response.Reply(w).Ok(map[string]interface{}{"user": user})
+
 }
 
 func handleGoogleAuth(w http.ResponseWriter, r *http.Request) {
