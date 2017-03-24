@@ -27,7 +27,7 @@ func Load(router *httprouter.Router) {
 	extendedChain := standardChain.Append(jwt_auth.Handler)
 
 	router.Handler("POST", "/auth/check", extendedChain.ThenFunc(handleAuthCheck))
-	router.Handler("POST", "/auth/google", standardChain.ThenFunc(handleGoogleAuth))
+	router.Handler("GET", "/auth/google", standardChain.ThenFunc(handleGoogleAuth))
 	//router.Handler("POST", "/auth/slack", standardChain.ThenFunc(handleSlackAuth))
 	//router.Handler("POST", "/auth/gmail", standardChain.ThenFunc(handleGmailAuth))
 	//router.Handler("POST", "/auth/drive", standardChain.ThenFunc(handleDriveAuth))
@@ -41,7 +41,7 @@ func handleAuthCheck(w http.ResponseWriter, r *http.Request) {
 	token := r.Header.Get("Authorization")
 	user_id, err := auth.ParseToken(token[7:])
 	if err != nil {
-		response.Reply(w).Unauthorized(err)
+		response.Reply(w).ServerInternalError()
 		return
 	}
 
