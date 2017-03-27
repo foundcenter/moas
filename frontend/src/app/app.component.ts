@@ -7,24 +7,9 @@ import { AuthService } from "./services/auth.service";
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit{
+export class AppComponent {
   title = 'MOAS app works!';
 
-  constructor(private authService: AuthService, private router: Router) {
-  }
-
-  ngOnInit(): void {
-    if (!this.authService.isLoggedIn()) {
-      this.router.navigateByUrl('/login');
-    } else {
-      this.authService.check()
-        .subscribe(
-          (data) => {},
-          (error) => {
-            this.authService.logout();
-            this.router.navigateByUrl('/login');
-          }
-        );
-    }
+  constructor() {
   }
 }

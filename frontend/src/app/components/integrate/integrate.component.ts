@@ -1,10 +1,12 @@
-import { Component, OnInit, ViewChild, AfterContentInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterContentInit, OnDestroy } from '@angular/core';
 import { IntegrationService } from '../../services/integration.service';
 import { ModalDirective } from 'ng2-bootstrap';
 import { Service } from '../../models/service';
 import { AccountService } from '../../services/account.service';
 import { Account } from '../../models/account';
 import { AuthService } from "../../services/auth.service";
+import { User } from "../../models/user";
+import { Subscription } from "rxjs";
 
 @Component({
   selector: 'app-integrate',
@@ -12,22 +14,33 @@ import { AuthService } from "../../services/auth.service";
   styleUrls: ['./integrate.component.scss'],
   providers: [IntegrationService, AccountService]
 })
-export class IntegrateComponent implements OnInit, AfterContentInit {
+export class IntegrateComponent implements OnInit, OnDestroy {
   @ViewChild('childModal') public childModal: ModalDirective;
   public services: Service[] = [];
   public accounts: Account[] = [];
   public jira: {email, password, error} = {email: '', password: '', error: null};
-  constructor(private integrationService: IntegrationService, private auth: AuthService, private accountService: AccountService) { }
+  private currentUserSubscription: Subscription;
+
+  constructor(private integrationService: IntegrationService, private auth: AuthService, private accountService: AccountService) {
+
+  }
+
+  ngOnDestroy(): void {
+    this.currentUserSubscription.unsubscribe();
+  }
 
   ngOnInit() {
-    this.accounts = this.accountService.getAccounts();
     this.services = this.integrationService.getAvailableServices();
-  }
 
-  ngAfterContentInit(): void {
-    this.assignAccountsToServices();
-  }
+    this.currentUserSubscription = this.auth.currentUser.subscribe((user: User) => {
+      if (!user) {
+        return;
+      }
 
+      this.accounts = user.accounts;
+      this.assignAccountsToServices();
+    });
+  }
 
   assignAccountsToServices(): void {
     this.accounts.forEach((account: Account) => {
@@ -53,6 +66,7 @@ export class IntegrateComponent implements OnInit, AfterContentInit {
     let totalAdded = 0;
     let rows : Service[][] = [];
     let row: Service[] = [];
+
     for (let i = 0; i < this.services.length; i = i + 3) {
       row = [this.services[i]];
       if (this.services[i+1]) {
@@ -90,12 +104,6 @@ export class IntegrateComponent implements OnInit, AfterContentInit {
             data => {
               console.log(`Data of ${serviceName} auth`);
               console.log(data);
-              this.accountService.mockAddOauthAccount(data, service)
-                .subscribe(
-                  (account) => {
-                    this.assignAccountToService(<Account>account);
-                  }
-                );
             },
             error => {
               console.log(`Error of ${serviceName} auth`);
