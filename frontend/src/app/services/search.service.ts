@@ -3,12 +3,13 @@ import { Observable } from "rxjs";
 import { Result } from "../models/result.interface";
 import { JwtHttp } from "ng2-ui-auth";
 import { Response } from "@angular/http";
+import { environment } from '../../environments/environment';
 
 
 
 @Injectable()
 export class SearchService {
-  private uri: string = 'http://localhost:8081';
+  private uri: string = environment.apiUrl;
 
   constructor(private http: JwtHttp) { }
 

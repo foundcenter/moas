@@ -1,23 +1,24 @@
 import { CustomConfig } from 'ng2-ui-auth';
 import { Response } from '@angular/http';
+import { environment } from '../environments/environment';
 
 /**
  * Created by Ron on 03/10/2016.
  */
-export const GOOGLE_CLIENT_ID = '531545236739-hhtfh2m5rcmeph76sabo3mvdupeu5hfa.apps.googleusercontent.com';
-export const SLACK_CLIENT_ID = '16724837808.155634746450';
-export const GITHUB_CLIENT_ID = '469a838ef4c6048510b6';
+export const GOOGLE_CLIENT_ID = environment.googleClientId;
+export const SLACK_CLIENT_ID = environment.slackClientId;
+export const GITHUB_CLIENT_ID = environment.githubClientId;
 
 export const BACKEND_MOCK = 'https://httpbin.org/post';
-export const REDIRECT_URI = 'http://localhost:4200';
-export const API_URL ='http://localhost:8081';
+export const REDIRECT_URI = environment.redirectUrl;
+export const API_URL = environment.apiUrl;
 
 export class MyAuthConfig extends CustomConfig {
     defaultHeaders = {'Content-Type': 'application/json'};
     providers = {
         google: {
             clientId: GOOGLE_CLIENT_ID,
-            url: 'http://localhost:8081/auth/google',
+            url: `${API_URL}/auth/google`,
             scope: 'profile email https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/drive.readonly',
             scopeDelimiter: ' ',
             accessType: 'offline'
@@ -75,7 +76,7 @@ export class MyAuthConfig extends CustomConfig {
             name: 'github',
             url: `${API_URL}/connect/github`,
             authorizationEndpoint: 'https://github.com/login/oauth/authorize',
-            redirectUri: 'http://localhost:4200',
+            redirectUri: REDIRECT_URI,
             requiredUrlParams: ['scope'],
             scope: 'user:email',
             scopeDelimiter: ' ',

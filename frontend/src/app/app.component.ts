@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService, JwtHttp } from "ng2-ui-auth";
 import { Router } from "@angular/router";
 import { ToastrConfig } from 'ngx-toastr';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -10,6 +11,7 @@ import { ToastrConfig } from 'ngx-toastr';
 })
 export class AppComponent implements OnInit {
   title = 'MOAS app works!';
+  private uri: string = environment.apiUrl;
 
   constructor(private authService: AuthService, private router: Router, private http: JwtHttp, toastrConfig: ToastrConfig) {
     toastrConfig.closeButton=true;
@@ -19,7 +21,7 @@ export class AppComponent implements OnInit {
     if (!this.authService.isAuthenticated()) {
       this.router.navigateByUrl('/login');
     } else {
-      this.http.get('http://localhost:8081/auth/check')
+      this.http.get(`${this.uri}/auth/check`)
         .subscribe(
         (data) => { },
         (error) => {
