@@ -26,7 +26,7 @@ export class LoginComponent implements OnInit {
         }
       })
       .catch(() => {
-        this.toastrService.warning('Login with Google failed!', 'Error')
+        this.toastrService.error('Login with Google failed!', 'Error')
       });
   }
 
