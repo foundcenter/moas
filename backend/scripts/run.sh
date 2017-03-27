@@ -1,0 +1,1 @@
+docker run -it -v ${PWD}:/go/src/github.com/foundcenter/moas/backend/ --env-file .env.production -p 8081:8081 --name moas --rm moas:latest
