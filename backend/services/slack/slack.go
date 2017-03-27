@@ -24,8 +24,8 @@ func init() {
 		RedirectURL:  config.Settings.Slack.RedirectURL,
 		Scopes: []string{
 			"search:read",
-			"identity.basic",
-			"identity.email",
+			"identify",
+			"users:read",
 		},
 		Endpoint: slackAuth.Endpoint,
 	}
@@ -38,10 +38,17 @@ func Login(ctx context.Context, code string) (models.User, error) {
 	if err != nil {
 		return user, err
 	}
-
 	client := slack.New(accessToken.AccessToken)
 
-	res, err := client.GetUserIdentity()
+	auth, err := client.AuthTest()
+
+	if err != nil {
+		return user, err
+	}
+
+	userId := auth.UserID
+
+	res, err := client.GetUserInfo(userId)
 
 	if err != nil {
 		return user, err
@@ -50,7 +57,7 @@ func Login(ctx context.Context, code string) (models.User, error) {
 	db := repo.New()
 	defer db.Destroy()
 
-	user, err = db.UserRepo.FindByAccount(AccountType, res.User.ID)
+	user, err = db.UserRepo.FindByAccount(AccountType, res.ID)
 
 	if err != nil {
 		return user, err
@@ -58,8 +65,8 @@ func Login(ctx context.Context, code string) (models.User, error) {
 
 	// If user is already registered merge data
 	if !user.ID.Valid() {
-		user.Name = res.User.Name
-		user.Picture = res.User.Image512
+		user.Name = res.Name
+		user.Picture = res.Profile.Image192
 	}
 
 	addAccount(ctx, &user, res, accessToken)
@@ -78,7 +85,16 @@ func Connect(ctx context.Context, userID string, code string) (models.User, erro
 	}
 
 	client := slack.New(accessToken.AccessToken)
-	res, err := client.GetUserIdentity()
+
+	auth, err := client.AuthTest()
+
+	if err != nil {
+		return user, err
+	}
+
+	userId := auth.UserID
+
+	res, err := client.GetUserInfo(userId)
 
 	db := repo.New()
 	defer db.Destroy()
@@ -95,11 +111,11 @@ func Connect(ctx context.Context, userID string, code string) (models.User, erro
 	return user, nil
 }
 
-func addAccount(ctx context.Context, user *models.User, res *slack.UserIdentityResponse, token *oauth2.Token) {
+func addAccount(ctx context.Context, user *models.User, slackUser *slack.User, token *oauth2.Token) {
 	a := models.AccountInfo{
 		Type:  AccountType,
-		ID:    res.User.ID,
-		Data:  res,
+		ID:    slackUser.ID,
+		Data:  slackUser,
 		Token: token,
 	}
 
@@ -111,8 +127,8 @@ func addAccount(ctx context.Context, user *models.User, res *slack.UserIdentityR
 
 	user.Accounts = append(user.Accounts, a)
 
-	if res.User.Email != "" && !utils.Contains(user.Emails, res.User.Email) {
-		user.Emails = append(user.Emails, res.User.Email)
+	if slackUser.Profile.Email != "" && !utils.Contains(user.Emails, slackUser.Profile.Email) {
+		user.Emails = append(user.Emails, slackUser.Profile.Email)
 	}
 }
 
@@ -126,30 +142,32 @@ func Search(ctx context.Context, accountInfo models.AccountInfo, query string) (
 
 	client := slack.New(accountInfo.Token.AccessToken)
 
-	messages, files, _ := client.Search(query, slack.SearchParameters{})
+	messages, files, _ := client.Search(query, slack.NewSearchParameters())
 
-	var results []models.SearchResult
+	results := make([]models.SearchResult, 0)
 
 	for _, m := range messages.Matches {
-		results = append(results, models.SearchResult{
+		msg := models.SearchResult{
 			AccountID:   "slack",
 			Service:     "slack",
 			Resource:    "message",
 			Title:       m.Username,
 			Description: m.Text,
 			Url:         m.Permalink,
-		})
+		}
+		results = append(results, msg)
 	}
 
 	for _, f := range files.Matches {
-		results = append(results, models.SearchResult{
+		file := models.SearchResult{
 			AccountID:   "slack",
 			Service:     "slack",
 			Resource:    "file",
 			Title:       f.Title,
 			Description: "",
 			Url:         f.Permalink,
-		})
+		}
+		results = append(results, file)
 	}
 
 	return results, nil

@@ -64,7 +64,7 @@ export class MyAuthConfig extends CustomConfig {
             authorizationEndpoint: 'https://slack.com/oauth/authorize',
             requiredUrlParams: ['scope'],
             redirectUri: REDIRECT_URI,
-            scope: 'search:read identity.basic identity.email',
+            scope: 'search:read identify users:read',
             scopePrefix: '',
             scopeDelimiter: ',',
             oauthType: '2.0',
