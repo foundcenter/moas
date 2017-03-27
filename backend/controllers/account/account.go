@@ -2,6 +2,8 @@ package account
 
 import (
 	"context"
+	"net/http"
+
 	"github.com/foundcenter/moas/backend/controllers/response"
 	"github.com/foundcenter/moas/backend/middleware/jwt_auth"
 	"github.com/foundcenter/moas/backend/middleware/logger"
@@ -9,9 +11,9 @@ import (
 	"github.com/foundcenter/moas/backend/services/auth"
 	"github.com/julienschmidt/httprouter"
 	"github.com/justinas/alice"
-	"net/http"
 )
 
+// WrapHandler for route params
 func WrapHandler(h http.Handler) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
@@ -20,6 +22,7 @@ func WrapHandler(h http.Handler) httprouter.Handle {
 	}
 }
 
+// Load routes for router
 func Load(router *httprouter.Router) {
 
 	standardChain := alice.New(logger.Handler)
@@ -40,23 +43,23 @@ func handleAccountDelete(w http.ResponseWriter, r *http.Request) {
 		response.Reply(w).BadRequest()
 	}
 
-	user_id, err := auth.ParseToken(token[7:])
+	userID, err := auth.ParseToken(token[7:])
 	if err != nil {
-		response.Reply(w).ServerInternalError()
+		response.Reply(w).ServerInternalError(err)
 		return
 	}
 
 	db := repo.New()
 	defer db.Destroy()
 
-	user, err := db.UserRepo.FindById(user_id)
+	user, err := db.UserRepo.FindById(userID)
 	if err != nil {
 		response.Reply(w).Unauthorized(err)
 		return
 	}
 
 	//find account & check if can be deleted
-	canBeDeleted := len(user.Accounts) > 1 && accountType !="gmail" && accountType!="drive"
+	canBeDeleted := len(user.Accounts) > 1 && accountType != "gmail" && accountType != "drive"
 
 	if canBeDeleted {
 		for i, a := range user.Accounts {
@@ -64,7 +67,7 @@ func handleAccountDelete(w http.ResponseWriter, r *http.Request) {
 				user.Accounts = append(user.Accounts[:i], user.Accounts[i+1:]...)
 				user, err = db.UserRepo.Update(user)
 				if err != nil {
-					response.Reply(w).ServerInternalError()
+					response.Reply(w).ServerInternalError(err)
 					return
 				}
 
