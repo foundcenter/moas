@@ -153,7 +153,6 @@ func addAccount(ctx context.Context, user *models.User, res *github.User, primar
 func Search(ctx context.Context, accountInfo models.AccountInfo, query string) ([]models.SearchResult, error) {
 
 	var wg sync.WaitGroup
-	//searchResult := make([]models.SearchResult, 0)
 	resultOfSearch := make([]models.SearchResult, 0)
 	queueOfResults := make(chan []models.SearchResult, 2)
 
@@ -161,107 +160,19 @@ func Search(ctx context.Context, accountInfo models.AccountInfo, query string) (
 	tc := oauth2.NewClient(ctx, ts)
 	client := github.NewClient(tc)
 
-	wg.Add(5)
+	wg.Add(3)
 	go func() {
-		userQuery := fmt.Sprintf("%s+user:%s", query, accountInfo.ID)
-		result, _, _ := client.Search.Commits(ctx, userQuery, nil)
-		searchResult := make([]models.SearchResult, 0)
-		if len(result.Commits) > 0 {
-			for _, c := range result.Commits {
-				s := models.SearchResult{}
-				s.Service = "github"
-				s.Resource = "commit"
-				s.AccountID = accountInfo.ID
-				s.Title = c.Commit.GetMessage()
-				s.Url = *c.HTMLURL
-				searchResult = append(searchResult, s)
-			}
-		} else {
-			fmt.Print("No commits found. \n")
-		}
+		searchResult := searchCommits(ctx, accountInfo, query, client)
 		queueOfResults <- searchResult
 	}()
 
 	go func() {
-		issuesQuery := fmt.Sprintf("%s+assignee:%s", query, accountInfo.ID)
-		result, _, _ := client.Search.Issues(ctx, issuesQuery, nil)
-		searchResult := make([]models.SearchResult, 0)
-		if len(result.Issues) > 0 {
-			for _, i := range result.Issues {
-				s := models.SearchResult{}
-				s.Service = "github"
-				s.Resource = "issue"
-				s.AccountID = accountInfo.ID
-				s.Description = i.Milestone.GetDescription()
-				s.Url = i.GetHTMLURL()
-				s.Title = i.GetTitle()
-				searchResult = append(searchResult, s)
-			}
-		} else {
-			fmt.Print("No issues found. \n")
-		}
+		searchResult := searchIssues(ctx, accountInfo, query, client)
 		queueOfResults <- searchResult
 	}()
 
 	go func() {
-		issuesQuery := fmt.Sprintf("%s+author:%s", query, accountInfo.ID)
-		result, _, _ := client.Search.Issues(ctx, issuesQuery, nil)
-		searchResult := make([]models.SearchResult, 0)
-		if len(result.Issues) > 0 {
-			for _, i := range result.Issues {
-				s := models.SearchResult{}
-				s.Service = "github"
-				s.Resource = "issue"
-				s.AccountID = accountInfo.ID
-				s.Description = i.Milestone.GetDescription()
-				s.Url = i.GetHTMLURL()
-				s.Title = i.GetTitle()
-				searchResult = append(searchResult, s)
-			}
-		} else {
-			fmt.Print("No issues found. \n")
-		}
-		queueOfResults <- searchResult
-	}()
-
-	go func() {
-		issuesQuery := fmt.Sprintf("%s+mentions:%s", query, accountInfo.ID)
-		result, _, _ := client.Search.Issues(ctx, issuesQuery, nil)
-		searchResult := make([]models.SearchResult, 0)
-		if len(result.Issues) > 0 {
-			for _, i := range result.Issues {
-				s := models.SearchResult{}
-				s.Service = "github"
-				s.Resource = "issue"
-				s.AccountID = accountInfo.ID
-				s.Description = i.Milestone.GetDescription()
-				s.Url = i.GetHTMLURL()
-				s.Title = i.GetTitle()
-				searchResult = append(searchResult, s)
-			}
-		} else {
-			fmt.Print("No issues found. \n")
-		}
-		queueOfResults <- searchResult
-	}()
-
-	go func() {
-		reposQuery := fmt.Sprintf("%s user:%s", query, accountInfo.ID)
-		result, _, _ := client.Search.Repositories(ctx, reposQuery, nil)
-		searchResult := make([]models.SearchResult, 0)
-		if len(result.Repositories) > 0 {
-			for _, r := range result.Repositories {
-				s := models.SearchResult{}
-				s.Service = "github"
-				s.Resource = "repository"
-				s.AccountID = accountInfo.ID
-				s.Description = r.GetDescription()
-				s.Url = r.GetHTMLURL()
-				searchResult = append(searchResult, s)
-			}
-		} else {
-			fmt.Print("No repositories found. \n")
-		}
+		searchResult := searchRepositories(ctx, accountInfo, query, client)
 		queueOfResults <- searchResult
 	}()
 
@@ -275,4 +186,146 @@ func Search(ctx context.Context, accountInfo models.AccountInfo, query string) (
 	wg.Wait()
 
 	return resultOfSearch, nil
+}
+
+func searchCommits(ctx context.Context, accountInfo models.AccountInfo, query string, client *github.Client) []models.SearchResult {
+
+	userQuery := fmt.Sprintf("%s+user:%s", query, accountInfo.ID)
+	result, _, _ := client.Search.Commits(ctx, userQuery, nil)
+	searchResult := make([]models.SearchResult, 0)
+
+	if len(result.Commits) > 0 {
+		for _, c := range result.Commits {
+			s := models.SearchResult{}
+			s.Service = "github"
+			s.Resource = "commit"
+			s.AccountID = accountInfo.ID
+			s.Title = c.Commit.GetMessage()
+			s.Url = *c.HTMLURL
+			searchResult = append(searchResult, s)
+		}
+	} else {
+		fmt.Print("No commits found. \n")
+	}
+
+	return searchResult
+
+}
+
+func searchIssues(ctx context.Context, accountInfo models.AccountInfo, query string, client *github.Client) []models.SearchResult {
+	var wg sync.WaitGroup
+	resultOfSearch := make([]models.SearchResult, 0)
+	queueOfResults := make(chan []models.SearchResult, 2)
+
+	wg.Add(3)
+	go func() {
+		issuesQuery := fmt.Sprintf("%s+assignee:%s", query, accountInfo.ID)
+		result, _, _ := client.Search.Issues(ctx, issuesQuery, nil)
+		searchResult := make([]models.SearchResult, 0)
+		if len(result.Issues) > 0 {
+			for _, i := range result.Issues {
+				s := models.SearchResult{}
+				s.ID = i.GetID()
+				s.Service = "github"
+				s.Resource = "issue"
+				s.AccountID = accountInfo.ID
+				s.Description = i.Milestone.GetDescription()
+				s.Url = i.GetHTMLURL()
+				s.Title = i.GetTitle()
+				searchResult = append(searchResult, s)
+			}
+		} else {
+			fmt.Print("No assignee issues found. \n")
+		}
+		queueOfResults <- searchResult
+	}()
+
+	go func() {
+		issuesQuery := fmt.Sprintf("%s+author:%s", query, accountInfo.ID)
+		result, _, _ := client.Search.Issues(ctx, issuesQuery, nil)
+		searchResult := make([]models.SearchResult, 0)
+		if len(result.Issues) > 0 {
+			for _, i := range result.Issues {
+				s := models.SearchResult{}
+				s.ID = i.GetID()
+				s.Service = "github"
+				s.Resource = "issue"
+				s.AccountID = accountInfo.ID
+				s.Description = i.Milestone.GetDescription()
+				s.Url = i.GetHTMLURL()
+				s.Title = i.GetTitle()
+				searchResult = append(searchResult, s)
+			}
+		} else {
+			fmt.Print("No issues of this author found. \n")
+		}
+		queueOfResults <- searchResult
+	}()
+
+	go func() {
+		issuesQuery := fmt.Sprintf("%s+mentions:%s", query, accountInfo.ID)
+		result, _, _ := client.Search.Issues(ctx, issuesQuery, nil)
+		searchResult := make([]models.SearchResult, 0)
+		if len(result.Issues) > 0 {
+			for _, i := range result.Issues {
+				s := models.SearchResult{}
+				s.ID = i.GetID()
+				s.Service = "github"
+				s.Resource = "issue"
+				s.AccountID = accountInfo.ID
+				s.Description = i.Milestone.GetDescription()
+				s.Url = i.GetHTMLURL()
+				s.Title = i.GetTitle()
+				searchResult = append(searchResult, s)
+			}
+		} else {
+			fmt.Print("No mentions in issues found. \n")
+		}
+		queueOfResults <- searchResult
+	}()
+
+	go func() {
+		for result := range queueOfResults {
+			resultOfSearch = append(resultOfSearch, result...)
+			wg.Done()
+		}
+	}()
+
+	wg.Wait()
+
+	//remove duplicates
+	encountered := make(map[int]bool, 0)
+	result := make([]models.SearchResult, 0)
+
+	for _, v := range resultOfSearch {
+		if encountered[v.ID] == true {
+		} else {
+			encountered[v.ID] = true
+			result = append(result, v)
+		}
+	}
+
+	return result
+
+}
+
+func searchRepositories(ctx context.Context, accountInfo models.AccountInfo, query string, client *github.Client) []models.SearchResult {
+
+	reposQuery := fmt.Sprintf("%s user:%s", query, accountInfo.ID)
+	result, _, _ := client.Search.Repositories(ctx, reposQuery, nil)
+	searchResult := make([]models.SearchResult, 0)
+	if len(result.Repositories) > 0 {
+		for _, r := range result.Repositories {
+			s := models.SearchResult{}
+			s.Service = "github"
+			s.Resource = "repository"
+			s.AccountID = accountInfo.ID
+			s.Description = r.GetDescription()
+			s.Url = r.GetHTMLURL()
+			searchResult = append(searchResult, s)
+		}
+	} else {
+		fmt.Print("No repositories found. \n")
+	}
+	return searchResult
 }

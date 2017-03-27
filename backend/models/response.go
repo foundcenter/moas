@@ -7,4 +7,5 @@ type SearchResult struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	Url         string `json:"url"`
+	ID          int    `json:"-"`
 }
