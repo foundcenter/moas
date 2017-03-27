@@ -24,7 +24,7 @@ _testmain.go
 *.prof
 
 .env
-.env.*
+.env.production
 bin/
 
 backend
