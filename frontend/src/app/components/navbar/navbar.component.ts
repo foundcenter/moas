@@ -1,5 +1,5 @@
-import { AuthService } from 'ng2-ui-auth';
 import { Component, OnInit } from '@angular/core';
+import { AuthService } from "../../services/auth.service";
 
 @Component({
   selector: 'app-navbar',

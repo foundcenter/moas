@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService, JwtHttp } from "ng2-ui-auth";
 import { Router } from "@angular/router";
+import { AuthService } from "./services/auth.service";
 
 @Component({
   selector: 'app-root',
@@ -10,14 +10,14 @@ import { Router } from "@angular/router";
 export class AppComponent implements OnInit{
   title = 'MOAS app works!';
 
-  constructor(private authService: AuthService, private router: Router, private http: JwtHttp) {
+  constructor(private authService: AuthService, private router: Router) {
   }
 
   ngOnInit(): void {
-    if (!this.authService.isAuthenticated()) {
+    if (!this.authService.isLoggedIn()) {
       this.router.navigateByUrl('/login');
     } else {
-      this.http.get('http://localhost:8081/auth/check')
+      this.authService.check()
         .subscribe(
           (data) => {},
           (error) => {
