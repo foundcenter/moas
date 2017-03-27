@@ -1,3 +1,4 @@
+import { ToastrService } from 'ngx-toastr';
 import { Component, OnInit, ViewChild, AfterContentInit } from '@angular/core';
 import { IntegrationService } from '../../services/integration.service';
 import { AuthService } from 'ng2-ui-auth';
@@ -17,7 +18,7 @@ export class IntegrateComponent implements OnInit, AfterContentInit {
   public services: Service[] = [];
   public accounts: Account[] = [];
   public jira: {email, password, error} = {email: '', password: '', error: null};
-  constructor(private integrationService: IntegrationService, private auth: AuthService, private accountService: AccountService) { }
+  constructor(private integrationService: IntegrationService, private auth: AuthService, private accountService: AccountService, private toastrService: ToastrService) { }
 
   ngOnInit() {
     this.accounts = this.accountService.getAccounts();
@@ -94,12 +95,14 @@ export class IntegrateComponent implements OnInit, AfterContentInit {
                 .subscribe(
                   (account) => {
                     this.assignAccountToService(<Account>account);
+                    this.toastrService.success(`${serviceName} successfuly connected`,'Success')
                   }
                 );
             },
             error => {
               console.log(`Error of ${serviceName} auth`);
               console.log(error);
+              this.toastrService.error(`${serviceName} fail to connect`,'Error')
             },
             () => {
               console.log(`Finally of ${serviceName} auth`)
@@ -125,9 +128,11 @@ export class IntegrateComponent implements OnInit, AfterContentInit {
           this.hideChildModal();
           this.jira.email = '';
           this.jira.password = '';
+          this.toastrService.success('Jira successfuly connected','Success')
         },
         error => {
           this.jira.error = error;
+          this.toastrService.error('Jira fail to connect','Error')
         }
       );
   }

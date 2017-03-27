@@ -1,6 +1,8 @@
+import { Response } from '@angular/http';
 import { Component, OnInit } from '@angular/core';
-import { Router } from "@angular/router";
-import { AuthService } from "../../services/auth.service";
+import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-login',
@@ -9,7 +11,7 @@ import { AuthService } from "../../services/auth.service";
 })
 export class LoginComponent implements OnInit {
 
-  constructor(private router: Router, private auth: AuthService) {
+  constructor(private router: Router, private auth: AuthService, private toastrService: ToastrService) {
   }
 
   ngOnInit() {
@@ -17,11 +19,14 @@ export class LoginComponent implements OnInit {
 
   loginWithGoogle() {
     this.auth.login()
-      .then(() => {
+      .then((res: Response) => {
         this.router.navigateByUrl('search');
+        if (res.status == 201) {
+          this.toastrService.info('Go to Integrate page to connect other services!', 'Integrate more services')
+        }
       })
       .catch(() => {
-        console.log("show toastr that login failed");
+        this.toastrService.warning('Login with Google failed!', 'Error')
       });
   }
 
