@@ -1,10 +1,10 @@
 import { Component, OnInit, ViewChild, AfterContentInit } from '@angular/core';
 import { IntegrationService } from '../../services/integration.service';
-import { AuthService } from 'ng2-ui-auth';
 import { ModalDirective } from 'ng2-bootstrap';
 import { Service } from '../../models/service';
 import { AccountService } from '../../services/account.service';
 import { Account } from '../../models/account';
+import { AuthService } from "../../services/auth.service";
 
 @Component({
   selector: 'app-integrate',
@@ -85,7 +85,7 @@ export class IntegrateComponent implements OnInit, AfterContentInit {
       case 'slack':
       case 'github':
         console.log('integrating ' + serviceName);
-        this.auth.authenticate(serviceName)
+        this.auth.connect(serviceName)
           .subscribe(
             data => {
               console.log(`Data of ${serviceName} auth`);

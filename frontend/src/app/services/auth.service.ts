@@ -32,6 +32,10 @@ export class AuthService {
     return this.http.get('http://localhost:8081/auth/check');
   }
 
+  connect(serviceName: string): Observable<Response> {
+    return this.uiAuth.authenticate(serviceName);
+  }
+
   setUser(response): void {
     this.user = User.fromJson(response);
   }
