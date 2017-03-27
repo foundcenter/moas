@@ -1,0 +1,1 @@
+docker push fcid/moas:latest
