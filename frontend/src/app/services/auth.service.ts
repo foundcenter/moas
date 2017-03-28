@@ -9,7 +9,7 @@ import { Router } from "@angular/router";
 export class AuthService{
   private user: User = null;
 
-  public currentUser: ReplaySubject<User> = new ReplaySubject(0);
+  public currentUser: ReplaySubject<User> = new ReplaySubject(1);
 
   constructor(private uiAuth: UiAuth, private http: JwtHttp, private router: Router) {
     if (!this.isLoggedIn()) {
@@ -28,7 +28,6 @@ export class AuthService{
       .toPromise()
       .then((data: Response) => {
         this.setUser(data.json().data.user);
-        this.currentUser.next(this.user);
         return data;
       });
   }
@@ -46,7 +45,6 @@ export class AuthService{
       .toPromise()
       .then((data: Response) => {
         this.setUser(data.json().data.user);
-        this.currentUser.next(this.user);
         return data;
       });
   }
@@ -57,6 +55,7 @@ export class AuthService{
 
   setUser(response): void {
     this.user = User.fromJson(response);
+    this.currentUser.next(this.user);
   }
 
 }

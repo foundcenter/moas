@@ -5,13 +5,14 @@ import { Observable } from "rxjs";
 import { Response } from "@angular/http";
 import { AuthService } from "./auth.service";
 import { User } from "../models/user";
+import { JwtHttp } from "ng2-ui-auth";
 
 @Injectable()
 export class AccountService {
 
   private currentUser: User;
 
-  constructor(private auth: AuthService) {
+  constructor(private auth: AuthService, private http: JwtHttp) {
 
     auth.currentUser.subscribe((user) => {
       if (!user) {
@@ -23,6 +24,10 @@ export class AccountService {
 
   getAccounts(): Account[] {
     return this.currentUser.accounts;
+  }
+
+  delete(serviceName: string, id: string): Observable<Response> {
+    return this.http.delete(`http://localhost:8081/account/${serviceName.toLowerCase()}/${id}`);
   }
 
   mockAddJira(email: string, password: string): Observable<Account> {

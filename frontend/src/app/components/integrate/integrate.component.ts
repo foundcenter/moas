@@ -30,13 +30,11 @@ export class IntegrateComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.services = this.integrationService.getAvailableServices();
-
     this.currentUserSubscription = this.auth.currentUser.subscribe((user: User) => {
       if (!user) {
         return;
       }
-
+      this.services = this.integrationService.getAvailableServices();
       this.accounts = user.accounts;
       this.assignAccountsToServices();
     });
@@ -90,12 +88,23 @@ export class IntegrateComponent implements OnInit, OnDestroy {
     this.jira.error = null;
   }
 
+  deleteAccount(account: Account, service: Service) {
+    this.accountService.delete(service.name, account.id)
+      .subscribe(
+        (data) => {
+          this.auth.setUser(data.json().data);
+        },
+        (error) => {
+        }
+      );
+  }
+
   handle(service: Service) {
-    let serviceName = this.slug(service.name);
+    let serviceName = service.slug();
 
     switch (serviceName) {
       case 'gmail':
-      case 'google-drive':
+      case 'drive':
       case 'slack':
       case 'github':
         console.log('integrating ' + serviceName);
@@ -104,6 +113,7 @@ export class IntegrateComponent implements OnInit, OnDestroy {
             data => {
               console.log(`Data of ${serviceName} auth`);
               console.log(data);
+              this.auth.setUser(data.json().data.user);
             },
             error => {
               console.log(`Error of ${serviceName} auth`);
@@ -138,13 +148,6 @@ export class IntegrateComponent implements OnInit, OnDestroy {
           this.jira.error = error;
         }
       );
-  }
-
-  slug(providerName: string): string{
-    return providerName
-      .toLowerCase()
-      .replace(/ /g,'-')
-      .replace(/[^\w-]+/g,'');
   }
 
 }

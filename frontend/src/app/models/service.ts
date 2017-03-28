@@ -10,6 +10,15 @@ export class Service {
     return 'assets/images/' + this.logo + '_logo.png';
   }
 
+  slug(): string {
+    switch (this.name) {
+      case Service.GOOGLEDRIVE().name:
+        return 'drive';
+      default:
+        return this.name.toLowerCase();
+    }
+  }
+
   static make(provider: string) : Service{
     switch (provider) {
       case 'gmail':
