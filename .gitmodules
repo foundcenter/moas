@@ -1,3 +1,0 @@
-[submodule "backend/vendor/github.com/google/go-github"]
-	path = backend/vendor/github.com/google/go-github
-	url = git@github.com:foundcenter/go-github.git

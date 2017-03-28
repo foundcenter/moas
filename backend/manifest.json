@@ -9,6 +9,9 @@
         "github.com/dgrijalva/jwt-go": {
             "branch": "master"
         },
+        "github.com/google/go-github": {
+            "source": "github.com/foundcenter/go-github"
+        },
         "github.com/gorilla/context": {
             "branch": "master"
         },

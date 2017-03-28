@@ -1,5 +1,5 @@
 {
-    "memo": "8512c0d552e1fcb419c2671e26e53b3149618c38ed630c6d1c7fab126700bbd0",
+    "memo": "855e6302948babb67818446294f02193b3fb2a554ca6424022fae3eb5b1fe3e9",
     "projects": [
         {
             "name": "cloud.google.com/go",
@@ -62,6 +62,7 @@
             "name": "github.com/google/go-github",
             "branch": "master",
             "revision": "d683a1c6198d75c6be7a7ab5e2f9834cb6408834",
+            "source": "github.com/foundcenter/go-github",
             "packages": [
                 "github"
             ]
