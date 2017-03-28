@@ -12,6 +12,7 @@ import (
 	"github.com/foundcenter/moas/backend/services/drive"
 	"github.com/foundcenter/moas/backend/services/github"
 	"github.com/foundcenter/moas/backend/services/gmail"
+	"github.com/foundcenter/moas/backend/services/jira"
 	"github.com/foundcenter/moas/backend/services/slack"
 	"github.com/julienschmidt/httprouter"
 	"github.com/justinas/alice"
@@ -37,6 +38,7 @@ func Load(router *httprouter.Router) {
 	router.Handler("POST", "/connect/gmail", extendedChain.ThenFunc(handleGmailConnect))
 	router.Handler("POST", "/connect/drive", extendedChain.ThenFunc(handleDriveConnect))
 	router.Handler("POST", "/connect/github", extendedChain.ThenFunc(handleGithubConnect))
+	router.Handler("POST", "/connect/jira", extendedChain.ThenFunc(handleJiraConnect))
 }
 func handleAuthCheck(w http.ResponseWriter, r *http.Request) {
 
@@ -232,6 +234,30 @@ func handleGithubConnect(w http.ResponseWriter, r *http.Request) {
 	user, err := github.Connect(r.Context(), userID, ga.Code)
 	if err != nil {
 		response.Reply(w).ServerInternalError(err)
+		return
+	}
+
+	response.Reply(w).Ok(map[string]interface{}{"user": user})
+
+}
+
+func handleJiraConnect(w http.ResponseWriter, r *http.Request) {
+
+	decoder := json.NewDecoder(r.Body)
+	var jiraAuth auth.JiraAuth
+	err := decoder.Decode(&jiraAuth)
+
+	token := r.Header.Get("Authorization")
+	userID, err := auth.ParseToken(token[7:])
+	if err != nil {
+		response.Reply(w).ServerInternalError(err)
+		return
+	}
+
+	user, err := jira.Connect(r.Context(), userID, jiraAuth.Url, jiraAuth.Username, jiraAuth.Password)
+
+	if err != nil {
+		response.Reply(w).BadRequest()
 		return
 	}
 

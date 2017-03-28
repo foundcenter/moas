@@ -28,6 +28,12 @@ type SlackAuth struct {
 	Code string `json:"code"`
 }
 
+type JiraAuth struct {
+	Url      string `json:"url"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
 func Login(email string, password string) (error, models.User) {
 	db := repo.New()
 	defer db.Destroy()
@@ -42,7 +48,6 @@ func Login(email string, password string) (error, models.User) {
 }
 
 func IssueToken(user models.User) (error, string) {
-
 
 	mc := MyClaims{user.ID.Hex(), jwt.StandardClaims{ExpiresAt: time.Now().Add(time.Hour * 24 * 30).Unix(), Issuer: "moas"}}
 
@@ -67,6 +72,6 @@ func ParseToken(tokenString string) (string, error) {
 	if !token.Valid {
 		return "", errors.New("Token not valid!")
 	} else {
-		return  myClaims.User_ID, nil
+		return myClaims.User_ID, nil
 	}
 }

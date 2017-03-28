@@ -18,6 +18,7 @@ func main() {
 	handler := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
 		AllowedHeaders: []string{"*"},
+		AllowedMethods: []string{"GET", "POST", "DELETE"},
 	}).Handler(router)
 
 	fmt.Printf("Starting server on: %s\n", config.Settings.App.URL)

@@ -3,7 +3,7 @@
     <!-- Brand and toggle get grouped for better mobile display -->
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-              data-target="#bs-example-navbar-collapse-1" aria-expanded="false" *ngIf="auth.isAuthenticated()">
+              data-target="#bs-example-navbar-collapse-1" aria-expanded="false" *ngIf="auth.isLoggedIn()">
         <span class="sr-only">Toggle navigation</span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
@@ -13,7 +13,7 @@
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1"  *ngIf="auth.isAuthenticated()">
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1"  *ngIf="auth.isLoggedIn()">
       <ul class="nav navbar-nav">
         <li><a [routerLink]="['/search']"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Search</a></li>
         <li><a [routerLink]="['/integrate']"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Integrate</a></li>

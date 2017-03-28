@@ -10,6 +10,31 @@ export class Service {
     return 'assets/images/' + this.logo + '_logo.png';
   }
 
+  slug(): string {
+    switch (this.name) {
+      case Service.GOOGLEDRIVE().name:
+        return 'drive';
+      default:
+        return this.name.toLowerCase();
+    }
+  }
+
+  static make(provider: string) : Service{
+    switch (provider) {
+      case 'gmail':
+        return Service.GMAIL();
+      case 'drive':
+        return Service.GOOGLEDRIVE();
+      case 'github':
+        return Service.GITHUB();
+      case 'slack':
+        return Service.SLACK();
+      default:
+        console.log('instantiating default provider');
+        return Service.GOOGLEDRIVE();
+    }
+  }
+
   static JIRA(): Service {
     return new Service('Jira', 'jira', 'Search projects and issues.');
   }

@@ -1,11 +1,13 @@
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { Component, OnInit, ViewChild, AfterContentInit } from '@angular/core';
 import { IntegrationService } from '../../services/integration.service';
-import { AuthService } from 'ng2-ui-auth';
 import { ModalDirective } from 'ng2-bootstrap';
 import { Service } from '../../models/service';
 import { AccountService } from '../../services/account.service';
 import { Account } from '../../models/account';
+import { AuthService } from "../../services/auth.service";
+import { User } from "../../models/user";
+import { Subscription } from "rxjs";
 
 @Component({
   selector: 'app-integrate',
@@ -13,22 +15,29 @@ import { Account } from '../../models/account';
   styleUrls: ['./integrate.component.scss'],
   providers: [IntegrationService, AccountService]
 })
-export class IntegrateComponent implements OnInit, AfterContentInit {
+export class IntegrateComponent implements OnInit, OnDestroy {
   @ViewChild('childModal') public childModal: ModalDirective;
   public services: Service[] = [];
   public accounts: Account[] = [];
   public jira: {email, password, error} = {email: '', password: '', error: null};
+  private currentUserSubscription: Subscription;
+
   constructor(private integrationService: IntegrationService, private auth: AuthService, private accountService: AccountService, private toastrService: ToastrService) { }
 
+  ngOnDestroy(): void {
+    this.currentUserSubscription.unsubscribe();
+  }
+
   ngOnInit() {
-    this.accounts = this.accountService.getAccounts();
-    this.services = this.integrationService.getAvailableServices();
+    this.currentUserSubscription = this.auth.currentUser.subscribe((user: User) => {
+      if (!user) {
+        return;
+      }
+      this.services = this.integrationService.getAvailableServices();
+      this.accounts = user.accounts;
+      this.assignAccountsToServices();
+    });
   }
-
-  ngAfterContentInit(): void {
-    this.assignAccountsToServices();
-  }
-
 
   assignAccountsToServices(): void {
     this.accounts.forEach((account: Account) => {
@@ -54,6 +63,7 @@ export class IntegrateComponent implements OnInit, AfterContentInit {
     let totalAdded = 0;
     let rows : Service[][] = [];
     let row: Service[] = [];
+
     for (let i = 0; i < this.services.length; i = i + 3) {
       row = [this.services[i]];
       if (this.services[i+1]) {
@@ -77,27 +87,33 @@ export class IntegrateComponent implements OnInit, AfterContentInit {
     this.jira.error = null;
   }
 
+  deleteAccount(account: Account, service: Service) {
+    this.accountService.delete(service.name, account.id)
+      .subscribe(
+        (data) => {
+          this.auth.setUser(data.json().data.user);
+        },
+        (error) => {
+        }
+      );
+  }
+
   handle(service: Service) {
-    let serviceName = this.slug(service.name);
+    let serviceName = service.slug();
 
     switch (serviceName) {
       case 'gmail':
-      case 'google-drive':
+      case 'drive':
       case 'slack':
       case 'github':
         console.log('integrating ' + serviceName);
-        this.auth.authenticate(serviceName)
+        this.auth.connect(serviceName)
           .subscribe(
             data => {
               console.log(`Data of ${serviceName} auth`);
               console.log(data);
-              this.accountService.mockAddOauthAccount(data, service)
-                .subscribe(
-                  (account) => {
-                    this.assignAccountToService(<Account>account);
-                    this.toastrService.success(`${serviceName} successfuly connected`,'Success')
-                  }
-                );
+              this.auth.setUser(data.json().data.user);
+              this.toastrService.success(`${serviceName} successfuly connected`,'Success')
             },
             error => {
               console.log(`Error of ${serviceName} auth`);
@@ -135,13 +151,6 @@ export class IntegrateComponent implements OnInit, AfterContentInit {
           this.toastrService.error('Jira fail to connect','Error')
         }
       );
-  }
-
-  slug(providerName: string): string{
-    return providerName
-      .toLowerCase()
-      .replace(/ /g,'-')
-      .replace(/[^\w-]+/g,'');
   }
 
 }

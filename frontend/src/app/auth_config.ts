@@ -41,7 +41,7 @@ export class MyAuthConfig extends CustomConfig {
             popupOptions: {width: 452, height: 633},
             state: () => encodeURIComponent(Math.random().toString(36).substr(2)),
         },
-        'google-drive': {
+        drive: {
             name: 'google-drive',
             clientId: GOOGLE_CLIENT_ID,
             url: `${API_URL}/connect/drive`,
