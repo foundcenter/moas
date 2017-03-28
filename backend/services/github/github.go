@@ -98,11 +98,10 @@ func Connect(ctx context.Context, userID string, code string) (models.User, erro
 	tc := oauth2.NewClient(ctx, ts)
 	client := github.NewClient(tc)
 
-	githubUser, resp, err := client.Users.Get(ctx, "")
+	githubUser, _, err := client.Users.Get(ctx, "")
 	if err != nil {
 		return user, err
 	}
-	fmt.Printf("%d", resp.Limit)
 
 	github_user_emails, _, err := client.Users.ListEmails(ctx, nil)
 	if err != nil {
