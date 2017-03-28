@@ -2,6 +2,8 @@ package auth
 
 import (
 	"encoding/json"
+	"net/http"
+
 	"github.com/foundcenter/moas/backend/controllers/response"
 	"github.com/foundcenter/moas/backend/middleware/jwt_auth"
 	"github.com/foundcenter/moas/backend/middleware/logger"
@@ -13,7 +15,6 @@ import (
 	"github.com/foundcenter/moas/backend/services/slack"
 	"github.com/julienschmidt/httprouter"
 	"github.com/justinas/alice"
-	"net/http"
 )
 
 type loginRequest struct {
@@ -21,6 +22,7 @@ type loginRequest struct {
 	Password string `json:"password"`
 }
 
+// Load routes for router
 func Load(router *httprouter.Router) {
 
 	standardChain := alice.New(logger.Handler)
@@ -39,15 +41,15 @@ func Load(router *httprouter.Router) {
 func handleAuthCheck(w http.ResponseWriter, r *http.Request) {
 
 	token := r.Header.Get("Authorization")
-	user_id, err := auth.ParseToken(token[7:])
+	userID, err := auth.ParseToken(token[7:])
 	if err != nil {
-		response.Reply(w).ServerInternalError()
+		response.Reply(w).ServerInternalError(err)
 		return
 	}
 
 	db := repo.New()
 	defer db.Destroy()
-	user, err := db.UserRepo.FindById(user_id)
+	user, err := db.UserRepo.FindById(userID)
 	if err != nil {
 		response.Reply(w).Unauthorized(err)
 		return
@@ -68,7 +70,7 @@ func handleGoogleAuth(w http.ResponseWriter, r *http.Request) {
 
 	user, err := gmail.Login(r.Context(), ga.Code)
 	if err != nil {
-		response.Reply(w).ServerInternalError()
+		response.Reply(w).ServerInternalError(err)
 		return
 	}
 
@@ -90,7 +92,7 @@ func handleGmailAuth(w http.ResponseWriter, r *http.Request) {
 
 	user, err := gmail.Login(r.Context(), ga.Code)
 	if err != nil {
-		response.Reply(w).ServerInternalError()
+		response.Reply(w).ServerInternalError(err)
 		return
 	}
 
@@ -111,15 +113,15 @@ func handleGmailConnect(w http.ResponseWriter, r *http.Request) {
 	err := decoder.Decode(&ga)
 
 	token := r.Header.Get("Authorization")
-	user_id, err := auth.ParseToken(token[7:])
+	userID, err := auth.ParseToken(token[7:])
 	if err != nil {
-		response.Reply(w).ServerInternalError()
+		response.Reply(w).ServerInternalError(err)
 		return
 	}
 
-	user, err := gmail.Connect(r.Context(), user_id, ga.Code)
+	user, err := gmail.Connect(r.Context(), userID, ga.Code)
 	if err != nil {
-		response.Reply(w).ServerInternalError()
+		response.Reply(w).ServerInternalError(err)
 		return
 	}
 
@@ -134,7 +136,7 @@ func handleDriveAuth(w http.ResponseWriter, r *http.Request) {
 
 	user, err := drive.Login(r.Context(), ga.Code)
 	if err != nil {
-		response.Reply(w).ServerInternalError()
+		response.Reply(w).ServerInternalError(err)
 		return
 	}
 
@@ -154,15 +156,15 @@ func handleDriveConnect(w http.ResponseWriter, r *http.Request) {
 	err := decoder.Decode(&ga)
 
 	token := r.Header.Get("Authorization")
-	user_id, err := auth.ParseToken(token[7:])
+	userID, err := auth.ParseToken(token[7:])
 	if err != nil {
-		response.Reply(w).ServerInternalError()
+		response.Reply(w).ServerInternalError(err)
 		return
 	}
 
-	user, err := drive.Connect(r.Context(), user_id, ga.Code)
+	user, err := drive.Connect(r.Context(), userID, ga.Code)
 	if err != nil {
-		response.Reply(w).ServerInternalError()
+		response.Reply(w).ServerInternalError(err)
 		return
 	}
 
@@ -177,7 +179,7 @@ func handleSlackAuth(w http.ResponseWriter, r *http.Request) {
 
 	user, err := slack.Login(r.Context(), ga.Code)
 	if err != nil {
-		response.Reply(w).ServerInternalError()
+		response.Reply(w).ServerInternalError(err)
 		return
 	}
 
@@ -198,15 +200,15 @@ func handleSlackConnect(w http.ResponseWriter, r *http.Request) {
 	err := decoder.Decode(&ga)
 
 	token := r.Header.Get("Authorization")
-	user_id, err := auth.ParseToken(token[7:])
+	userID, err := auth.ParseToken(token[7:])
 	if err != nil {
-		response.Reply(w).ServerInternalError()
+		response.Reply(w).ServerInternalError(err)
 		return
 	}
 
-	user, err := slack.Connect(r.Context(), user_id, ga.Code)
+	user, err := slack.Connect(r.Context(), userID, ga.Code)
 	if err != nil {
-		response.Reply(w).ServerInternalError()
+		response.Reply(w).ServerInternalError(err)
 		return
 	}
 
@@ -221,15 +223,15 @@ func handleGithubConnect(w http.ResponseWriter, r *http.Request) {
 	err := decoder.Decode(&ga)
 
 	token := r.Header.Get("Authorization")
-	user_id, err := auth.ParseToken(token[7:])
+	userID, err := auth.ParseToken(token[7:])
 	if err != nil {
-		response.Reply(w).ServerInternalError()
+		response.Reply(w).ServerInternalError(err)
 		return
 	}
 
-	user, err := github.Connect(r.Context(), user_id, ga.Code)
+	user, err := github.Connect(r.Context(), userID, ga.Code)
 	if err != nil {
-		response.Reply(w).ServerInternalError()
+		response.Reply(w).ServerInternalError(err)
 		return
 	}
 

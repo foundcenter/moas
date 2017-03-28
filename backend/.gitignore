@@ -23,8 +23,9 @@ _testmain.go
 *.test
 *.prof
 
-debug
 .env
+.env.production
+bin/
 
-vendor/
 backend
+debug

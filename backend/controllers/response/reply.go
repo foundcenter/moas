@@ -1,8 +1,10 @@
 package response
 
 import (
-	"github.com/alioygur/gores"
+	"log"
 	"net/http"
+
+	"github.com/alioygur/gores"
 )
 
 type Response struct {
@@ -22,9 +24,10 @@ func (r *Response) BadRequest() {
 	gores.JSON(r.writer, err.Status, map[string]interface{}{"error": err})
 }
 
-func (r *Response) ServerInternalError() {
-	err := &Error{"Internal server error", http.StatusInternalServerError}
-	gores.JSON(r.writer, err.Status, map[string]interface{}{"error": err})
+func (r *Response) ServerInternalError(err error) {
+	log.Print(err.Error())
+	errorResponse := &Error{"Internal server error", http.StatusInternalServerError}
+	gores.JSON(r.writer, errorResponse.Status, map[string]interface{}{"error": errorResponse})
 }
 
 func (r *Response) Unauthorized(e error) {

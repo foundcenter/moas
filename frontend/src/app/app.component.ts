@@ -1,6 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from "@angular/router";
-import { AuthService } from "./services/auth.service";
+import { Component } from "@angular/core";
+import { ToastrConfig } from "ngx-toastr";
 
 @Component({
   selector: 'app-root',
@@ -10,6 +9,7 @@ import { AuthService } from "./services/auth.service";
 export class AppComponent {
   title = 'MOAS app works!';
 
-  constructor() {
+  constructor(toastrConfig: ToastrConfig) {
+    toastrConfig.closeButton=true;
   }
 }

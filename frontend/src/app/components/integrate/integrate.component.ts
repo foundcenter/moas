@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewChild, AfterContentInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
 import { IntegrationService } from '../../services/integration.service';
 import { ModalDirective } from 'ng2-bootstrap';
 import { Service } from '../../models/service';
@@ -21,9 +22,7 @@ export class IntegrateComponent implements OnInit, OnDestroy {
   public jira: {email, password, error} = {email: '', password: '', error: null};
   private currentUserSubscription: Subscription;
 
-  constructor(private integrationService: IntegrationService, private auth: AuthService, private accountService: AccountService) {
-
-  }
+  constructor(private integrationService: IntegrationService, private auth: AuthService, private accountService: AccountService, private toastrService: ToastrService) { }
 
   ngOnDestroy(): void {
     this.currentUserSubscription.unsubscribe();
@@ -114,10 +113,12 @@ export class IntegrateComponent implements OnInit, OnDestroy {
               console.log(`Data of ${serviceName} auth`);
               console.log(data);
               this.auth.setUser(data.json().data.user);
+              this.toastrService.success(`${serviceName} successfuly connected`,'Success')
             },
             error => {
               console.log(`Error of ${serviceName} auth`);
               console.log(error);
+              this.toastrService.error(`${serviceName} fail to connect`,'Error')
             },
             () => {
               console.log(`Finally of ${serviceName} auth`)
@@ -143,9 +144,11 @@ export class IntegrateComponent implements OnInit, OnDestroy {
           this.hideChildModal();
           this.jira.email = '';
           this.jira.password = '';
+          this.toastrService.success('Jira successfuly connected','Success')
         },
         error => {
           this.jira.error = error;
+          this.toastrService.error('Jira fail to connect','Error')
         }
       );
   }

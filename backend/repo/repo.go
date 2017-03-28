@@ -2,6 +2,7 @@ package repo
 
 import "gopkg.in/mgo.v2"
 import "github.com/foundcenter/moas/backend/config"
+import "log"
 
 var masterSession *mgo.Session
 
@@ -11,9 +12,10 @@ type DB struct {
 }
 
 func init() {
+	log.Printf("Connecting to mongo %+v...", config.Settings.Mongo)
 	session, err := mgo.DialWithInfo(config.Settings.Mongo)
 	if err != nil {
-		panic(err)
+		log.Panic(err)
 	}
 	session.SetMode(mgo.Monotonic, true)
 	masterSession = session
