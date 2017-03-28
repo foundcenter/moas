@@ -4,10 +4,12 @@ import { AuthService as UiAuth, JwtHttp } from "ng2-ui-auth";
 import { User } from "../models/user";
 import { Observable, ReplaySubject } from "rxjs";
 import { Router } from "@angular/router";
+import { environment } from "../../environments/environment";
 
 @Injectable()
 export class AuthService{
   private user: User = null;
+  private uri: string = environment.apiUrl;
 
   public currentUser: ReplaySubject<User> = new ReplaySubject(1);
 
@@ -41,7 +43,7 @@ export class AuthService{
   }
 
   check(): Promise<Response> {
-    return this.http.get('http://localhost:8081/auth/check')
+    return this.http.get(`${this.uri}/auth/check`)
       .toPromise()
       .then((data: Response) => {
         this.setUser(data.json().data.user);

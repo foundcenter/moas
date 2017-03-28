@@ -5,7 +5,7 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:8081',
+  apiUrl: 'http://localhost:8080',
   redirectUrl: 'http://localhost:4200',
   googleClientId: '115655419099-5irupagjg158brcr5o0ief540dm7gg01.apps.googleusercontent.com',
   slackClientId: '16724837808.155634746450',

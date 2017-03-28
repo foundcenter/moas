@@ -6,9 +6,11 @@ import { Response } from "@angular/http";
 import { AuthService } from "./auth.service";
 import { User } from "../models/user";
 import { JwtHttp } from "ng2-ui-auth";
+import { environment } from "../../environments/environment";
 
 @Injectable()
 export class AccountService {
+  private uri: string = environment.apiUrl;
 
   private currentUser: User;
 
@@ -27,7 +29,7 @@ export class AccountService {
   }
 
   delete(serviceName: string, id: string): Observable<Response> {
-    return this.http.delete(`http://localhost:8081/account/${serviceName.toLowerCase()}/${id}`);
+    return this.http.delete(`${this.uri}/account/${serviceName.toLowerCase()}/${id}`);
   }
 
   mockAddJira(email: string, password: string): Observable<Account> {
