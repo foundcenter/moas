@@ -71,7 +71,7 @@ func handleAccountDelete(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 
-				response.Reply(w).Ok(user)
+				response.Reply(w).Ok(map[string]interface{}{"user": user})
 				return
 			}
 		}
