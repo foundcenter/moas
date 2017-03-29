@@ -11,6 +11,7 @@ import (
 	"github.com/foundcenter/moas/backend/services/drive"
 	"github.com/foundcenter/moas/backend/services/github"
 	"github.com/foundcenter/moas/backend/services/gmail"
+	"github.com/foundcenter/moas/backend/services/jira"
 	"github.com/foundcenter/moas/backend/services/slack"
 	"github.com/gorilla/context"
 	"github.com/julienschmidt/httprouter"
@@ -70,7 +71,13 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 				result, _ := github.Search(r.Context(), account, query)
 				queueOfResults <- result
 			}(account)
-			// and other providers...
+		case "jira":
+			//jira search
+			go func(account models.AccountInfo) {
+				result, _ := jira.Search(r.Context(), account, query)
+				queueOfResults <- result
+			}(account)
+
 		}
 	}
 	//here we wait result of search from all services
