@@ -7,7 +7,7 @@ import { Router } from "@angular/router";
 import { environment } from "../../environments/environment";
 
 @Injectable()
-export class AuthService{
+export class AuthService {
   private user: User = null;
   private uri: string = environment.apiUrl;
 
@@ -38,7 +38,7 @@ export class AuthService{
     return this.uiAuth.isAuthenticated();
   }
 
-  logout(): Observable<void>{
+  logout(): Observable<void> {
     return this.uiAuth.logout();
   }
 
@@ -58,6 +58,16 @@ export class AuthService{
   setUser(response): void {
     this.user = User.fromJson(response);
     this.currentUser.next(this.user);
+  }
+
+  connectJira(url: string, username: string, password: string): Observable<Response> {
+    let body = {
+      'url': url,
+      'username': username,
+      'password': password
+
+    }
+    return this.http.post(this.uri+'/connect/jira', body)
   }
 
 }

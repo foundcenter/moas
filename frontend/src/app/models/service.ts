@@ -19,7 +19,7 @@ export class Service {
     }
   }
 
-  static make(provider: string) : Service{
+  static make(provider: string): Service {
     switch (provider) {
       case 'gmail':
         return Service.GMAIL();
@@ -29,6 +29,8 @@ export class Service {
         return Service.GITHUB();
       case 'slack':
         return Service.SLACK();
+      case 'jira':
+        return Service.JIRA();
       default:
         console.log('instantiating default provider');
         return Service.GOOGLEDRIVE();

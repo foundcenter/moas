@@ -19,7 +19,7 @@ export class IntegrateComponent implements OnInit, OnDestroy {
   @ViewChild('childModal') public childModal: ModalDirective;
   public services: Service[] = [];
   public accounts: Account[] = [];
-  public jira: {email, password, error} = {email: '', password: '', error: null};
+  public jira: { username, password, url, error } = { username: '', password: '', url: '', error: null };
   private currentUserSubscription: Subscription;
 
   constructor(private integrationService: IntegrationService, private auth: AuthService, private accountService: AccountService, private toastrService: ToastrService) { }
@@ -61,16 +61,16 @@ export class IntegrateComponent implements OnInit, OnDestroy {
 
   getRows(): Service[][] {
     let totalAdded = 0;
-    let rows : Service[][] = [];
+    let rows: Service[][] = [];
     let row: Service[] = [];
 
     for (let i = 0; i < this.services.length; i = i + 3) {
       row = [this.services[i]];
-      if (this.services[i+1]) {
-        row.push(this.services[i+1]);
+      if (this.services[i + 1]) {
+        row.push(this.services[i + 1]);
       }
-      if (this.services[i+2]) {
-        row.push(this.services[i+2]);
+      if (this.services[i + 2]) {
+        row.push(this.services[i + 2]);
       }
       rows.push(row);
     }
@@ -78,11 +78,11 @@ export class IntegrateComponent implements OnInit, OnDestroy {
     return rows;
   }
 
-  public showChildModal():void {
+  public showChildModal(): void {
     this.childModal.show();
   }
 
-  public hideChildModal():void {
+  public hideChildModal(): void {
     this.childModal.hide();
     this.jira.error = null;
   }
@@ -90,11 +90,11 @@ export class IntegrateComponent implements OnInit, OnDestroy {
   deleteAccount(account: Account, service: Service) {
     this.accountService.delete(service.name, account.id)
       .subscribe(
-        (data) => {
-          this.auth.setUser(data.json().data.user);
-        },
-        (error) => {
-        }
+      (data) => {
+        this.auth.setUser(data.json().data.user);
+      },
+      (error) => {
+      }
       );
   }
 
@@ -109,23 +109,23 @@ export class IntegrateComponent implements OnInit, OnDestroy {
         console.log('integrating ' + serviceName);
         this.auth.connect(serviceName)
           .subscribe(
-            data => {
-              console.log(`Data of ${serviceName} auth`);
-              console.log(data);
-              this.auth.setUser(data.json().data.user);
-              this.toastrService.success(`${serviceName} successfuly connected`,'Success')
-            },
-            error => {
-              console.log(`Error of ${serviceName} auth`);
-              console.log(error);
-              this.toastrService.error(`${serviceName} fail to connect`,'Error')
-            },
-            () => {
-              console.log(`Finally of ${serviceName} auth`)
-            }
+          data => {
+            console.log(`Data of ${serviceName} auth`);
+            console.log(data);
+            this.auth.setUser(data.json().data.user);
+            this.toastrService.success(`${serviceName} successfuly connected`, 'Success')
+          },
+          error => {
+            console.log(`Error of ${serviceName} auth`);
+            console.log(error);
+            this.toastrService.error(`${serviceName} fail to connect`, 'Error')
+          },
+          () => {
+            console.log(`Finally of ${serviceName} auth`)
+          }
           );
         break;
-        
+
       case 'jira':
         console.log('trigger modal for jira now');
         this.showChildModal();
@@ -136,20 +136,21 @@ export class IntegrateComponent implements OnInit, OnDestroy {
     }
   }
 
-  addJira(){
-    this.accountService.mockAddJira(this.jira.email, this.jira.password)
+  addJira() {
+    this.auth.connectJira(this.jira.url, this.jira.username, this.jira.password)
       .subscribe(
-        data => {
-          this.assignAccountToService(<Account>data);
-          this.hideChildModal();
-          this.jira.email = '';
-          this.jira.password = '';
-          this.toastrService.success('Jira successfuly connected','Success')
-        },
-        error => {
-          this.jira.error = error;
-          this.toastrService.error('Jira fail to connect','Error')
-        }
+      data => {
+        this.auth.setUser(data.json().data.user);
+        this.jira.username = '';
+        this.jira.password = '';
+        this.jira.url = '';
+        this.toastrService.success('Jira successfuly connected', 'Success');
+        this.hideChildModal();
+      },
+      error => {
+        this.jira.error = error;
+        this.toastrService.error('Jira fail to connect', 'Error');
+      }
       );
   }
 
