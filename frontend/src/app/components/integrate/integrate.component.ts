@@ -106,28 +106,21 @@ export class IntegrateComponent implements OnInit, OnDestroy {
       case 'drive':
       case 'slack':
       case 'github':
-        console.log('integrating ' + serviceName);
         this.auth.connect(serviceName)
           .subscribe(
           data => {
-            console.log(`Data of ${serviceName} auth`);
-            console.log(data);
             this.auth.setUser(data.json().data.user);
             this.toastrService.success(`${serviceName} successfuly connected`, 'Success')
           },
           error => {
-            console.log(`Error of ${serviceName} auth`);
-            console.log(error);
             this.toastrService.error(`${serviceName} fail to connect`, 'Error')
           },
           () => {
-            console.log(`Finally of ${serviceName} auth`)
           }
           );
         break;
 
       case 'jira':
-        console.log('trigger modal for jira now');
         this.showChildModal();
         break;
 

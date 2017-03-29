@@ -20,7 +20,6 @@ export class LogoutComponent implements OnInit {
           this.toastrService.info('Successfully logout! See you soon', 'Success');
         },
         error: (err: any) => {
-          console.log(err);
           this.toastrService.error('Something gone wrong with logout!', 'Error');
         }
       });
