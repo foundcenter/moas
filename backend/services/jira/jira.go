@@ -99,7 +99,7 @@ func Search(ctx context.Context, accountInfo models.AccountInfo, query string) (
 			s.Service = "jira"
 			s.Resource = "issue"
 			s.AccountID = accountInfo.ID
-			s.Title = i.Fields.Summary
+			s.Title = i.Key + " " + i.Fields.Summary
 			s.Description = i.Fields.Description
 			s.Url = user.Url + "browse/" + i.Key
 			searchResult = append(searchResult, s)
