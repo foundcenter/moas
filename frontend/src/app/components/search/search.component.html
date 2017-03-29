@@ -27,7 +27,7 @@
             <li *ngFor="let service of resultsServices"
                 class="search__service"
                 [ngClass]="{active: selected==service}">
-                <a (click)="select(service)">{{ service }} <sup>{{ countBy(service) }}</sup></a>
+                <a (click)="select(service)"> <img *ngIf="service != 'All'" src="assets/images/{{ service }}_logo.png" alt="" class="service-img">   {{ service }} <sup>{{ countBy(service) }}</sup></a>
             </li>
         </ul>
         <div *ngIf="results.length == 0 && noResults == true">

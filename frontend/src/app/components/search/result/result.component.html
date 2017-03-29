@@ -1,10 +1,11 @@
 <div class="search-result">
   <h4><a href="{{ result.url }}" target="_blank">
+    <img src="assets/images/{{ result.service }}_logo.png" alt="" style="height: 1em;">
     <span *ngIf="result.title">{{ result.title }}</span>
     <span *ngIf="!result.title">{{ result.resource }} from {{ result.service }}</span>
   </a></h4>
   <p [innerHTML]="result.description"></p>
   <p>
-    {{ result.resource }} from {{ result.service }} @ {{ result.account_id }}
+    {{ result.resource }} from <img src="assets/images/{{ result.service }}_logo.png" alt="" class="service-img"> @ {{ result.account_id }}
   </p>
 </div>
