@@ -19,6 +19,7 @@ export class IntegrateComponent implements OnInit, OnDestroy {
   @ViewChild('childModal') public childModal: ModalDirective;
   public services: Service[] = [];
   public accounts: Account[] = [];
+  public rows: Service[][] = [];
   public jira: { username, password, url, error } = { username: '', password: '', url: '', error: null };
   private currentUserSubscription: Subscription;
 
@@ -35,6 +36,7 @@ export class IntegrateComponent implements OnInit, OnDestroy {
       }
       this.services = this.integrationService.getAvailableServices();
       this.accounts = user.accounts;
+      this.rows = this.getRows();
       this.assignAccountsToServices();
     });
   }
