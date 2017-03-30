@@ -61,7 +61,7 @@
         {
             "name": "github.com/google/go-github",
             "branch": "master",
-            "revision": "511dcd19331d08e8dd8cff3dadc1791525714ab3",
+            "revision": "966917d2e8fb79c648d2f6613b7f1d749bfe7978",
             "source": "github.com/foundcenter/go-github",
             "packages": [
                 "github"
