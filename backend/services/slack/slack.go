@@ -121,6 +121,7 @@ func addAccount(ctx context.Context, user *models.User, slackUser *slack.User, t
 		ID:    slackUser.ID,
 		Data:  slackUser,
 		Token: token,
+		Active: true,
 	}
 
 	for _, acc := range user.Accounts {

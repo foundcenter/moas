@@ -59,21 +59,21 @@ func handleAccountDelete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//find account & check if can be deleted
-	canBeDeleted := len(user.Accounts) > 1 && accountType != "gmail" && accountType != "drive"
-
-	if canBeDeleted {
-		for i, a := range user.Accounts {
-			if a.Type == accountType && a.ID == accountID {
+	for i, a := range user.Accounts {
+		if a.Type == accountType && a.ID == accountID {
+			if accountType == "gmail" || accountType == "drive" {
+				user.Accounts[i].Active = false
+			} else {
 				user.Accounts = append(user.Accounts[:i], user.Accounts[i+1:]...)
-				user, err = db.UserRepo.Update(user)
-				if err != nil {
-					response.Reply(w).ServerInternalError(err)
-					return
-				}
-
-				response.Reply(w).Ok(map[string]interface{}{"user": user})
+			}
+			user, err = db.UserRepo.Update(user)
+			if err != nil {
+				response.Reply(w).ServerInternalError(err)
 				return
 			}
+
+			response.Reply(w).Ok(map[string]interface{}{"user": user})
+			return
 		}
 	}
 

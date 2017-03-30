@@ -46,38 +46,42 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 
 	wg.Add(len(user.Accounts))
 	for _, account := range user.Accounts {
-		switch account.Type {
-		case "gmail":
-			// gmail search
-			go func(account models.AccountInfo) {
-				result := gmail.Search(r.Context(), account, query)
-				queueOfResults <- result
-			}(account)
-		case "drive":
-			// drive search
-			go func(account models.AccountInfo) {
-				result := drive.Search(r.Context(), account, query)
-				queueOfResults <- result
-			}(account)
-		case "slack":
-			// slack search
-			go func(account models.AccountInfo) {
-				result, _ := slack.Search(r.Context(), account, query)
-				queueOfResults <- result
-			}(account)
-		case "github":
-			// github search
-			go func(account models.AccountInfo) {
-				result, _ := github.Search(r.Context(), account, query)
-				queueOfResults <- result
-			}(account)
-		case "jira":
-			//jira search
-			go func(account models.AccountInfo) {
-				result, _ := jira.Search(r.Context(), account, query)
-				queueOfResults <- result
-			}(account)
+		if account.Active {
+			switch account.Type {
+			case "gmail":
+				// gmail search
+				go func(account models.AccountInfo) {
+					result := gmail.Search(r.Context(), account, query)
+					queueOfResults <- result
+				}(account)
+			case "drive":
+				// drive search
+				go func(account models.AccountInfo) {
+					result := drive.Search(r.Context(), account, query)
+					queueOfResults <- result
+				}(account)
+			case "slack":
+				// slack search
+				go func(account models.AccountInfo) {
+					result, _ := slack.Search(r.Context(), account, query)
+					queueOfResults <- result
+				}(account)
+			case "github":
+				// github search
+				go func(account models.AccountInfo) {
+					result, _ := github.Search(r.Context(), account, query)
+					queueOfResults <- result
+				}(account)
+			case "jira":
+				//jira search
+				go func(account models.AccountInfo) {
+					result, _ := jira.Search(r.Context(), account, query)
+					queueOfResults <- result
+				}(account)
 
+			}
+		} else {
+			wg.Done()
 		}
 	}
 	//here we wait result of search from all services

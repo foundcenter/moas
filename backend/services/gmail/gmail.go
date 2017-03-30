@@ -125,14 +125,16 @@ func Connect(ctx context.Context, userID string, code string, redirectURL string
 
 func addAccount(ctx context.Context, user *models.User, res *UserGmailInfo, token *oauth2.Token, account_type string) {
 	a := models.AccountInfo{
-		Type:  account_type,
-		ID:    res.Email,
-		Data:  res,
-		Token: token,
+		Type:   account_type,
+		ID:     res.Email,
+		Data:   res,
+		Token:  token,
+		Active: true,
 	}
 
-	for _, acc := range user.Accounts {
+	for i, acc := range user.Accounts {
 		if acc.ID == a.ID && acc.Type == a.Type {
+			user.Accounts[i].Active = true
 			return
 		}
 	}

@@ -14,9 +14,9 @@ type User struct {
 }
 
 type AccountInfo struct {
-	Type  string        `json:"type"`
-	ID    string        `json:"id"`
-	Data  interface{}   `json:"data"`
-	Token *oauth2.Token `json:"-"`
+	Type   string        `json:"type"`
+	ID     string        `json:"id"`
+	Data   interface{}   `json:"data"`
+	Token  *oauth2.Token `json:"-"`
+	Active bool          `json:"active"`
 }
-

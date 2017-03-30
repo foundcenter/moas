@@ -137,6 +137,7 @@ func addAccount(ctx context.Context, user *models.User, res *github.User, primar
 		ID:    res.GetLogin(),
 		Data:  res,
 		Token: token,
+		Active: true,
 	}
 
 	for _, acc := range user.Accounts {

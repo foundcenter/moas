@@ -60,6 +60,7 @@ func addAccount(ctx context.Context, user *models.User, res *JiraUser) {
 		Type: AccountType,
 		ID:   res.AccountId,
 		Data: res,
+		Active: true,
 	}
 
 	for _, acc := range user.Accounts {
