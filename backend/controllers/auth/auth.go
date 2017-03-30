@@ -164,7 +164,7 @@ func handleDriveConnect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := drive.Connect(r.Context(), userID, ga.Code)
+	user, err := drive.Connect(r.Context(), userID, ga.Code, ga.RedirectURL)
 	if err != nil {
 		response.Reply(w).ServerInternalError(err)
 		return

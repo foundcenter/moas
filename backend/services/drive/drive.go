@@ -25,10 +25,11 @@ type UserDriveInfo struct {
 	Picture string `json:"picture"`
 }
 
-func init() {
-	conf = &oauth2.Config{
+func initOAuthConfig(redirectURL string) *oauth2.Config {
+	config := &oauth2.Config{
 		ClientID:     config.Settings.Google.ClientID,
 		ClientSecret: config.Settings.Google.ClientSecret,
+		RedirectURL:  redirectURL,
 		Scopes: []string{
 			"profile",
 			"email",
@@ -36,17 +37,20 @@ func init() {
 		},
 		Endpoint: google.Endpoint,
 	}
+
+	return config
 }
 
-func Login(ctx context.Context, code string) (models.User, error) {
+func Login(ctx context.Context, code string, redirectURL string) (models.User, error) {
 
 	var user models.User
-	accessToken, err := conf.Exchange(ctx, code)
+	config := initOAuthConfig(redirectURL)
+	accessToken, err := config.Exchange(ctx, code)
 	if err != nil {
 		return user, err
 	}
 
-	client := conf.Client(ctx, accessToken)
+	client := config.Client(ctx, accessToken)
 
 	userInfo, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
 	if err != nil {
@@ -79,15 +83,16 @@ func Login(ctx context.Context, code string) (models.User, error) {
 	return user, err
 }
 
-func Connect(ctx context.Context, userID string, code string) (models.User, error) {
+func Connect(ctx context.Context, userID string, code string, redirectURL string) (models.User, error) {
 	var user models.User
-	accessToken, err := conf.Exchange(ctx, code)
+	config := initOAuthConfig(redirectURL)
+	accessToken, err := config.Exchange(ctx, code)
 
 	if err != nil {
 		return user, err
 	}
 
-	client := conf.Client(ctx, accessToken)
+	client := config.Client(ctx, accessToken)
 	userInfo, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
 	if err != nil {
 		return user, err
