@@ -136,7 +136,7 @@ func handleDriveAuth(w http.ResponseWriter, r *http.Request) {
 	var ga auth.GoogleAuth
 	err := decoder.Decode(&ga)
 
-	user, err := drive.Login(r.Context(), ga.Code)
+	user, err := drive.Login(r.Context(), ga.Code, ga.RedirectURL)
 	if err != nil {
 		response.Reply(w).ServerInternalError(err)
 		return
