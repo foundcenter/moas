@@ -3,6 +3,9 @@ package github
 import (
 	"context"
 	"fmt"
+	"sync"
+	"time"
+
 	"github.com/foundcenter/moas/backend/config"
 	"github.com/foundcenter/moas/backend/models"
 	"github.com/foundcenter/moas/backend/repo"
@@ -10,31 +13,30 @@ import (
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 	githubAuth "golang.org/x/oauth2/github"
-	"sync"
-	"time"
 )
 
 const AccountType = "github"
 
-var conf *oauth2.Config
-
-func init() {
-	conf = &oauth2.Config{
+func initOAuthConfig(redirectURL string) *oauth2.Config {
+	config := &oauth2.Config{
 		ClientID:     config.Settings.Github.ClientID,
 		ClientSecret: config.Settings.Github.ClientSecret,
-		RedirectURL:  config.Settings.Github.RedirectURL,
+		RedirectURL:  redirectURL,
 		Scopes: []string{
 			"user:email",
 		},
 		Endpoint: githubAuth.Endpoint,
 	}
+
+	return config
 }
 
-func Login(ctx context.Context, code string) (models.User, error) {
+func Login(ctx context.Context, code string, redirectURL string) (models.User, error) {
 
 	var user models.User
 	var github_account_id string
-	accessToken, err := conf.Exchange(ctx, code)
+	config := initOAuthConfig(redirectURL)
+	accessToken, err := config.Exchange(ctx, code)
 	if err != nil {
 		return user, err
 	}
@@ -83,11 +85,12 @@ func Login(ctx context.Context, code string) (models.User, error) {
 	return user, err
 }
 
-func Connect(ctx context.Context, userID string, code string) (models.User, error) {
+func Connect(ctx context.Context, userID string, code string, redirectURL string) (models.User, error) {
 
 	var githubAccountId string
 	var user models.User
-	accessToken, err := conf.Exchange(ctx, code)
+	config := initOAuthConfig(redirectURL)
+	accessToken, err := config.Exchange(ctx, code)
 	if err != nil {
 		return user, err
 	}

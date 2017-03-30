@@ -24,21 +24,18 @@ type Configuration struct {
 type GoogleConfiguration struct {
 	ClientID     string
 	ClientSecret string
-	RedirectURL  string
 }
 
 // SlackConfiguration settings
 type SlackConfiguration struct {
 	ClientID     string
 	ClientSecret string
-	RedirectURL  string
 }
 
 //GithubConfiguration settings
 type GithubConfiguration struct {
 	ClientID     string
 	ClientSecret string
-	RedirectURL  string
 }
 
 // ApplicationConfiguration for server
@@ -55,6 +52,13 @@ func init() {
 		log.Print(err.Error())
 	}
 
+	appURL := os.Getenv("APP_URL")
+	port := os.Getenv("PORT")
+
+	if port != "" {
+		appURL = ":" + port
+	}
+
 	Settings = &Configuration{
 		Mongo: &mgo.DialInfo{
 			Addrs:    strings.Split(os.Getenv("MONGO_HOSTS"), ","),
@@ -66,20 +70,17 @@ func init() {
 		Google: &GoogleConfiguration{
 			ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
 			ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
-			RedirectURL:  os.Getenv("GOOGLE_REDIRECT_URL"),
 		},
 		Slack: &SlackConfiguration{
 			ClientID:     os.Getenv("SLACK_CLIENT_ID"),
 			ClientSecret: os.Getenv("SLACK_CLIENT_SECRET"),
-			RedirectURL:  os.Getenv("SLACK_REDIRECT_URL"),
 		},
 		Github: &GithubConfiguration{
 			ClientID:     os.Getenv("GITHUB_CLIENT_ID"),
 			ClientSecret: os.Getenv("GITHUB_CLIENT_SECRET"),
-			RedirectURL:  os.Getenv("GITHUB_REDIRECT_URL"),
 		},
 		App: &ApplicationConfiguration{
-			URL: os.Getenv("APP_URL"),
+			URL: appURL,
 		},
 	}
 }

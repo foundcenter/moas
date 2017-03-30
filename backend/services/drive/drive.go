@@ -3,6 +3,8 @@ package drive
 import (
 	"encoding/json"
 	"fmt"
+	"log"
+
 	"github.com/foundcenter/moas/backend/config"
 	"github.com/foundcenter/moas/backend/models"
 	"github.com/foundcenter/moas/backend/repo"
@@ -11,7 +13,6 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/drive/v2"
-	"log"
 )
 
 const AccountType = "drive"
@@ -28,7 +29,6 @@ func init() {
 	conf = &oauth2.Config{
 		ClientID:     config.Settings.Google.ClientID,
 		ClientSecret: config.Settings.Google.ClientSecret,
-		RedirectURL:  config.Settings.Google.RedirectURL,
 		Scopes: []string{
 			"profile",
 			"email",

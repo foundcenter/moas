@@ -3,6 +3,8 @@ package gmail
 import (
 	"encoding/json"
 	"fmt"
+	"log"
+
 	"github.com/foundcenter/moas/backend/config"
 	"github.com/foundcenter/moas/backend/models"
 	"github.com/foundcenter/moas/backend/repo"
@@ -11,7 +13,6 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/gmail/v1"
-	"log"
 )
 
 const (
@@ -19,19 +20,17 @@ const (
 	AccountTypeDrive = "drive"
 )
 
-var conf *oauth2.Config
-
 type UserGmailInfo struct {
 	Email   string `json:"email"`
 	Name    string `json:"name"`
 	Picture string `json:"picture"`
 }
 
-func init() {
-	conf = &oauth2.Config{
+func initOAuthConfig(redirectURL string) *oauth2.Config {
+	config := &oauth2.Config{
 		ClientID:     config.Settings.Google.ClientID,
 		ClientSecret: config.Settings.Google.ClientSecret,
-		RedirectURL:  config.Settings.Google.RedirectURL,
+		RedirectURL:  redirectURL,
 		Scopes: []string{
 			"profile",
 			"email",
@@ -40,17 +39,19 @@ func init() {
 		},
 		Endpoint: google.Endpoint,
 	}
+
+	return config
 }
 
-func Login(ctx context.Context, code string) (models.User, error) {
+func Login(ctx context.Context, code string, redirectURL string) (models.User, error) {
 
 	var user models.User
-	accessToken, err := conf.Exchange(ctx, code)
+	config := initOAuthConfig(redirectURL)
+	accessToken, err := config.Exchange(ctx, code)
 	if err != nil {
 		return user, err
 	}
-
-	client := conf.Client(ctx, accessToken)
+	client := config.Client(ctx, accessToken)
 
 	userInfo, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
 	if err != nil {
@@ -84,15 +85,16 @@ func Login(ctx context.Context, code string) (models.User, error) {
 	return user, err
 }
 
-func Connect(ctx context.Context, userID string, code string) (models.User, error) {
+func Connect(ctx context.Context, userID string, code string, redirectURL string) (models.User, error) {
 	var user models.User
-	accessToken, err := conf.Exchange(ctx, code)
+	config := initOAuthConfig(redirectURL)
+	accessToken, err := config.Exchange(ctx, code)
 
 	if err != nil {
 		return user, err
 	}
 
-	client := conf.Client(ctx, accessToken)
+	client := config.Client(ctx, accessToken)
 	userInfo, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
 	if err != nil {
 		return user, err
@@ -172,7 +174,8 @@ func Search(ctx context.Context, account models.AccountInfo, query string) []mod
 
 func CreateGmailService(ctx context.Context, token *oauth2.Token) *gmail.Service {
 
-	client := conf.Client(ctx, token)
+	config := initOAuthConfig("")
+	client := config.Client(ctx, token)
 	gmailService, err := gmail.New(client)
 
 	if err != nil {

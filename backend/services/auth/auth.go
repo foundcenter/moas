@@ -21,11 +21,13 @@ type MyClaims struct {
 }
 
 type GoogleAuth struct {
-	Code string `json:"code"`
+	Code        string `json:"code"`
+	RedirectURL string `json:"redirectUri"`
 }
 
 type SlackAuth struct {
-	Code string `json:"code"`
+	Code        string `json:"code"`
+	RedirectURL string `json:"redirectUri"`
 }
 
 type JiraAuth struct {

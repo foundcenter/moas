@@ -70,7 +70,7 @@ func handleGoogleAuth(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	user, err := gmail.Login(r.Context(), ga.Code)
+	user, err := gmail.Login(r.Context(), ga.Code, ga.RedirectURL)
 	if err != nil {
 		response.Reply(w).ServerInternalError(err)
 		return
@@ -92,7 +92,7 @@ func handleGmailAuth(w http.ResponseWriter, r *http.Request) {
 	var ga auth.GoogleAuth
 	err := decoder.Decode(&ga)
 
-	user, err := gmail.Login(r.Context(), ga.Code)
+	user, err := gmail.Login(r.Context(), ga.Code, ga.RedirectURL)
 	if err != nil {
 		response.Reply(w).ServerInternalError(err)
 		return
@@ -121,7 +121,7 @@ func handleGmailConnect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := gmail.Connect(r.Context(), userID, ga.Code)
+	user, err := gmail.Connect(r.Context(), userID, ga.Code, ga.RedirectURL)
 	if err != nil {
 		response.Reply(w).ServerInternalError(err)
 		return
@@ -179,7 +179,7 @@ func handleSlackAuth(w http.ResponseWriter, r *http.Request) {
 	var ga auth.SlackAuth
 	err := decoder.Decode(&ga)
 
-	user, err := slack.Login(r.Context(), ga.Code)
+	user, err := slack.Login(r.Context(), ga.Code, ga.RedirectURL)
 	if err != nil {
 		response.Reply(w).ServerInternalError(err)
 		return
@@ -208,7 +208,7 @@ func handleSlackConnect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := slack.Connect(r.Context(), userID, ga.Code)
+	user, err := slack.Connect(r.Context(), userID, ga.Code, ga.RedirectURL)
 	if err != nil {
 		response.Reply(w).ServerInternalError(err)
 		return
@@ -231,7 +231,7 @@ func handleGithubConnect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := github.Connect(r.Context(), userID, ga.Code)
+	user, err := github.Connect(r.Context(), userID, ga.Code, ga.RedirectURL)
 	if err != nil {
 		response.Reply(w).ServerInternalError(err)
 		return

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"fmt"
+
 	"github.com/foundcenter/moas/backend/config"
 	"github.com/foundcenter/moas/backend/models"
 	"github.com/foundcenter/moas/backend/repo"
@@ -15,13 +16,10 @@ import (
 
 const AccountType = "slack"
 
-var conf *oauth2.Config
-
-func init() {
-	conf = &oauth2.Config{
+func initOAuthConfig(redirectURL string) *oauth2.Config {
+	config := &oauth2.Config{
 		ClientID:     config.Settings.Slack.ClientID,
 		ClientSecret: config.Settings.Slack.ClientSecret,
-		RedirectURL:  config.Settings.Slack.RedirectURL,
 		Scopes: []string{
 			"search:read",
 			"identify",
@@ -29,12 +27,16 @@ func init() {
 		},
 		Endpoint: slackAuth.Endpoint,
 	}
+
+	return config
 }
 
-func Login(ctx context.Context, code string) (models.User, error) {
+func Login(ctx context.Context, code string, redirectURL string) (models.User, error) {
 
 	var user models.User
-	accessToken, err := conf.Exchange(ctx, code)
+	config := initOAuthConfig(redirectURL)
+	config.RedirectURL = redirectURL
+	accessToken, err := config.Exchange(ctx, code)
 	if err != nil {
 		return user, err
 	}
@@ -76,9 +78,11 @@ func Login(ctx context.Context, code string) (models.User, error) {
 	return user, err
 }
 
-func Connect(ctx context.Context, userID string, code string) (models.User, error) {
+func Connect(ctx context.Context, userID string, code string, redirectURL string) (models.User, error) {
 	var user models.User
-	accessToken, err := conf.Exchange(ctx, code)
+	config := initOAuthConfig(redirectURL)
+	config.RedirectURL = redirectURL
+	accessToken, err := config.Exchange(ctx, code)
 
 	if err != nil {
 		return user, err
