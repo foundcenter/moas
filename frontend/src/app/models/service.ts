@@ -46,7 +46,7 @@ export class Service {
   }
 
   static GOOGLEDRIVE(): Service {
-    return new Service('Google Drive', 'drive', 'Search your drive files and directories.');
+    return new Service('Drive', 'drive', 'Search your drive files and directories.');
   }
 
   static SLACK(): Service {

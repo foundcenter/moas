@@ -92,8 +92,10 @@ export class IntegrateComponent implements OnInit, OnDestroy {
       .subscribe(
       (data) => {
         this.auth.setUser(data.json().data.user);
+        this.toastrService.success(`Successfully delete ${service.name} account ${account.id} !`, 'Account deleted')
       },
       (error) => {
+        this.toastrService.error(`while deleting ${service.name} account ${account.id} !`, 'Error')
       }
       );
   }

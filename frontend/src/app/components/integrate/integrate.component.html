@@ -22,6 +22,7 @@
 
         <div *ngIf="service.accounts" class="list-group">
           <div *ngFor="let account of service.accounts" href="#" class="list-group-item">
+           <div *ngIf="account.status=='Ok'">
             <h5 class="list-group-item-heading">{{ account.email }}</h5>
             <p>
               AccountId: <small>({{ account.id}})</small>
@@ -33,6 +34,7 @@
             <p>
               <a (click)="deleteAccount(account, service)">Delete</a>
             </p>
+            </div>
           </div>
         </div>
 

@@ -20,7 +20,7 @@ export class Account {
     let id = accountResponse.id;
     let service = Service.make(accountResponse.type);
     // TODO: check a status flag when we implement it
-    let status = Account.statusOk;
+    let status = accountResponse.active? Account.statusOk:Account.statusExpired  ;
 
     return new Account(email, id, status, service);
   }
