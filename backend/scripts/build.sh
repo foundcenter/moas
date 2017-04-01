@@ -1,4 +1,9 @@
-rm -rf bin/
-mkdir -p bin
-docker run -v ${PWD}:/go/src/github.com/foundcenter/moas/backend/ --rm golang:1.8.0 /bin/sh -c 'cd /go/src/github.com/foundcenter/moas/backend/ && go build -o bin/moas .'
-docker build -t fcid/moas:latest .
+PROJ=github.com/foundcenter/moas/backend
+SRC_DIR=$GOPATH/src/$PROJ
+OUT_DIR=$SRC_DIR/bin/
+BIN_NAME=moas
+rm $OUT_DIR/$BIN_NAME
+mkdir -p $OUT_DIR
+go build -o $OUT_DIR/$BIN_NAME $PROJ/
+go fmt $PROJ
+go vet $PROJ
