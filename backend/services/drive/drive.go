@@ -144,14 +144,16 @@ func addAccount(ctx context.Context, user *models.User, res *UserDriveInfo, toke
 	}
 }
 
-func Search(ctx context.Context, account models.AccountInfo, query string) []models.SearchResult {
+func Search(ctx context.Context, account models.AccountInfo, query string) ([]models.SearchResult,error) {
 
 	var searchResult []models.SearchResult = make([]models.SearchResult, 0)
 	driveService := CreateDriveService(ctx, account.Token)
 
+
 	ref, err := driveService.Files.List().Q("fullText contains '" + query + "'").Do()
 	if err != nil {
-		log.Fatalf("Unable to retrieve files. %v", err)
+		fmt.Printf("Unable to retrieve files. %v", err)
+		return searchResult, err
 	}
 
 	if len(ref.Items) > 0 {
@@ -169,7 +171,7 @@ func Search(ctx context.Context, account models.AccountInfo, query string) []mod
 		fmt.Print("No files found. \n")
 	}
 
-	return searchResult
+	return searchResult, nil
 }
 
 func CreateDriveService(ctx context.Context, token *oauth2.Token) *drive.Service {

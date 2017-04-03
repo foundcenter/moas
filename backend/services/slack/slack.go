@@ -146,10 +146,14 @@ func Search(ctx context.Context, accountInfo models.AccountInfo, query string) (
 	}
 
 	client := slack.New(accountInfo.Token.AccessToken)
-
-	messages, files, _ := client.Search(query, slack.NewSearchParameters())
-
 	results := make([]models.SearchResult, 0)
+
+	messages, files, err := client.Search(query, slack.NewSearchParameters())
+
+	if err != nil {
+		return results, err
+	}
+
 
 	for _, m := range messages.Matches {
 		msg := models.SearchResult{

@@ -27,11 +27,11 @@ func Load(router *httprouter.Router) {
 
 func handleSearch(w http.ResponseWriter, r *http.Request) {
 
-	resultOfSearch := make([]models.SearchResult, 0)
 	var wg sync.WaitGroup
+	queueOfResults := make(chan models.SearchResultAndErrors, 2)
+	resultOfSearch := make([]models.SearchResult, 0)
+	searchErrors := models.SearchErrors{}
 	query := r.URL.Query().Get("q")
-
-	queueOfResults := make(chan []models.SearchResult, 2)
 
 	token := context.Get(r, "user").(*jwt.Token).Raw
 	user_id, _ := auth.ParseToken(token)
@@ -51,32 +51,62 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 			case "gmail":
 				// gmail search
 				go func(account models.AccountInfo) {
-					result := gmail.Search(r.Context(), account, query)
-					queueOfResults <- result
+					searchError := models.SearchError{}
+					result, err := gmail.Search(r.Context(), account, query)
+					if err != nil {
+						searchError.AccountID = account.ID
+						searchError.AccountType = account.Type
+						searchError.Error = err
+					}
+					queueOfResults <- models.SearchResultAndErrors{result, searchError}
 				}(account)
 			case "drive":
 				// drive search
 				go func(account models.AccountInfo) {
-					result := drive.Search(r.Context(), account, query)
-					queueOfResults <- result
+					e := models.SearchError{}
+					result, err := drive.Search(r.Context(), account, query)
+					if err != nil {
+						e.AccountID = account.ID
+						e.AccountType = account.Type
+						e.Error = err
+					}
+					queueOfResults <- models.SearchResultAndErrors{result, e}
 				}(account)
 			case "slack":
 				// slack search
 				go func(account models.AccountInfo) {
-					result, _ := slack.Search(r.Context(), account, query)
-					queueOfResults <- result
+					e := models.SearchError{}
+					result, err := slack.Search(r.Context(), account, query)
+					if err != nil {
+						e.AccountID = account.ID
+						e.AccountType = account.Type
+						e.Error = err
+					}
+					queueOfResults <- models.SearchResultAndErrors{result, e}
 				}(account)
 			case "github":
 				// github search
 				go func(account models.AccountInfo) {
-					result, _ := github.Search(r.Context(), account, query)
-					queueOfResults <- result
+					e := models.SearchError{}
+					result, err := github.Search(r.Context(), account, query)
+					if err != nil {
+						e.AccountID = account.ID
+						e.AccountType = account.Type
+						e.Error = err
+					}
+					queueOfResults <- models.SearchResultAndErrors{result, e}
 				}(account)
 			case "jira":
 				//jira search
 				go func(account models.AccountInfo) {
-					result, _ := jira.Search(r.Context(), account, query)
-					queueOfResults <- result
+					e := models.SearchError{}
+					result, err := jira.Search(r.Context(), account, query)
+					if err != nil {
+						e.AccountID = account.ID
+						e.AccountType = account.Type
+						e.Error = err
+					}
+					queueOfResults <- models.SearchResultAndErrors{result, e}
 				}(account)
 
 			}
@@ -87,13 +117,20 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 	//here we wait result of search from all services
 	go func() {
 		for r := range queueOfResults {
-			resultOfSearch = append(resultOfSearch, r...)
+			resultOfSearch = append(resultOfSearch, r.SearchResult...)
+			if r.SearchError.AccountID != "" {
+				searchErrors.SearchError = append(searchErrors.SearchError, r.SearchError)
+			}
 			wg.Done()
 		}
 	}()
 
 	wg.Wait()
 
-	response.Reply(w).Ok(resultOfSearch)
+	if len(searchErrors.SearchError) > 0 {
+		response.Reply(w).Ok(resultOfSearch, searchErrors)
+	} else {
+		response.Reply(w).Ok(resultOfSearch)
+	}
 
 }

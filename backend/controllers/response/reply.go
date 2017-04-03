@@ -1,10 +1,9 @@
 package response
 
 import (
+	"github.com/alioygur/gores"
 	"log"
 	"net/http"
-
-	"github.com/alioygur/gores"
 )
 
 type Response struct {
@@ -35,8 +34,12 @@ func (r *Response) Unauthorized(e error) {
 	gores.JSON(r.writer, err.Status, map[string]interface{}{"error": err})
 }
 
-func (r *Response) Ok(data interface{}) {
-	gores.JSON(r.writer, http.StatusOK, map[string]interface{}{"data": data})
+func (r *Response) Ok(data interface{}, meta ...interface{}) {
+	if len(meta) == 0 {
+		gores.JSON(r.writer, http.StatusOK, map[string]interface{}{"data": data})
+	} else {
+		gores.JSON(r.writer, http.StatusOK, map[string]interface{}{"data": data, "meta": meta[0]})
+	}
 }
 
 func (r *Response) Created(data interface{}) {

@@ -146,7 +146,7 @@ func addAccount(ctx context.Context, user *models.User, res *UserGmailInfo, toke
 	}
 }
 
-func Search(ctx context.Context, account models.AccountInfo, query string) []models.SearchResult {
+func Search(ctx context.Context, account models.AccountInfo, query string) ([]models.SearchResult, error) {
 
 	searchResult := make([]models.SearchResult, 0)
 	gmailService := CreateGmailService(ctx, account.Token)
@@ -155,6 +155,7 @@ func Search(ctx context.Context, account models.AccountInfo, query string) []mod
 	ref, err := gmailService.Users.Threads.List(userEmail).Q(query).MaxResults(100).Do()
 	if err != nil {
 		fmt.Printf("Unable to retrieve threads. %v", err)
+		return searchResult, err
 	}
 
 	if len(ref.Threads) > 0 {
@@ -171,7 +172,7 @@ func Search(ctx context.Context, account models.AccountInfo, query string) []mod
 		fmt.Print("No threads found. \n")
 	}
 
-	return searchResult
+	return searchResult, nil
 }
 
 func CreateGmailService(ctx context.Context, token *oauth2.Token) *gmail.Service {

@@ -93,6 +93,9 @@ func Search(ctx context.Context, accountInfo models.AccountInfo, query string) (
 
 	jqlQuery := "assignee=" + user.Key + "&(description~" + query + "|summary~" + query + ")"
 	issue, _, err := client.Issue.Search(jqlQuery, nil)
+	if err != nil {
+		return searchResult, err
+	}
 
 	if len(issue) > 0 {
 		for _, i := range issue {
@@ -109,7 +112,12 @@ func Search(ctx context.Context, accountInfo models.AccountInfo, query string) (
 		fmt.Print("No issues in Jira found. \n")
 	}
 
+
 	project, _, err := client.Project.Get(query)
+	if err != nil {
+		return searchResult, err
+	}
+
 	if project != nil {
 		s := models.SearchResult{}
 		s.Service = "jira"
