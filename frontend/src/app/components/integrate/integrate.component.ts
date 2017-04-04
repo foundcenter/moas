@@ -118,11 +118,13 @@ export class IntegrateComponent implements OnInit, OnDestroy {
       .subscribe(
         (data: Response) => {
           this.auth.setUser(data.json().data.user);
-          console.log(`all is good call auth to update user, close mini modal, flash`);
           this.github.open = false;
+          this.github.token = "";
+          this.toastrService.success(`Personal token for ${githubUsername} has been saved.`, 'Github updated');
         },
-        error => {
-          console.log(`display error`);
+        (error: Response) => {
+          this.toastrService.error(`${error.json().error}`, `Personal token error`);
+          this.github.token = "";
         }
       );
   }
