@@ -4,6 +4,7 @@ import { IntegrationService } from '../../services/integration.service';
 import { ModalDirective } from 'ng2-bootstrap';
 import { Service } from '../../models/service';
 import { AccountService } from '../../services/account.service';
+import { Response } from '@angular/http';
 import { Account } from '../../models/account';
 import { AuthService } from "../../services/auth.service";
 import { User } from "../../models/user";
@@ -21,6 +22,8 @@ export class IntegrateComponent implements OnInit, OnDestroy {
   public accounts: Account[] = [];
   public rows: Service[][] = [];
   public jira: { username, password, url, error } = { username: '', password: '', url: '', error: null };
+  public github: { token: string, open: boolean, error: string } = { token: '', open: false, error: '' };
+  public githubPersonalToken: string = '';
   private currentUserSubscription: Subscription;
 
   constructor(private integrationService: IntegrationService, private auth: AuthService, private accountService: AccountService, private toastrService: ToastrService) { }
@@ -99,6 +102,28 @@ export class IntegrateComponent implements OnInit, OnDestroy {
       (error) => {
         this.toastrService.error(`while deleting ${service.name} account ${account.id} !`, 'Error')
       }
+      );
+  }
+
+  openGithub(account: Account): void{
+    this.github.open = true;
+  }
+  closeGithub(): void {
+    this.github.open = false;
+    this.github.token = '';
+    this.github.error = null;
+  }
+  submitPersonal(githubUsername: string) {
+    this.auth.setGithubPersonal(githubUsername, this.github.token)
+      .subscribe(
+        (data: Response) => {
+          this.auth.setUser(data.json().data.user);
+          console.log(`all is good call auth to update user, close mini modal, flash`);
+          this.github.open = false;
+        },
+        error => {
+          console.log(`display error`);
+        }
       );
   }
 

@@ -60,13 +60,18 @@ export class AuthService {
     this.currentUser.next(this.user);
   }
 
+  setGithubPersonal(username: string, token: string): Observable<Response>  {
+    return this.http.put(`${this.uri}/connect/github/${username}`, { token: token });
+  }
+
   connectJira(url: string, username: string, password: string): Observable<Response> {
     let body = {
       'url': url,
       'username': username,
       'password': password
 
-    }
+    };
+
     return this.http.post(this.uri+'/connect/jira', body)
   }
 

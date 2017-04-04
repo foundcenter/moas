@@ -31,8 +31,36 @@
             'label-success': account.isOk(),
             'label-danger': account.isExpired()}">{{ account.status }}</span>
             </p>
+            <p *ngIf="account.service.name=='GitHub' && !github.open">
+              <a (click)="openGithub(account)"
+                 tooltip="With personal access you can search all repos that you have access to. Without it, you can only search your own."
+                 placement="top"
+              >Set personal token</a>
+            </p>
+             <div class="panel panel-default" *ngIf="account.service.name=='GitHub' && github.open">
+               <div class="panel-body">
+                 <form (ngSubmit)="submitPersonal(account.id)" autocomplete="off">
+                   <p class="text-muted">
+                     Create a <a href="https://github.com/settings/tokens/new" target="_blank">personal token</a>
+                      with <strong>repo</strong> top level scope.
+                   </p>
+                   <div class="form-group">
+                     <input class="form-control input-sm" [(ngModel)]="github.token" type="text"
+                            placeholder="Paste personal token"
+                            required
+                            minlength="40"
+                            maxlength="40"
+                            id="githubTokenInput" name="token">
+                   </div>
+                   <div class="form-group">
+                     <button type="submit" class="btn btn-sm btn-primary">Save</button>
+                     <button type="reset" class="btn btn-sm btn-link" (click)="closeGithub()">Cancel</button>
+                   </div>
+                 </form>
+               </div>
+             </div>
             <p>
-              <a (click)="deleteAccount(account, service)">Delete</a>
+              <a (click)="deleteAccount(account, service)" class="text-danger">Delete</a>
             </p>
             </div>
           </div>
