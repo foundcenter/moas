@@ -2,10 +2,8 @@ package github
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"sync"
-	"time"
-
 	"github.com/foundcenter/moas/backend/config"
 	"github.com/foundcenter/moas/backend/models"
 	"github.com/foundcenter/moas/backend/repo"
@@ -13,6 +11,9 @@ import (
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 	githubAuth "golang.org/x/oauth2/github"
+	"sync"
+	"time"
+	"strings"
 )
 
 const AccountType = "github"
@@ -131,12 +132,46 @@ func Connect(ctx context.Context, userID string, code string, redirectURL string
 	return user, nil
 }
 
+func ConnectWithApiToken(ctx context.Context, userID string, token string, username string) (models.User, error) {
+
+	var accountId string
+	var user models.User
+
+	personalApiToken := oauth2.Token{AccessToken: token}
+	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
+	tc := oauth2.NewClient(ctx, ts)
+
+	client := github.NewClient(tc)
+	githubUser, _, err := client.Users.Get(ctx, "")
+	if err != nil {
+		return user, err
+	}
+
+
+	if githubUser.GetLogin() != username {
+		return user, errors.New("GitHub users don't match!")
+	}
+
+	db := repo.New()
+	defer db.Destroy()
+
+	user, err = db.UserRepo.FindById(userID)
+	if err != nil {
+		return user, err
+	}
+
+	addAccount(ctx, &user, githubUser, accountId, &personalApiToken)
+	user, err = db.UserRepo.Update(user)
+
+	return user, nil
+}
+
 func addAccount(ctx context.Context, user *models.User, res *github.User, primaryEmail string, token *oauth2.Token) {
 	a := models.AccountInfo{
-		Type:  AccountType,
-		ID:    res.GetLogin(),
-		Data:  res,
-		Token: token,
+		Type:   AccountType,
+		ID:     res.GetLogin(),
+		Data:   res,
+		Token:  token,
 		Active: true,
 	}
 
@@ -193,7 +228,7 @@ func Search(ctx context.Context, accountInfo models.AccountInfo, query string) (
 
 func searchCommits(ctx context.Context, accountInfo models.AccountInfo, query string, client *github.Client) []models.SearchResult {
 
-	userQuery := fmt.Sprintf("%s+user:%s", query, accountInfo.ID)
+	userQuery := fmt.Sprintf("%s+author:%s", query, accountInfo.ID)
 	result, _, _ := client.Search.Commits(ctx, userQuery, nil)
 	searchResult := make([]models.SearchResult, 0)
 
@@ -314,18 +349,21 @@ func searchIssues(ctx context.Context, accountInfo models.AccountInfo, query str
 
 func searchRepositories(ctx context.Context, accountInfo models.AccountInfo, query string, client *github.Client) []models.SearchResult {
 
-	reposQuery := fmt.Sprintf("%s user:%s", query, accountInfo.ID)
-	result, _, _ := client.Search.Repositories(ctx, reposQuery, nil)
+	result, _, _ := client.Repositories.List(ctx, "", nil)
+
 	searchResult := make([]models.SearchResult, 0)
-	if len(result.Repositories) > 0 {
-		for _, r := range result.Repositories {
-			s := models.SearchResult{}
-			s.Service = "github"
-			s.Resource = "repository"
-			s.AccountID = accountInfo.ID
-			s.Description = r.GetDescription()
-			s.Url = r.GetHTMLURL()
-			searchResult = append(searchResult, s)
+	if len(result) > 0 {
+		for _, r := range result {
+			if strings.Contains(r.GetName(), query) {
+				s := models.SearchResult{}
+				s.Service = "github"
+				s.Resource = "repository"
+				s.AccountID = accountInfo.ID
+				s.Description = r.GetDescription()
+				s.Url = r.GetHTMLURL()
+				s.Title=r.GetFullName()
+				searchResult = append(searchResult, s)
+			}
 		}
 	} else {
 		fmt.Print("No repositories found. \n")

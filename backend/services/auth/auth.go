@@ -36,6 +36,10 @@ type JiraAuth struct {
 	Password string `json:"password"`
 }
 
+type GitHubToken struct {
+	Token string `json:"token"`
+}
+
 func Login(email string, password string) (error, models.User) {
 	db := repo.New()
 	defer db.Destroy()
