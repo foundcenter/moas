@@ -137,27 +137,38 @@ func ConnectWithApiToken(ctx context.Context, userID string, token string, usern
 	var accountId string
 	var user models.User
 
+	db := repo.New()
+	defer db.Destroy()
+
+	user, err := db.UserRepo.FindById(userID)
+	if err != nil {
+		return user, err
+	}
+
 	personalApiToken := oauth2.Token{AccessToken: token}
 	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
 	tc := oauth2.NewClient(ctx, ts)
 
 	client := github.NewClient(tc)
-	githubUser, _, err := client.Users.Get(ctx, "")
+	githubUser, resp, err := client.Users.Get(ctx, "")
 	if err != nil {
 		return user, err
 	}
-
 
 	if githubUser.GetLogin() != username {
 		return user, errors.New("GitHub users don't match!")
 	}
 
-	db := repo.New()
-	defer db.Destroy()
+	scopes := strings.Split(resp.Header.Get("X-OAuth-Scopes"), ", ")
+	hasRepo := false
+	for _, s := range scopes {
+		if  s == "repo"{
+			hasRepo = true
+		}
+	}
 
-	user, err = db.UserRepo.FindById(userID)
-	if err != nil {
-		return user, err
+	if !hasRepo {
+		return user, errors.New("Personal token does not have repo scope")
 	}
 
 	addAccount(ctx, &user, githubUser, accountId, &personalApiToken)
@@ -175,8 +186,9 @@ func addAccount(ctx context.Context, user *models.User, res *github.User, primar
 		Active: true,
 	}
 
-	for _, acc := range user.Accounts {
+	for i, acc := range user.Accounts {
 		if acc.ID == a.ID && acc.Type == a.Type {
+			user.Accounts[i] = a
 			return
 		}
 	}

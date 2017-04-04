@@ -23,6 +23,10 @@ func (r *Response) BadRequest() {
 	gores.JSON(r.writer, err.Status, map[string]interface{}{"error": err})
 }
 
+func (r *Response) Error(err error, status int) {
+	gores.JSON(r.writer, status, map[string]interface{}{"error": err.Error()})
+}
+
 func (r *Response) ServerInternalError(err error) {
 	log.Print(err.Error())
 	errorResponse := &Error{"Internal server error: " + err.Error(), http.StatusInternalServerError}

@@ -16,6 +16,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/justinas/alice"
 	"net/http"
+	"errors"
 )
 
 type loginRequest struct {
@@ -66,7 +67,7 @@ func handleGithubConnectWithApiToken(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(gitHubToken.Token) != 40 {
-		response.Reply(w).BadRequest()
+		response.Reply(w).Error(errors.New("Personal token must be 40 characters long"), http.StatusUnprocessableEntity)
 		return
 	}
 
@@ -79,7 +80,7 @@ func handleGithubConnectWithApiToken(w http.ResponseWriter, r *http.Request) {
 
 	user, err := github.ConnectWithApiToken(r.Context(), userID, gitHubToken.Token, username)
 	if err != nil {
-		response.Reply(w).ServerInternalError(err)
+		response.Reply(w).Error(err, http.StatusUnprocessableEntity)
 		return
 	}
 
