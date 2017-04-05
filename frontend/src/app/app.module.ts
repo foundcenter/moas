@@ -20,7 +20,7 @@ import { IntegrateComponent } from './components/integrate/integrate.component';
 import { AlertModule, ModalModule, TooltipModule } from 'ng2-bootstrap';
 import { AuthService } from './services/auth.service';
 import { NgSpinKitModule } from 'ng-spin-kit';
-
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 @NgModule({
   declarations: [
     AppComponent,
@@ -35,6 +35,7 @@ import { NgSpinKitModule } from 'ng-spin-kit';
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     FormsModule,
     HttpModule,
     AppRoutingModule,
