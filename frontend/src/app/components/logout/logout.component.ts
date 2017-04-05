@@ -10,16 +10,16 @@ import { AuthService } from '../../services/auth.service';
 })
 export class LogoutComponent implements OnInit {
 
-  constructor(private router: Router, private authService: AuthService, private toastrService: ToastrService) { }
+  constructor(private router: Router, private auth: AuthService, private toastr: ToastrService) { }
 
   ngOnInit() {
-    this.authService.logout()
+    this.auth.logout()
       .then(() => {
         this.router.navigateByUrl('login');
-        this.toastrService.info('Successfully logout! See you soon', 'Success');
+        this.toastr.info('Successfully logout! See you soon', 'Success');
       })
       .catch(() => {
-        this.toastrService.error('Something gone wrong with logout!', 'Error');
+        this.toastr.error('Something gone wrong with logout!', 'Error');
       });
   }
 

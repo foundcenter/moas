@@ -26,7 +26,7 @@ export class IntegrateComponent implements OnInit, OnDestroy {
   public githubPersonalToken: string = '';
   private currentUserSubscription: Subscription;
 
-  constructor(private integrationService: IntegrationService, private auth: AuthService, private accountService: AccountService, private toastrService: ToastrService) { }
+  constructor(private integrationService: IntegrationService, private auth: AuthService, private accountService: AccountService, private toastr: ToastrService) { }
 
   ngOnDestroy(): void {
     this.currentUserSubscription.unsubscribe();
@@ -95,10 +95,10 @@ export class IntegrateComponent implements OnInit, OnDestroy {
   deleteAccount(account: Account, service: Service) {
     this.accountService.delete(service.name, account.id)
       .then(() => {
-        this.toastrService.success(`Successfully delete ${service.name} account ${account.id} !`, 'Account deleted');
+        this.toastr.success(`Successfully delete ${service.name} account ${account.id} !`, 'Account deleted');
       })
       .catch(() => {
-        this.toastrService.error(`while deleting ${service.name} account ${account.id} !`, 'Error');
+        this.toastr.error(`while deleting ${service.name} account ${account.id} !`, 'Error');
       });
   }
 
@@ -115,10 +115,10 @@ export class IntegrateComponent implements OnInit, OnDestroy {
       .then(() => {
         this.github.open = false;
         this.github.token = "";
-        this.toastrService.success(`Personal token for ${githubUsername} has been saved.`, 'Github updated');
+        this.toastr.success(`Personal token for ${githubUsername} has been saved.`, 'Github updated');
       })
       .catch((error: Response) => {
-        this.toastrService.error(`${error.json().error}`, `Personal token error`);
+        this.toastr.error(`${error.json().error}`, `Personal token error`);
         this.github.token = "";
       });
   }
@@ -133,10 +133,10 @@ export class IntegrateComponent implements OnInit, OnDestroy {
       case 'github':
         this.auth.connect(serviceName)
           .then(() => {
-            this.toastrService.success(`${serviceName} successfuly connected`, 'Success')
+            this.toastr.success(`${serviceName} successfuly connected`, 'Success')
           })
           .catch(() => {
-            this.toastrService.error(`${serviceName} fail to connect`, 'Error')
+            this.toastr.error(`${serviceName} fail to connect`, 'Error')
           });
         break;
 
@@ -155,12 +155,12 @@ export class IntegrateComponent implements OnInit, OnDestroy {
         this.jira.username = '';
         this.jira.password = '';
         this.jira.url = '';
-        this.toastrService.success('Jira successfuly connected', 'Success');
+        this.toastr.success('Jira successfuly connected', 'Success');
         this.hideChildModal();
       })
       .catch(error => {
         this.jira.error = error;
-        this.toastrService.error('Jira fail to connect', 'Error');
+        this.toastr.error('Jira fail to connect', 'Error');
       });
   }
 }

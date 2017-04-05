@@ -11,7 +11,7 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class LoginComponent implements OnInit {
 
-  constructor(private router: Router, private auth: AuthService, private toastrService: ToastrService) {
+  constructor(private router: Router, private auth: AuthService, private toastr: ToastrService) {
   }
 
   ngOnInit() {
@@ -22,11 +22,11 @@ export class LoginComponent implements OnInit {
       .then((res: Response) => {
         this.router.navigateByUrl('search');
         if (res.status == 201) {
-          this.toastrService.info('Go to Integrate page to connect other services!', 'Integrate more services')
+          this.toastr.info('Go to Integrate page to connect other services!', 'Integrate more services')
         }
       })
       .catch(() => {
-        this.toastrService.error('Login with Google failed!', 'Error')
+        this.toastr.error('Login with Google failed!', 'Error')
       });
   }
 
