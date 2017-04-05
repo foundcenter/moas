@@ -76,6 +76,16 @@ export class AuthService {
       });
   }
 
+  delete(serviceName: string, id: string): Promise<Response> {
+    return this.http.delete(`${this.uri}/account/${serviceName.toLowerCase()}/${id}`)
+      .toPromise()
+      .then((data: Response) => {
+        this.setUser(data.json().data.user);
+        return data;
+      });
+  }
+
+
   connectJira(url: string, username: string, password: string): Promise<Response> {
     let body = {
       'url': url,

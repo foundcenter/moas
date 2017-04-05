@@ -3,7 +3,6 @@ import { ToastrService } from 'ngx-toastr';
 import { IntegrationService } from '../../services/integration.service';
 import { ModalDirective } from 'ng2-bootstrap';
 import { Service } from '../../models/service';
-import { AccountService } from '../../services/account.service';
 import { Response } from '@angular/http';
 import { Account } from '../../models/account';
 import { AuthService } from '../../services/auth.service';
@@ -14,7 +13,7 @@ import { Subscription } from 'rxjs';
   selector: 'app-integrate',
   templateUrl: './integrate.component.html',
   styleUrls: ['./integrate.component.scss'],
-  providers: [IntegrationService, AccountService]
+  providers: [IntegrationService]
 })
 export class IntegrateComponent implements OnInit, OnDestroy {
   @ViewChild('childModal') public childModal: ModalDirective;
@@ -26,7 +25,7 @@ export class IntegrateComponent implements OnInit, OnDestroy {
   public githubPersonalToken: string = '';
   private currentUserSubscription: Subscription;
 
-  constructor(private integrationService: IntegrationService, private auth: AuthService, private accountService: AccountService, private toastr: ToastrService) { }
+  constructor(private integrationService: IntegrationService, private auth: AuthService, private toastr: ToastrService) { }
 
   ngOnDestroy(): void {
     this.currentUserSubscription.unsubscribe();
@@ -93,7 +92,7 @@ export class IntegrateComponent implements OnInit, OnDestroy {
   }
 
   deleteAccount(account: Account, service: Service) {
-    this.accountService.delete(service.name, account.id)
+    this.auth.delete(service.name, account.id)
       .then(() => {
         this.toastr.success(`Successfully delete ${service.name} account ${account.id} !`, 'Account deleted');
       })
