@@ -19,6 +19,7 @@ import { ResultComponent } from './components/search/result/result.component';
 import { IntegrateComponent } from './components/integrate/integrate.component';
 import { AlertModule, ModalModule, TooltipModule } from 'ng2-bootstrap';
 import { AuthService } from './services/auth.service';
+import { NgSpinKitModule } from 'ng-spin-kit';
 
 @NgModule({
   declarations: [
@@ -41,7 +42,8 @@ import { AuthService } from './services/auth.service';
     ModalModule.forRoot(),
     AlertModule.forRoot(),
     TooltipModule.forRoot(),
-    ToastrModule.forRoot()
+    ToastrModule.forRoot(),
+    NgSpinKitModule
   ],
   providers: [
     AuthGuard,

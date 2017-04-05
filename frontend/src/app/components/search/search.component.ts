@@ -21,6 +21,7 @@ export class SearchComponent implements OnInit, AfterViewInit {
   public query: string = '';
   public noResults: boolean = false;
   public errors: AccountError[] = [];
+  public loading: boolean =false;
 
   constructor(private searchService: SearchService, private toastr: ToastrService) {
   }
@@ -83,6 +84,7 @@ export class SearchComponent implements OnInit, AfterViewInit {
   }
 
   search(): void{
+    this.loading=true;
     this.reset();
 
     if (!this.isValidQuery()) {
@@ -98,9 +100,11 @@ export class SearchComponent implements OnInit, AfterViewInit {
           this.errors = <AccountError[]>data.json().meta.errors;
         }
         //set flags for accounts on user object in auth service
+        this.loading=false;
       })
       .catch((error) => {
         this.toastr.error('An error occurred', 'Search failed');
+        this.loading=false;
       });
   }
 
