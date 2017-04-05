@@ -2,9 +2,12 @@ import { Service } from "./service";
 export class Account {
   static readonly statusOk: string = 'Ok';
   static readonly statusExpired: string = 'Expired';
+  public email: string;
+  public id: string;
+  public status: string;
+  public service: Service;
 
-  constructor(public email: string, public id: string, public status: string,
-              public service: Service) {
+  constructor() {
   }
 
   isOk(): boolean{
@@ -16,13 +19,15 @@ export class Account {
   }
 
   public static fromJson(accountResponse) {
-    let email = accountResponse.email;
-    let id = accountResponse.id;
-    let service = Service.make(accountResponse.type);
-    // TODO: check a status flag when we implement it
-    let status = accountResponse.active? Account.statusOk:Account.statusExpired  ;
+    let account = new Account();
 
-    return new Account(email, id, status, service);
+    account.email = accountResponse.email;
+    account.id = accountResponse.id;
+    account.service = Service.make(accountResponse.type);
+    // TODO: check a status flag when we implement it
+    account.status = accountResponse.active? Account.statusOk:Account.statusExpired;
+
+    return account;
   }
 
 }

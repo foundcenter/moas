@@ -22,7 +22,7 @@
 
         <div *ngIf="service.accounts" class="list-group">
           <div *ngFor="let account of service.accounts" href="#" class="list-group-item">
-           <div *ngIf="account.status=='Ok'">
+           <div>
             <h5 class="list-group-item-heading">{{ account.email }}</h5>
             <p>
               AccountId: <small>({{ account.id}})</small>
@@ -59,7 +59,7 @@
                  </form>
                </div>
              </div>
-            <p>
+            <p *ngIf="!account.isExpired()">
               <a (click)="deleteAccount(account, service)" class="text-danger">Delete</a>
             </p>
             </div>
