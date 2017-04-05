@@ -1,5 +1,4 @@
 import { CustomConfig } from 'ng2-ui-auth';
-import { Response } from '@angular/http';
 import { environment } from '../environments/environment';
 
 /**

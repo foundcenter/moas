@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { IntegrationService } from '../../services/integration.service';
 import { ModalDirective } from 'ng2-bootstrap';
@@ -6,9 +6,9 @@ import { Service } from '../../models/service';
 import { AccountService } from '../../services/account.service';
 import { Response } from '@angular/http';
 import { Account } from '../../models/account';
-import { AuthService } from "../../services/auth.service";
-import { User } from "../../models/user";
-import { Subscription } from "rxjs";
+import { AuthService } from '../../services/auth.service';
+import { User } from '../../models/user';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-integrate',
@@ -94,15 +94,12 @@ export class IntegrateComponent implements OnInit, OnDestroy {
 
   deleteAccount(account: Account, service: Service) {
     this.accountService.delete(service.name, account.id)
-      .subscribe(
-      (data) => {
-        this.auth.setUser(data.json().data.user);
-        this.toastrService.success(`Successfully delete ${service.name} account ${account.id} !`, 'Account deleted')
-      },
-      (error) => {
-        this.toastrService.error(`while deleting ${service.name} account ${account.id} !`, 'Error')
-      }
-      );
+      .then(() => {
+        this.toastrService.success(`Successfully delete ${service.name} account ${account.id} !`, 'Account deleted');
+      })
+      .catch(() => {
+        this.toastrService.error(`while deleting ${service.name} account ${account.id} !`, 'Error');
+      });
   }
 
   openGithub(account: Account): void{
@@ -115,18 +112,15 @@ export class IntegrateComponent implements OnInit, OnDestroy {
   }
   submitPersonal(githubUsername: string) {
     this.auth.setGithubPersonal(githubUsername, this.github.token)
-      .subscribe(
-        (data: Response) => {
-          this.auth.setUser(data.json().data.user);
-          this.github.open = false;
-          this.github.token = "";
-          this.toastrService.success(`Personal token for ${githubUsername} has been saved.`, 'Github updated');
-        },
-        (error: Response) => {
-          this.toastrService.error(`${error.json().error}`, `Personal token error`);
-          this.github.token = "";
-        }
-      );
+      .then(() => {
+        this.github.open = false;
+        this.github.token = "";
+        this.toastrService.success(`Personal token for ${githubUsername} has been saved.`, 'Github updated');
+      })
+      .catch((error: Response) => {
+        this.toastrService.error(`${error.json().error}`, `Personal token error`);
+        this.github.token = "";
+      });
   }
 
   handle(service: Service) {
@@ -138,17 +132,12 @@ export class IntegrateComponent implements OnInit, OnDestroy {
       case 'slack':
       case 'github':
         this.auth.connect(serviceName)
-          .subscribe(
-          data => {
-            this.auth.setUser(data.json().data.user);
+          .then(() => {
             this.toastrService.success(`${serviceName} successfuly connected`, 'Success')
-          },
-          error => {
+          })
+          .catch(() => {
             this.toastrService.error(`${serviceName} fail to connect`, 'Error')
-          },
-          () => {
-          }
-          );
+          });
         break;
 
       case 'jira':
@@ -162,20 +151,16 @@ export class IntegrateComponent implements OnInit, OnDestroy {
 
   addJira() {
     this.auth.connectJira(this.jira.url, this.jira.username, this.jira.password)
-      .subscribe(
-      data => {
-        this.auth.setUser(data.json().data.user);
+      .then(() => {
         this.jira.username = '';
         this.jira.password = '';
         this.jira.url = '';
         this.toastrService.success('Jira successfuly connected', 'Success');
         this.hideChildModal();
-      },
-      error => {
+      })
+      .catch(error => {
         this.jira.error = error;
         this.toastrService.error('Jira fail to connect', 'Error');
-      }
-      );
+      });
   }
-
 }

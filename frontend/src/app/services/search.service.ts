@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
 import { JwtHttp } from 'ng2-ui-auth';
 import { Response } from '@angular/http';
 import { environment } from '../../environments/environment';
-
 
 @Injectable()
 export class SearchService {
@@ -11,8 +9,8 @@ export class SearchService {
 
   constructor(private http: JwtHttp) { }
 
-  search(query: string): Observable<Response> {
+  search(query: string): Promise<Response> {
     return this.http.get(`${this.uri}/search?q=${query}`)
-      .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
+      .toPromise();
   }
 }

@@ -1,4 +1,4 @@
-import { Service } from "./service";
+import { Service } from './service';
 export class Account {
   static readonly statusOk: string = 'Ok';
   static readonly statusExpired: string = 'Expired';

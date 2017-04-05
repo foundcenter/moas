@@ -3,6 +3,7 @@ import { SearchService } from '../../services/search.service';
 import { Result } from '../../models/result.interface';
 import { Response } from '@angular/http';
 import { AccountError } from '../../models/accountError';
+import { ToastrService } from 'ngx-toastr';
 
 const ALL = 'All';
 
@@ -21,7 +22,7 @@ export class SearchComponent implements OnInit, AfterViewInit {
   public noResults: boolean = false;
   public errors: AccountError[] = [];
 
-  constructor(private searchService: SearchService) {
+  constructor(private searchService: SearchService, private toastr: ToastrService) {
   }
 
   ngOnInit() {
@@ -89,14 +90,18 @@ export class SearchComponent implements OnInit, AfterViewInit {
     }
 
     this.searchService.search(this.query)
-      .subscribe(
-        (data: Response) => {
-          this.results = <Result[]>data.json().data;
-          this.sortResults();
+      .then((data: Response) => {
+        this.results = <Result[]>data.json().data;
+        this.sortResults();
+
+        if (<AccountError[]>data.json().meta) {
           this.errors = <AccountError[]>data.json().meta.errors;
-          //set flags for accounts on user object in auth service
         }
-      );
+        //set flags for accounts on user object in auth service
+      })
+      .catch((error) => {
+        this.toastr.error('An error occurred', 'Search failed');
+      });
   }
 
   reset(): void {

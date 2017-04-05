@@ -1,12 +1,10 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Account } from '../models/account';
-import { Service } from '../models/service';
-import { Observable } from "rxjs";
-import { Response } from "@angular/http";
-import { AuthService } from "./auth.service";
-import { User } from "../models/user";
-import { JwtHttp } from "ng2-ui-auth";
-import { environment } from "../../environments/environment";
+import { Response } from '@angular/http';
+import { AuthService } from './auth.service';
+import { User } from '../models/user';
+import { JwtHttp } from 'ng2-ui-auth';
+import { environment } from '../../environments/environment';
 
 @Injectable()
 export class AccountService {
@@ -28,8 +26,13 @@ export class AccountService {
     return this.currentUser.accounts;
   }
 
-  delete(serviceName: string, id: string): Observable<Response> {
-    return this.http.delete(`${this.uri}/account/${serviceName.toLowerCase()}/${id}`);
+  delete(serviceName: string, id: string): Promise<Response> {
+    return this.http.delete(`${this.uri}/account/${serviceName.toLowerCase()}/${id}`)
+      .toPromise()
+      .then((data: Response) => {
+        this.auth.setUser(data.json().data.user);
+        return data;
+      });
   }
 
 }

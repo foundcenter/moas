@@ -1,4 +1,4 @@
-import { Account } from "./account";
+import { Account } from './account';
 
 export class User {
   public id: string;

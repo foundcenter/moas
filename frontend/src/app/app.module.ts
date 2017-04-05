@@ -11,14 +11,14 @@ import { AppComponent } from './app.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 import { LoginComponent } from './components/login/login.component';
-import { Ng2UiAuthModule } from "ng2-ui-auth/commonjs/ng2-ui-auth.module";
+import { Ng2UiAuthModule } from 'ng2-ui-auth/commonjs/ng2-ui-auth.module';
 import { LogoutComponent } from './components/logout/logout.component';
-import { SearchComponent } from "./components/search/search.component";
+import { SearchComponent } from './components/search/search.component';
 import { FocusDirective } from './focus.directive';
 import { ResultComponent } from './components/search/result/result.component';
 import { IntegrateComponent } from './components/integrate/integrate.component';
-import { ModalModule, AlertModule, TooltipModule } from "ng2-bootstrap";
-import { AuthService } from "./services/auth.service";
+import { AlertModule, ModalModule, TooltipModule } from 'ng2-bootstrap';
+import { AuthService } from './services/auth.service';
 
 @NgModule({
   declarations: [

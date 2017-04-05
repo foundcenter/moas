@@ -1,7 +1,7 @@
 import { ToastrService } from 'ngx-toastr';
 import { Component, OnInit } from '@angular/core';
-import { Router } from "@angular/router";
-import { AuthService } from "../../services/auth.service";
+import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-logout',
@@ -14,14 +14,12 @@ export class LogoutComponent implements OnInit {
 
   ngOnInit() {
     this.authService.logout()
-      .subscribe({
-        complete: () => {
-          this.router.navigateByUrl('login');
-          this.toastrService.info('Successfully logout! See you soon', 'Success');
-        },
-        error: (err: any) => {
-          this.toastrService.error('Something gone wrong with logout!', 'Error');
-        }
+      .then(() => {
+        this.router.navigateByUrl('login');
+        this.toastrService.info('Successfully logout! See you soon', 'Success');
+      })
+      .catch(() => {
+        this.toastrService.error('Something gone wrong with logout!', 'Error');
       });
   }
 

@@ -1,10 +1,10 @@
-import { Injectable, OnDestroy, OnInit } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
-import { AuthService as UiAuth, JwtHttp } from "ng2-ui-auth";
-import { User } from "../models/user";
-import { Observable, ReplaySubject } from "rxjs";
-import { Router } from "@angular/router";
-import { environment } from "../../environments/environment";
+import { AuthService as UiAuth, JwtHttp } from 'ng2-ui-auth';
+import { User } from '../models/user';
+import { ReplaySubject } from 'rxjs';
+import { Router } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 @Injectable()
 export class AuthService {
@@ -20,8 +20,10 @@ export class AuthService {
     }
     this.check()
       .catch(() => {
-        this.logout();
-        router.navigateByUrl('/login');
+        this.logout()
+          .then(() => {
+            router.navigateByUrl('/login');
+          });
       })
   }
 
@@ -38,8 +40,8 @@ export class AuthService {
     return this.uiAuth.isAuthenticated();
   }
 
-  logout(): Observable<void> {
-    return this.uiAuth.logout();
+  logout(): Promise<void> {
+    return this.uiAuth.logout().toPromise();
   }
 
   check(): Promise<Response> {
@@ -51,8 +53,13 @@ export class AuthService {
       });
   }
 
-  connect(serviceName: string): Observable<Response> {
-    return this.uiAuth.authenticate(serviceName);
+  connect(serviceName: string): Promise<Response> {
+    return this.uiAuth.authenticate(serviceName)
+      .toPromise()
+      .then((data: Response) => {
+        this.setUser(data.json().data.user);
+        return data;
+      });
   }
 
   setUser(response): void {
@@ -60,19 +67,28 @@ export class AuthService {
     this.currentUser.next(this.user);
   }
 
-  setGithubPersonal(username: string, token: string): Observable<Response>  {
-    return this.http.put(`${this.uri}/connect/github/${username}`, { token: token });
+  setGithubPersonal(username: string, token: string): Promise<Response>  {
+    return this.http.put(`${this.uri}/connect/github/${username}`, { token: token })
+      .toPromise()
+      .then((data: Response) => {
+        this.setUser(data.json().data.user);
+        return data;
+      });
   }
 
-  connectJira(url: string, username: string, password: string): Observable<Response> {
+  connectJira(url: string, username: string, password: string): Promise<Response> {
     let body = {
       'url': url,
       'username': username,
       'password': password
-
     };
 
     return this.http.post(this.uri+'/connect/jira', body)
+      .toPromise()
+      .then((data: Response) => {
+        this.setUser(data.json().data.user);
+        return data;
+      });
   }
 
 }
