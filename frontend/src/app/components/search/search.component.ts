@@ -84,12 +84,13 @@ export class SearchComponent implements OnInit, AfterViewInit {
   }
 
   search(): void{
-    this.loading=true;
     this.reset();
 
     if (!this.isValidQuery()) {
       return;
     }
+
+    this.loading=true;
 
     this.searchService.search(this.query)
       .then((data: Response) => {
