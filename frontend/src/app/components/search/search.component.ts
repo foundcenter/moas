@@ -1,6 +1,8 @@
-import { Component, OnInit, EventEmitter, AfterViewInit } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, OnInit } from '@angular/core';
 import { SearchService } from '../../services/search.service';
-import { Result } from "../../models/result.interface";
+import { Result } from '../../models/result.interface';
+import { Response } from '@angular/http';
+import { AccountError } from '../../models/accountError';
 
 const ALL = 'All';
 
@@ -17,6 +19,7 @@ export class SearchComponent implements OnInit, AfterViewInit {
   public selected: string = ALL;
   public query: string = '';
   public noResults: boolean = false;
+  public errors: AccountError[] = [];
 
   constructor(private searchService: SearchService) {
   }
@@ -87,10 +90,11 @@ export class SearchComponent implements OnInit, AfterViewInit {
 
     this.searchService.search(this.query)
       .subscribe(
-        data => {
-          let result = <Result[]>data;
-          this.results.push.apply(this.results, result);
+        (data: Response) => {
+          this.results = <Result[]>data.json().data;
           this.sortResults();
+          this.errors = <AccountError[]>data.json().meta.errors;
+          //set flags for accounts on user object in auth service
         }
       );
   }

@@ -11,9 +11,8 @@ export class SearchService {
 
   constructor(private http: JwtHttp) { }
 
-  search(query: string): Observable<Object[]> {
+  search(query: string): Observable<Response> {
     return this.http.get(`${this.uri}/search?q=${query}`)
-      .map((res: Response) => res.json().data)
       .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
   }
 }
