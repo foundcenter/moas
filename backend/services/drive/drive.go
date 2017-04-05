@@ -176,7 +176,8 @@ func Search(ctx context.Context, account models.AccountInfo, query string) ([]mo
 
 func CreateDriveService(ctx context.Context, token *oauth2.Token) *drive.Service {
 
-	client := conf.Client(ctx, token)
+	config := initOAuthConfig("")
+	client := config.Client(ctx, token)
 	driveService, err := drive.New(client)
 
 	if err != nil {
