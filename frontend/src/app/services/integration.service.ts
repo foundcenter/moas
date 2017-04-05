@@ -6,11 +6,7 @@ export class IntegrationService {
 
   constructor() { }
 
-  getAvailableServices(): Service[] {
-    return this.mockServices();
-  }
-
-  private mockServices(): Service[] {
+  getAll(): Service[] {
     let gmail = Service.GMAIL();
     let googleDrive = Service.GOOGLEDRIVE();
     let jira = Service.JIRA();

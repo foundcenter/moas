@@ -37,7 +37,7 @@ export class IntegrateComponent implements OnInit, OnDestroy {
       if (!user) {
         return;
       }
-      this.services = this.integrationService.getAvailableServices();
+      this.services = this.integrationService.getAll();
       this.accounts = user.accounts;
       this.rows = this.getRows();
       this.assignAccountsToServices();
