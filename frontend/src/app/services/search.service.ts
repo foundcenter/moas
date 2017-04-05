@@ -1,8 +1,8 @@
-import { Injectable } from "@angular/core";
-import { Observable } from "rxjs";
-import { JwtHttp } from "ng2-ui-auth";
-import { Response } from "@angular/http";
-import { environment } from "../../environments/environment";
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { JwtHttp } from 'ng2-ui-auth';
+import { Response } from '@angular/http';
+import { environment } from '../../environments/environment';
 
 
 @Injectable()
