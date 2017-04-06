@@ -78,7 +78,7 @@ func Login(ctx context.Context, code string, redirectURL string) (models.User, e
 
 	addAccount(ctx, &user, &gu, accessToken)
 
-	user, err = db.UserRepo.Upsert(user)
+	user, err, _ = db.UserRepo.Upsert(user)
 
 	return user, err
 }

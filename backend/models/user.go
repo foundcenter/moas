@@ -1,8 +1,14 @@
 package models
 
+
 import (
 	"golang.org/x/oauth2"
 	"gopkg.in/mgo.v2/bson"
+)
+
+const (
+	LOGIN = "login"
+	REGISTER = "register"
 )
 
 type User struct {

@@ -17,6 +17,7 @@ import (
 	"github.com/justinas/alice"
 	"net/http"
 	"errors"
+	"github.com/foundcenter/moas/backend/models"
 )
 
 type loginRequest struct {
@@ -118,7 +119,7 @@ func handleGoogleAuth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := gmail.Login(r.Context(), ga.Code, ga.RedirectURL)
+	user, err, action := gmail.Login(r.Context(), ga.Code, ga.RedirectURL)
 	if err != nil {
 		response.Reply(w).ServerInternalError(err)
 		return
@@ -127,6 +128,11 @@ func handleGoogleAuth(w http.ResponseWriter, r *http.Request) {
 	err, tokenString := auth.IssueToken(user)
 	if err != nil {
 		response.Reply(w).BadRequest()
+		return
+	}
+
+	if action == models.REGISTER {
+		response.Reply(w).Created(map[string]interface{}{"user": user, "token": tokenString})
 		return
 	}
 
@@ -140,7 +146,7 @@ func handleGmailAuth(w http.ResponseWriter, r *http.Request) {
 	var ga auth.GoogleAuth
 	err := decoder.Decode(&ga)
 
-	user, err := gmail.Login(r.Context(), ga.Code, ga.RedirectURL)
+	user, err, _:= gmail.Login(r.Context(), ga.Code, ga.RedirectURL)
 	if err != nil {
 		response.Reply(w).ServerInternalError(err)
 		return

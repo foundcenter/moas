@@ -21,7 +21,7 @@ func (u *User) Insert(user models.User) (models.User, error) {
 	return user, err
 }
 
-func (u *User) Upsert(user models.User) (models.User, error) {
+func (u *User) Upsert(user models.User) (models.User, error, string) {
 
 	c := u.Database.C("users")
 
@@ -29,9 +29,14 @@ func (u *User) Upsert(user models.User) (models.User, error) {
 		user.ID = bson.NewObjectId()
 	}
 
-	_, err := c.UpsertId(user.ID, user)
+	ci, err := c.UpsertId(user.ID, user)
 
-	return user, err
+	action := models.REGISTER
+	if ci.Updated == 1 {
+		action = models.LOGIN
+	}
+
+	return user, err, action
 }
 
 

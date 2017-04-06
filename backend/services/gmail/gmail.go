@@ -43,19 +43,19 @@ func initOAuthConfig(redirectURL string) *oauth2.Config {
 	return config
 }
 
-func Login(ctx context.Context, code string, redirectURL string) (models.User, error) {
+func Login(ctx context.Context, code string, redirectURL string) (models.User, error, string) {
 
 	var user models.User
 	config := initOAuthConfig(redirectURL)
 	accessToken, err := config.Exchange(ctx, code)
 	if err != nil {
-		return user, err
+		return user, err, ""
 	}
 	client := config.Client(ctx, accessToken)
 
 	userInfo, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
 	if err != nil {
-		return user, err
+		return user, err, ""
 	}
 	defer userInfo.Body.Close()
 
@@ -63,7 +63,7 @@ func Login(ctx context.Context, code string, redirectURL string) (models.User, e
 	var gu UserGmailInfo
 	err = decoder.Decode(&gu)
 	if err != nil {
-		return user, err
+		return user, err, ""
 	}
 
 	db := repo.New()
@@ -80,9 +80,9 @@ func Login(ctx context.Context, code string, redirectURL string) (models.User, e
 	addAccount(ctx, &user, &gu, accessToken, AccountTypeGmail)
 	addAccount(ctx, &user, &gu, accessToken, AccountTypeDrive)
 
-	user, err = db.UserRepo.Upsert(user)
+	user, err, action := db.UserRepo.Upsert(user)
 
-	return user, err
+	return user, err, action
 }
 
 func Connect(ctx context.Context, userID string, code string, redirectURL string) (models.User, error) {
