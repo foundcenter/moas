@@ -157,7 +157,7 @@ func Search(ctx context.Context, accountInfo models.AccountInfo, query string) (
 
 	for _, m := range messages.Matches {
 		msg := models.SearchResult{
-			AccountID:   "slack",
+			AccountID:   accountInfo.ID,
 			Service:     "slack",
 			Resource:    "message",
 			Title:       m.Username,
@@ -169,7 +169,7 @@ func Search(ctx context.Context, accountInfo models.AccountInfo, query string) (
 
 	for _, f := range files.Matches {
 		file := models.SearchResult{
-			AccountID:   "slack",
+			AccountID:   accountInfo.ID,
 			Service:     "slack",
 			Resource:    "file",
 			Title:       f.Title,
