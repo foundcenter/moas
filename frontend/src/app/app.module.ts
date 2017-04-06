@@ -21,6 +21,8 @@ import { AlertModule, ModalModule, TooltipModule } from 'ng2-bootstrap';
 import { AuthService } from './services/auth.service';
 import { NgSpinKitModule } from 'ng-spin-kit';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ConfirmationPopoverModule } from 'angular-confirmation-popover';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -44,7 +46,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     AlertModule.forRoot(),
     TooltipModule.forRoot(),
     ToastrModule.forRoot(),
-    NgSpinKitModule
+    NgSpinKitModule,
+    ConfirmationPopoverModule.forRoot({
+      confirmButtonType: 'danger' // set defaults here
+    })
   ],
   providers: [
     AuthGuard,

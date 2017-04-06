@@ -8,46 +8,42 @@
 
         <div *ngIf="service.accounts" class="list-group">
           <div *ngFor="let account of service.accounts" href="#" class="list-group-item">
-           <div>
-            <h5 class="list-group-item-heading">{{ account.email }}</h5>
-            <p>
-              AccountId: <small>({{ account.id}})</small>
+            <div>
+              <h5 class="list-group-item-heading">{{ account.email }}</h5>
+              <p>
+                Account ID: <small><b>{{ account.id}}</b></small>
 
-              <span class="label pull-right" [ngClass]="{
+                <span class="label pull-right" [ngClass]="{
             'label-success': account.isOk(),
             'label-danger': account.isExpired()}">{{ account.status }}</span>
-            </p>
-            <p *ngIf="account.service.name=='GitHub' && !github.open">
-              <a (click)="openGithub(account)"
-                 tooltip="With personal access you can search all repos that you have access to. Without it, you can only search your own."
-                 placement="top"
-              >Set personal token</a>
-            </p>
-             <div class="panel panel-default" *ngIf="account.service.name=='GitHub' && github.open">
-               <div class="panel-body">
-                 <form (ngSubmit)="submitPersonal(account.id)" autocomplete="off">
-                   <p class="text-muted">
-                     Create a <a href="https://github.com/settings/tokens/new" target="_blank">personal token</a>
-                      with <strong>repo</strong> top level scope.
-                   </p>
-                   <div class="form-group">
-                     <input class="form-control input-sm" [(ngModel)]="github.token" type="text"
-                            placeholder="Paste personal token"
-                            required
-                            minlength="40"
-                            maxlength="40"
-                            id="githubTokenInput" name="token">
-                   </div>
-                   <div class="form-group">
-                     <button type="submit" class="btn btn-sm btn-primary">Save</button>
-                     <button type="reset" class="btn btn-sm btn-link" (click)="closeGithub()">Cancel</button>
-                   </div>
-                 </form>
-               </div>
-             </div>
-            <p *ngIf="!account.isExpired()">
-              <a (click)="deleteAccount(account, service)" class="text-danger">Delete</a>
-            </p>
+              </p>
+              <p *ngIf="account.service.name=='GitHub' && !github.open">
+                <a (click)="openGithub(account)" tooltip="With personal access you can search all repos that you have access to. Without it, you can only search your own."
+                  placement="top">Set personal token</a>
+              </p>
+              <div class="panel panel-default" *ngIf="account.service.name=='GitHub' && github.open">
+                <div class="panel-body">
+                  <form (ngSubmit)="submitPersonal(account.id)" autocomplete="off">
+                    <p class="text-muted">
+                      Create a <a href="https://github.com/settings/tokens/new" target="_blank">personal token</a> with <strong>repo</strong>                      top level scope.
+                    </p>
+                    <div class="form-group">
+                      <input class="form-control input-sm" [(ngModel)]="github.token" type="text" placeholder="Paste personal token" required minlength="40"
+                        maxlength="40" id="githubTokenInput" name="token">
+                    </div>
+                    <div class="form-group">
+                      <button type="submit" class="btn btn-sm btn-primary">Save</button>
+                      <button type="reset" class="btn btn-sm btn-link" (click)="closeGithub()">Cancel</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+              <p *ngIf="!account.isExpired()">
+                <a class="btn btn-xs btn-danger" mwlConfirmationPopover [title]="'Please confirm'" [message]="'Are you really sure you want delete this account?'"
+                  placement="top" [confirmText]="'Yes'" (confirm)="deleteAccount(account,service)" [cancelText]="'No'" (cancel)="null" [focusButton]="'cancel'">
+                  Delete
+                </a>
+              </p>
             </div>
           </div>
         </div>
@@ -65,7 +61,8 @@
 
 </div>
 
-<div bsModal #childModal="bs-modal" class="modal fade integrate__modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+<div bsModal #childModal="bs-modal" class="modal fade integrate__modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
