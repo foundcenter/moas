@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { IntegrationService } from '../../services/integration.service';
-import { ModalDirective } from 'ng2-bootstrap';
+import { ModalDirective } from 'ngx-bootstrap';
 import { Service } from '../../models/service';
 import { Response } from '@angular/http';
 import { Account } from '../../models/account';
