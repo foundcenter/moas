@@ -90,7 +90,7 @@ export class SearchComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    this.loading=true;
+    this.loading = true;
 
     this.searchService.search(this.query)
       .then((data: Response) => {
@@ -104,8 +104,8 @@ export class SearchComponent implements OnInit, AfterViewInit {
         this.loading=false;
       })
       .catch((error) => {
-        this.toastr.error('An error occurred', 'Search failed');
-        this.loading=false;
+        this.toastr.error('An error occurred.', 'Search failed.');
+        this.loading = false;
       });
   }
 

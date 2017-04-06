@@ -94,10 +94,10 @@ export class IntegrateComponent implements OnInit, OnDestroy {
   deleteAccount(account: Account, service: Service) {
     this.auth.delete(service.name, account.id)
       .then(() => {
-        this.toastr.success(`Successfully delete ${service.name} account ${account.id} !`, 'Account deleted');
+        this.toastr.success(`Successfully deleted ${service.name} account ${account.id}!`, 'Account deleted.');
       })
       .catch(() => {
-        this.toastr.error(`while deleting ${service.name} account ${account.id} !`, 'Error');
+        this.toastr.error(`While deleting ${service.name} account ${account.id}!`, 'Account not deleted.');
       });
   }
 
@@ -113,12 +113,12 @@ export class IntegrateComponent implements OnInit, OnDestroy {
     this.auth.setGithubPersonal(githubUsername, this.github.token)
       .then(() => {
         this.github.open = false;
-        this.github.token = "";
-        this.toastr.success(`Personal token for ${githubUsername} has been saved.`, 'Github updated');
+        this.github.token = '';
+        this.toastr.success(`Personal token for ${githubUsername} has been saved.`, 'Github updated.');
       })
       .catch((error: Response) => {
-        this.toastr.error(`${error.json().error}`, `Personal token error`);
-        this.github.token = "";
+        this.toastr.error(`${error.json().error}`, `Personal token error.`);
+        this.github.token = '';
       });
   }
 
@@ -132,10 +132,10 @@ export class IntegrateComponent implements OnInit, OnDestroy {
       case 'github':
         this.auth.connect(serviceName)
           .then(() => {
-            this.toastr.success(`${serviceName} successfuly connected`, 'Success')
+            this.toastr.success(`${serviceName} account successfully connected.`, 'Account added.')
           })
           .catch(() => {
-            this.toastr.error(`${serviceName} fail to connect`, 'Error')
+            this.toastr.error(`${serviceName} account failed to connect.`, 'Failed to add account.')
           });
         break;
 
@@ -154,12 +154,12 @@ export class IntegrateComponent implements OnInit, OnDestroy {
         this.jira.username = '';
         this.jira.password = '';
         this.jira.url = '';
-        this.toastr.success('Jira successfuly connected', 'Success');
+        this.toastr.success('Jira successfully connected.', 'Account added.');
         this.hideChildModal();
       })
       .catch(error => {
         this.jira.error = error;
-        this.toastr.error('Jira fail to connect', 'Error');
+        this.toastr.error('Jira failed to connect.', 'Failed to add account.');
       });
   }
 }

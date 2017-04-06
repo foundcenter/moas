@@ -16,10 +16,10 @@ export class LogoutComponent implements OnInit {
     this.auth.logout()
       .then(() => {
         this.router.navigateByUrl('login');
-        this.toastr.info('Successfully logout! See you soon', 'Success');
+        this.toastr.info('See you soon!', 'You are now logged out.');
       })
       .catch(() => {
-        this.toastr.error('Something gone wrong with logout!', 'Error');
+        this.toastr.error('Something went wrong with logout.', 'Logout failed.');
       });
   }
 

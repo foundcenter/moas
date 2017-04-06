@@ -22,11 +22,11 @@ export class LoginComponent implements OnInit {
       .then((res: Response) => {
         this.router.navigateByUrl('search');
         if (res.status == 201) {
-          this.toastr.info('Go to Integrate page to connect other services!', 'Integrate more services')
+          this.toastr.success(`Connect other services on Integrate page.`, 'Welcome!');
         }
       })
       .catch(() => {
-        this.toastr.error('Login with Google failed!', 'Error')
+        this.toastr.error('Login has failed or was cancelled.', 'Login failed.');
       });
   }
 
