@@ -113,10 +113,7 @@ func Search(ctx context.Context, accountInfo models.AccountInfo, query string) (
 	}
 
 
-	project, _, err := client.Project.Get(query)
-	if err != nil {
-		return searchResult, err
-	}
+	project, _, _ := client.Project.Get(query)
 
 	if project != nil {
 		s := models.SearchResult{}
