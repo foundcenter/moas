@@ -115,5 +115,11 @@ export class SearchComponent implements OnInit, AfterViewInit {
     this.selected = ALL;
     this.noResults = false;
   }
+
+  fullReset(): void {
+    this.reset();
+    this.query = '';
+    this.focusSearchBar();
+  }
 }
 
