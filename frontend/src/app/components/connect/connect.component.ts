@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { IntegrationService } from '../../services/integration.service';
 import { ModalDirective } from 'ngx-bootstrap';
 import { Service } from '../../models/service';
 import { Response } from '@angular/http';
@@ -8,12 +7,13 @@ import { Account } from '../../models/account';
 import { AuthService } from '../../services/auth.service';
 import { User } from '../../models/user';
 import { Subscription } from 'rxjs';
+import { ConnectService } from '../../services/connect.service';
 
 @Component({
   selector: 'app-connect',
   templateUrl: './connect.component.html',
   styleUrls: ['./connect.component.scss'],
-  providers: [IntegrationService]
+  providers: [ConnectService]
 })
 export class ConnectComponent implements OnInit, OnDestroy {
   @ViewChild('childModal') public childModal: ModalDirective;
@@ -25,7 +25,7 @@ export class ConnectComponent implements OnInit, OnDestroy {
   public githubPersonalToken: string = '';
   private currentUserSubscription: Subscription;
 
-  constructor(private integrationService: IntegrationService, private auth: AuthService, private toastr: ToastrService) { }
+  constructor(private connectService: ConnectService, private auth: AuthService, private toastr: ToastrService) { }
 
   ngOnDestroy(): void {
     this.currentUserSubscription.unsubscribe();
@@ -36,7 +36,7 @@ export class ConnectComponent implements OnInit, OnDestroy {
       if (!user) {
         return;
       }
-      this.services = this.integrationService.getAll();
+      this.services = this.connectService.getAll();
       this.accounts = user.accounts;
       this.rows = this.getRows();
       this.assignAccountsToServices();
@@ -144,7 +144,7 @@ export class ConnectComponent implements OnInit, OnDestroy {
         break;
 
       default:
-        console.log('Integration not handled for ' + serviceName);
+        console.log('Connection not handled for ' + serviceName);
     }
   }
 

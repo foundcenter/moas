@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Service } from '../models/service';
 
 @Injectable()
-export class IntegrationService {
+export class ConnectService {
 
   constructor() { }
 
