@@ -15,8 +15,8 @@
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1"  *ngIf="auth.isLoggedIn()">
       <ul class="nav navbar-nav">
-        <li><a [routerLink]="['/search']" (click)="searchClicked()"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Search</a></li>
-        <li><a [routerLink]="['/connect']"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Connect</a></li>
+        <li [ngClass]="{active: isActive('/search')}"><a [routerLink]="['/search']" (click)="searchClicked()"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Search</a></li>
+        <li [ngClass]="{active: isActive('/connect')}"><a [routerLink]="['/connect']"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Connect</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><a routerLink="/logout">Logout</a></li>
