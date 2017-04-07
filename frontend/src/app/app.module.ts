@@ -22,6 +22,7 @@ import { NgSpinKitModule } from 'ng-spin-kit';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ConfirmationPopoverModule } from 'angular-confirmation-popover';
 import { ConnectComponent } from './components/connect/connect.component';
+import { SearchService } from './services/search.service';
 
 @NgModule({
   declarations: [
@@ -53,7 +54,8 @@ import { ConnectComponent } from './components/connect/connect.component';
   ],
   providers: [
     AuthGuard,
-    AuthService
+    AuthService,
+    SearchService
   ],
   bootstrap: [AppComponent]
 })

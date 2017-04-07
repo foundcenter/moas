@@ -1,19 +1,19 @@
-import { AfterViewInit, Component, EventEmitter, OnInit } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, OnDestroy, OnInit } from '@angular/core';
 import { SearchService } from '../../services/search.service';
 import { Result } from '../../models/result.interface';
 import { Response } from '@angular/http';
 import { AccountError } from '../../models/accountError';
 import { ToastrService } from 'ngx-toastr';
+import { Subscription } from 'rxjs';
 
 const ALL = 'All';
 
 @Component({
   selector: 'app-search',
   templateUrl: './search.component.html',
-  styleUrls: ['./search.component.scss'],
-  providers: [SearchService]
+  styleUrls: ['./search.component.scss']
 })
-export class SearchComponent implements OnInit, AfterViewInit {
+export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   public focusTriggeringEventEmmiter = new EventEmitter<boolean>();
   public results: Result[] = [];
   public resultsServices: string[] = [ALL];
@@ -21,18 +21,28 @@ export class SearchComponent implements OnInit, AfterViewInit {
   public query: string = '';
   public noResults: boolean = false;
   public errors: AccountError[] = [];
-  public loading: boolean =false;
+  public loading: boolean = false;
+  private searchFocusSubscription: Subscription;
 
   constructor(private searchService: SearchService, private toastr: ToastrService) {
   }
 
-  ngOnInit() {
+  ngOnDestroy(): void {
+    this.searchFocusSubscription.unsubscribe();
+  }
 
+  ngOnInit() {
+    this.searchFocusSubscription = this.searchService.searchClicked.subscribe((clicked: boolean) => {
+      if (clicked) {
+        this.focusSearchBar();
+      }
+    })
   }
 
   ngAfterViewInit() {
     this.focusSearchBar();
   }
+
   
   private focusSearchBar(): void{
     this.focusTriggeringEventEmmiter.emit(true);
