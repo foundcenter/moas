@@ -11,6 +11,17 @@
       width: 128px;
       height: 128px;
     }
+    .input-group-addon {
+      padding: 6px 4px;
+      color: #c1c1c1;
+
+      &:first-child {
+        padding-left: 0;
+      }
+      &:last-child {
+        padding-right: 0;
+      }
+    }
   }
 
   &__service--info {

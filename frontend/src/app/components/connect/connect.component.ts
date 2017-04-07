@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { ModalDirective } from 'ngx-bootstrap';
 import { Service } from '../../models/service';
@@ -20,12 +20,15 @@ export class ConnectComponent implements OnInit, OnDestroy {
   public services: Service[] = [];
   public accounts: Account[] = [];
   public rows: Service[][] = [];
-  public jira: { username, password, url, error } = { username: '', password: '', url: '', error: null };
-  public github: { token: string, open: boolean, error: string } = { token: '', open: false, error: '' };
+  public jira: { username: string, password: string, url: string, error: string, custom: boolean };
+  public github: { token: string, open: boolean, error: string };
   public githubPersonalToken: string = '';
   private currentUserSubscription: Subscription;
 
-  constructor(private connectService: ConnectService, private auth: AuthService, private toastr: ToastrService) { }
+  constructor(private connectService: ConnectService, private auth: AuthService, private toastr: ToastrService) {
+    this.github = { token: '', open: false, error: '' };
+    this.jira = { username: '', password: '', url: '', error: null, custom: false };
+  }
 
   ngOnDestroy(): void {
     this.currentUserSubscription.unsubscribe();
@@ -148,8 +151,18 @@ export class ConnectComponent implements OnInit, OnDestroy {
     }
   }
 
+  toggleJiraUrl(): void {
+    this.jira.custom = !this.jira.custom;
+  }
+
+  private getJiraUrl(): string {
+    if (this.jira.custom) {
+      return this.jira.url;
+    }
+    return `https://${this.jira.url}.atlassian.net`;
+  }
   addJira() {
-    this.auth.connectJira(this.jira.url, this.jira.username, this.jira.password)
+    this.auth.connectJira(this.getJiraUrl(), this.jira.username, this.jira.password)
       .then(() => {
         this.jira.username = '';
         this.jira.password = '';
