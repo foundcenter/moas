@@ -5,13 +5,13 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LogoutComponent } from './components/logout/logout.component';
 import { SearchComponent } from './components/search/search.component';
-import { IntegrateComponent } from './components/integrate/integrate.component';
+import { ConnectComponent } from './components/connect/connect.component';
 
 const appRoutes: Routes = [
     { path: 'login', component: LoginComponent },
     { path: 'logout', component: LogoutComponent, canActivate:[AuthGuard]},
     { path: 'search', component: SearchComponent, canActivate:[AuthGuard]},
-    { path: 'integrate', component: IntegrateComponent, canActivate:[AuthGuard]},
+    { path: 'connect', component: ConnectComponent, canActivate:[AuthGuard]},
     { path: '', redirectTo: '/search', pathMatch: 'full' },
     { path: '**', component: PageNotFoundComponent }
 ];

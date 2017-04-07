@@ -22,7 +22,7 @@ export class LoginComponent implements OnInit {
       .then((res: Response) => {
         this.router.navigateByUrl('search');
         if (res.status == 201) {
-          this.toastr.success(`Connect other services on Integrate page.`, 'Welcome!');
+          this.toastr.success(`Connect other services to improve your search.`, 'Welcome!');
         }
       })
       .catch(() => {

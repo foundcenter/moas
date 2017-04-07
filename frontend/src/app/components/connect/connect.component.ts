@@ -10,12 +10,12 @@ import { User } from '../../models/user';
 import { Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-integrate',
-  templateUrl: './integrate.component.html',
-  styleUrls: ['./integrate.component.scss'],
+  selector: 'app-connect',
+  templateUrl: './connect.component.html',
+  styleUrls: ['./connect.component.scss'],
   providers: [IntegrationService]
 })
-export class IntegrateComponent implements OnInit, OnDestroy {
+export class ConnectComponent implements OnInit, OnDestroy {
   @ViewChild('childModal') public childModal: ModalDirective;
   public services: Service[] = [];
   public accounts: Account[] = [];
