@@ -48,6 +48,12 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.focusTriggeringEventEmmiter.emit(true);
   }
 
+  refocus(event: KeyboardEvent): void {
+    if (this.results.length == 0) {
+      this.focusSearchBar();
+    }
+  }
+
   private sortResults(): void{
     if (this.results.length == 0) {
       this.noResults = true;

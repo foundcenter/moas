@@ -12,6 +12,7 @@
                 <!--<label class="control-label" for="inputLarge">Large input</label>-->
                 <input [focus]="focusTriggeringEventEmmiter"
                        (keyup)="onKey($event)"
+                       (blur)="refocus($event)"
                        [(ngModel)]="query"
                        name="query"
                        placeholder="Search..."
