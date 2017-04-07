@@ -90,13 +90,15 @@
                         <label for="urlField" class="control-label">Organization URL <a (click)="toggleJiraUrl()">use custom url</a></label>
                         <div class="input-group">
                             <span class="input-group-addon">https://</span>
-                            <input type="text" [(ngModel)]="jira.url" class="form-control" id="urlField" name="url">
+                            <input type="text" [(ngModel)]="jira.url" class="form-control" id="urlField" name="url"
+                                   [focus]="focusTriggeringEventEmmiter">
                             <span class="input-group-addon">.atlassian.net</span>
                         </div>
                     </div>
                     <div class="form-group" *ngIf="jira.custom" >
                         <label for="urlField" class="control-label">Organization URL <a (click)="toggleJiraUrl()">use default url</a></label>
-                        <input pattern="https?://.+" required [(ngModel)]="jira.url" class="form-control" id="urlField" name="url">
+                        <input pattern="https?://.+" required [(ngModel)]="jira.url" class="form-control" id="urlField" name="url"
+                               [focus]="focusTriggeringEventEmmiter">
                     </div>
                     <div class="form-group">
                         <label for="usernameField" class="control-label">Username</label>

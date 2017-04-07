@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { ModalDirective } from 'ngx-bootstrap';
 import { Service } from '../../models/service';
@@ -17,6 +17,7 @@ import { ConnectService } from '../../services/connect.service';
 })
 export class ConnectComponent implements OnInit, OnDestroy {
   @ViewChild('childModal') public childModal: ModalDirective;
+  public focusTriggeringEventEmmiter = new EventEmitter<boolean>();
   public services: Service[] = [];
   public accounts: Account[] = [];
   public rows: Service[][] = [];
@@ -87,6 +88,9 @@ export class ConnectComponent implements OnInit, OnDestroy {
 
   public showChildModal(): void {
     this.childModal.show();
+    setTimeout(() => {
+      this.focusTriggeringEventEmmiter.emit(true);
+    }, 500);
   }
 
   public hideChildModal(): void {
